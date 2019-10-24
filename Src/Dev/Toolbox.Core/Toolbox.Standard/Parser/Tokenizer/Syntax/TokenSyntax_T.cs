@@ -4,16 +4,19 @@ using System.Text;
 
 namespace Toolbox.Standard
 {
-    public struct TokenSyntax : ITokenSyntax
+    public struct TokenSyntax<T> : ITokenSyntax where T : Enum
     {
-        public TokenSyntax(string token, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
+        public TokenSyntax(string token, T tokenType, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
         {
             Token = token;
+            TokenType = tokenType;
             StringComparison = stringComparison;
             Priority = 3 + Token.Length;
         }
 
         public string Token { get; }
+
+        public T TokenType { get; }
 
         public StringComparison StringComparison { get; }
 
@@ -32,7 +35,7 @@ namespace Toolbox.Standard
         public IToken CreateToken(ReadOnlySpan<char> span)
         {
             string value = span.ToString();
-            return new TokenValue(value);
+            return new TokenValue<T>(value, TokenType);
         }
     }
 }
