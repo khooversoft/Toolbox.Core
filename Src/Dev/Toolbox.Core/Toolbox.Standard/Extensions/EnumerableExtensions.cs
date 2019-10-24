@@ -17,5 +17,19 @@ namespace Toolbox.Standard
         {
             yield return self;
         }
+
+        /// <summary>
+        /// Execute 'action' on each item
+        /// </summary>
+        /// <typeparam name="T">type</typeparam>
+        /// <param name="list">list to operate on</param>
+        /// <param name="action">action to execute</param>
+        public static void ForEach<T>(this IEnumerable<T> list, Action<T> action)
+        {
+            foreach (var item in list)
+            {
+                action(item);
+            }
+        }
     }
 }
