@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -136,7 +139,7 @@ namespace Toolbox.Standard
         /// Build string path
         /// </summary>
         /// <returns>string path</returns>
-        public StringPath Build() => new StringPath(_parts, Delimiter, HasRoot);
+        public PathVector Build() => new PathVector(_parts, Delimiter, HasRoot);
 
         public IEnumerator<string> GetEnumerator() => _parts.GetEnumerator();
 

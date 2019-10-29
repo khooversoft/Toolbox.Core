@@ -2,15 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Toolbox.Standard
 {
-    public interface ITokenSyntax
+    public interface IEventDimensions : IReadOnlyDictionary<string, object>
     {
-        int Priority { get; }
-
-        int? Match(ReadOnlySpan<char> span);
-
-        IToken CreateToken(ReadOnlySpan<char> span);
     }
 }

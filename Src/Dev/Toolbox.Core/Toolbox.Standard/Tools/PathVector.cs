@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +12,7 @@ namespace Toolbox.Standard
     /// <summary>
     /// Immutable string parts or vectors
     /// </summary>
-    public class StringPath : IEnumerable<string>
+    public class PathVector : IEnumerable<string>
     {
         private readonly string[] _parts;
         private readonly Deferred<string> _deferred;
@@ -17,7 +20,7 @@ namespace Toolbox.Standard
         /// <summary>
         /// Default empty
         /// </summary>
-        private StringPath()
+        private PathVector()
             : this(Enumerable.Empty<string>(), "/", true)
         {
         }
@@ -28,7 +31,7 @@ namespace Toolbox.Standard
         /// <param name="parts">parts of path</param>
         /// <param name="delimiter">delimiter</param>
         /// <param name="hasRoot">has root</param>
-        public StringPath(IEnumerable<string> parts, string delimiter, bool hasRoot)
+        public PathVector(IEnumerable<string> parts, string delimiter, bool hasRoot)
         {
             _parts = parts.ToArray();
             Delimiter = delimiter;
@@ -39,7 +42,7 @@ namespace Toolbox.Standard
         /// <summary>
         /// Empty path with root
         /// </summary>
-        public static StringPath Empty { get; } = new StringPath();
+        public static PathVector Empty { get; } = new PathVector();
 
         public string this[int index] => _parts[index];
 
@@ -74,7 +77,7 @@ namespace Toolbox.Standard
         /// </summary>
         /// <param name="parts"></param>
         /// <returns>new immutable string path object</returns>
-        public StringPath With(params string[] parts) => new StringPath(_parts.Concat(parts), Delimiter, HasRoot);
+        public PathVector With(params string[] parts) => new PathVector(_parts.Concat(parts), Delimiter, HasRoot);
 
         public IEnumerator<string> GetEnumerator() => ((IEnumerable<string>)_parts).GetEnumerator();
 
@@ -84,7 +87,7 @@ namespace Toolbox.Standard
         /// Implicit conversion to string
         /// </summary>
         /// <param name="source">source to convert</param>
-        public static implicit operator string(StringPath source) => source.ToString();
+        public static implicit operator string(PathVector source) => source.ToString();
 
         /// <summary>
         /// Parse path
@@ -93,6 +96,6 @@ namespace Toolbox.Standard
         /// <param name="delimiter">delimiter</param>
         /// <param name="hasRoot">has root</param>
         /// <returns></returns>
-        public static StringPath Parse(string path, string delimiter = "/") => new StringPathBuilder(delimiter).Parse(path).Build();
+        public static PathVector Parse(string path, string delimiter = "/") => new StringPathBuilder(delimiter).Parse(path).Build();
     }
 }
