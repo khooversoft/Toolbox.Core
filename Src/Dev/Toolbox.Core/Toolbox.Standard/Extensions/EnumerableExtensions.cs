@@ -31,5 +31,16 @@ namespace Toolbox.Standard
                 action(item);
             }
         }
+
+        /// <summary>
+        /// Convert enumerable to stack
+        /// </summary>
+        /// <typeparam name="T">type</typeparam>
+        /// <param name="self">enumerable</param>
+        /// <returns>hash set</returns>
+        public static Stack<T> ToStack<T>(this IEnumerable<T> self)
+        {
+            return new Stack<T>(self);
+        }
     }
 }
