@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     /// <summary>
     /// Fast deferred execution using lambda

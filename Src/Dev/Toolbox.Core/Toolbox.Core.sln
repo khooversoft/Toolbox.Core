@@ -11,9 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Standard.Test", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventHubPerformanceTest", "..\..\Test\EventHubPerformanceTest\EventHubPerformanceTest.csproj", "{B3D18F3B-C59B-4490-9E9F-9D85D8D71673}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.Core.Extensions.Configuration", "Toolbox.Core.Extensions.Configuration\Toolbox.Core.Extensions.Configuration.csproj", "{9A08829A-6762-490D-8108-DC0B63969511}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Core.Extensions.Configuration", "Toolbox.Core.Extensions.Configuration\Toolbox.Core.Extensions.Configuration.csproj", "{9A08829A-6762-490D-8108-DC0B63969511}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.Core.Extensions.Configuration.Test", "..\..\Test\Toolbox.Core.Extensions.Configuration.Test\Toolbox.Core.Extensions.Configuration.Test.csproj", "{CC7BED2E-53C1-4FC1-BBAC-6458AE6815AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Core.Extensions.Configuration.Test", "..\..\Test\Toolbox.Core.Extensions.Configuration.Test\Toolbox.Core.Extensions.Configuration.Test.csproj", "{CC7BED2E-53C1-4FC1-BBAC-6458AE6815AD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{9CFC2CA8-284D-4042-B6E7-D18D5C110ED8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{288AF5C3-517B-482C-9E1A-E327B65334E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,9 +50,11 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{B4BAD5D6-0B85-4F7F-8B8F-6FB3F181CC59} = {9D09F860-56E2-4388-B177-89DAB3C3010A}
-		{B3D18F3B-C59B-4490-9E9F-9D85D8D71673} = {9D09F860-56E2-4388-B177-89DAB3C3010A}
-		{CC7BED2E-53C1-4FC1-BBAC-6458AE6815AD} = {9D09F860-56E2-4388-B177-89DAB3C3010A}
+		{B4BAD5D6-0B85-4F7F-8B8F-6FB3F181CC59} = {288AF5C3-517B-482C-9E1A-E327B65334E9}
+		{B3D18F3B-C59B-4490-9E9F-9D85D8D71673} = {9CFC2CA8-284D-4042-B6E7-D18D5C110ED8}
+		{CC7BED2E-53C1-4FC1-BBAC-6458AE6815AD} = {288AF5C3-517B-482C-9E1A-E327B65334E9}
+		{9CFC2CA8-284D-4042-B6E7-D18D5C110ED8} = {9D09F860-56E2-4388-B177-89DAB3C3010A}
+		{288AF5C3-517B-482C-9E1A-E327B65334E9} = {9D09F860-56E2-4388-B177-89DAB3C3010A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {35BE6AA3-91F5-44F4-857E-D28D3F05FB51}

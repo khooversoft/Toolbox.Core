@@ -1,4 +1,8 @@
-﻿using FluentAssertions;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using FluentAssertions;
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +22,7 @@ namespace Toolbox.Standard.Test.Tools
         [InlineData("/root/second/third", new string[] { "root", "second", "third" }, true)]
         public void TestPartPatterns(string value, string[] expectedParts, bool hasRoot)
         {
-            PathVector subject = new StringPathBuilder().Parse(value).Build();
+            StringVector subject = new StringPathBuilder().Parse(value).Build();
 
             subject
                 .Zip(expectedParts, (o, i) => (o, i))
@@ -46,7 +50,7 @@ namespace Toolbox.Standard.Test.Tools
         [InlineData("/root/second/third", new string[] { "root", "second", "third" }, false)]
         public void TestPartPatternsFailures(string value, string[] expectedParts, bool hasRoot)
         {
-            PathVector subject = new StringPathBuilder().Parse(value).Build();
+            StringVector subject = new StringPathBuilder().Parse(value).Build();
 
             subject
                 .Zip(expectedParts, (o, i) => (o, i))
@@ -65,7 +69,7 @@ namespace Toolbox.Standard.Test.Tools
         [InlineData(true, new string[] { "first", "second" }, "/first/second")]
         public void TestStringPathBuilder_WhenBuilt_ShouldNotFail(bool hasRoot, string[] parts, string expected)
         {
-            PathVector path = new StringPathBuilder()
+            StringVector path = new StringPathBuilder()
                 .SetHasRoot(hasRoot)
                 .Add(parts)
                 .Build();

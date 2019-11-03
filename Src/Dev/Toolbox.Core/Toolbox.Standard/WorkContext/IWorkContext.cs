@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     /// <summary>
     /// Execution context
@@ -17,7 +17,7 @@ namespace Toolbox.Standard
     public interface IWorkContext
     {
         CorrelationVector Cv { get; }
-        PathVector Tag { get; }
+        StringVector Tag { get; }
         IServiceProvider? Container { get; }
         CancellationToken CancellationToken { get; }
         ITelemetry Telemetry { get; }
@@ -26,7 +26,7 @@ namespace Toolbox.Standard
         IWorkContext WithNewCv();
         IWorkContext WithExtended();
         IWorkContext WithIncrement();
-        IWorkContext WithTag(PathVector tag, [CallerMemberName] string? memberName = null);
+        IWorkContext WithTag(StringVector tag, [CallerMemberName] string? memberName = null);
         IWorkContext WithMethodName([CallerMemberName] string? memberName = null);
         IWorkContext With(ITelemetry eventLog);
         IWorkContext With(IEventDimensions eventDimenensions);

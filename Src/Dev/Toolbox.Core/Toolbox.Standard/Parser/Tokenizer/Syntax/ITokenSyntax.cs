@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     public interface ITokenSyntax
     {

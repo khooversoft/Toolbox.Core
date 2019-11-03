@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     public struct TokenValue<T> : IToken where T : Enum
     {

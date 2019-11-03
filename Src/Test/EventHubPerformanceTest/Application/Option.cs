@@ -1,55 +1,57 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Toolbox.Core.Extensions.Configuration;
-using Toolbox.Standard;
+using Khooversoft.Toolbox.Core.Extensions.Configuration;
+using Khooversoft.Toolbox.Standard;
 
 namespace EventHubPerformanceTest
 {
     public class Option : IOption
     {
         [Option("Display help", ShortCuts = new string[] { "?" })]
-        public bool Help { get; }
+        public bool Help { get; private set; }
 
         [Option("Send events")]
-        public bool Send { get; }
+        public bool Send { get; private set; }
 
         [Option("Receive events")]
-        public bool Receive { get; }
+        public bool Receive { get; private set; }
 
         [Option("Number of events to send")]
-        public int Count { get; } = 1;
+        public int Count { get; private set; } = 1;
 
         [Option("Event Hub")]
-        public EventHub EventHub { get; }
+        public EventHub? EventHub { get; private set; }
 
         [Option("Storage account")]
-        public StorageAccount StorageAccount { get; }
-
-        public CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
+        public StorageAccount? StorageAccount { get; private set; }
 
         public static IOption Build(string[] args)
         {
             IOption option = new ConfigurationBuilder()
-                .AddIncludeFiles(args)
+                .AddIncludeFiles(args, "ConfigFile")
                 .AddCommandLine(args.ConflateKeyValue<Option>())
                 .Build()
                 .BuildOption<Option>();
 
-            Verify.Assert(option != null, $"Option did not build");
-            Verify.Assert(option.Send || option.Receive, "Send and/or Receive must be specified");
-            Verify.Assert(option.EventHub != null, "Event hub details are required");
-            Verify.Assert(option.EventHub.ConnectionString != null, "Event hub connection string is required");
-            Verify.Assert(option.EventHub.Name != null, "Event hub name is required");
+            option.Verify(nameof(option)).IsNotNull();
+            (option.Send || option.Receive).Verify().Assert("Send and/or Receive must be specified");
+            option.EventHub.Verify().IsNotNull("Must specify Event hub details");
+            option.EventHub!.ConnectionString!.Verify().IsNotEmpty("Event hub connection string is required");
+            option.EventHub!.Name!.Verify().IsNotEmpty("Event hub name is required");
+            option.Count.Verify().Assert(x => x >= 0, "Count must be greater then 0, or 0 for no limit");
 
-            if( option.Receive)
+            if (option.Receive)
             {
-                Verify.Assert(option.StorageAccount != null, "Storage account details are required");
-                Verify.Assert(option.StorageAccount.AccountName != null, "Storage account name is required");
-                Verify.Assert(option.StorageAccount.ContainerName != null, "Storage account container name is required");
-                Verify.Assert(option.StorageAccount.AccountKey != null, "Storage account key is required");
+                option.StorageAccount.Verify().IsNotNull("Storage account details are required");
+                option.StorageAccount!.AccountName!.Verify().IsNotNull("Storage account name is required");
+                option.StorageAccount.ContainerName.Verify().IsNotNull("Storage account container name is required");
+                option.StorageAccount.AccountKey.Verify().IsNotNull("Storage account key is required");
             }
 
             return option;

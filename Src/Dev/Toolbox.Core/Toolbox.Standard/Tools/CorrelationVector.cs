@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     /// <summary>
     /// Immutable correlation tag value.  Can be extended or incremented.
@@ -51,7 +51,7 @@ namespace Toolbox.Standard
         public CorrelationVector(string correlationTag)
             : this()
         {
-            Verify.IsNotEmpty(nameof(correlationTag), correlationTag);
+            correlationTag.Verify(nameof(correlationTag)).IsNotEmpty();
 
             string[] parts = correlationTag.Split(_splitSearch, StringSplitOptions.RemoveEmptyEntries);
 
@@ -68,7 +68,7 @@ namespace Toolbox.Standard
         private CorrelationVector(string correlationTag, int extensionValue)
             : this()
         {
-            Verify.IsNotEmpty(nameof(correlationTag), correlationTag);
+            correlationTag.Verify(nameof(correlationTag)).IsNotEmpty();
 
             BaseCv = correlationTag;
             ExtensionValue = extensionValue;

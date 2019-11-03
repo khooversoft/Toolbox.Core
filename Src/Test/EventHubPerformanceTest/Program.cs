@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -33,37 +37,45 @@ namespace EventHubPerformanceTest
             return _error;
         }
 
-        private static void DisplayStartDetails(string[] args)
-        {
-            Console.WriteLine($"Arguments: {string.Join(", ", args)}");
-        }
+        private static void DisplayStartDetails(string[] args) => Console.WriteLine($"Arguments: {string.Join(", ", args)}");
 
         private async Task<int> Run(string[] args)
         {
             Console.WriteLine(_programTitle);
             Console.WriteLine();
 
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
             IOption option = Option.Build(args);
+
+            IWorkContext context = new WorkContextBuilder()
+                .Set(cancellationTokenSource.Token)
+                .Build();
 
             if (option.Help)
             {
                 return _ok;
             }
 
-            var tasks = new Func<Task>[]
+            var actions = new IAction?[]
             {
-                option.Send ? () => new SendEvents(option).Run() : (Func<Task>)null,
-                option.Receive ? () => new ReceiveEvents(option).Run() : (Func<Task>)null,
+                option.Send ? new SendEvents(option) : null,
+                option.Receive ? new ReceiveEvents(option) : null,
             };
 
             var runningTasks = new List<Task>();
 
-            foreach(var item in tasks.Where(x => x != null))
+            foreach(var item in actions.Where(x => x != null))
             {
-                runningTasks.Add(Task.Run(item));
+                runningTasks.Add(item!.Run(context));
             }
 
-            Console.CancelKeyPress += delegate { option.CancellationTokenSource.Cancel(); };
+            Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e) {
+                e.Cancel = true;
+                cancellationTokenSource.Cancel();
+            };
+
+            Console.CancelKeyPress += delegate { cancellationTokenSource.Cancel(); };
 
             Console.WriteLine("Hit Ctrl C to quite");
             Console.WriteLine();

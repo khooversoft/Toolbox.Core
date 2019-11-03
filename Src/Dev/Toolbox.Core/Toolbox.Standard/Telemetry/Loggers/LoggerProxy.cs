@@ -5,7 +5,7 @@
 //using System.Collections.Generic;
 //using System.Text;
 
-//namespace Toolbox.Standard
+//namespace Khooversoft.Toolbox.Standard
 //{
 //    /// <summary>
 //    /// Internal proxy logger, used by event source to send telemetry

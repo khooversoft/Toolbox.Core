@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     /// <summary>
     /// Work context builder, used this class to create new instances of immutable work context
@@ -21,7 +21,7 @@ namespace Toolbox.Standard
         public WorkContextBuilder()
         {
             Cv = new CorrelationVector();
-            Tag = PathVector.Empty;
+            Tag = StringVector.Empty;
             EventLog = new TelemetryLogNull();
             Dimensions = new EventDimensions();
         }
@@ -32,7 +32,7 @@ namespace Toolbox.Standard
         /// <param name="context"></param>
         public WorkContextBuilder(IWorkContext context)
         {
-            Verify.IsNotNull(nameof(context), context);
+            context.Verify().IsNotNull();
 
             Cv = context.Cv;
             Tag = context.Tag;
@@ -44,7 +44,7 @@ namespace Toolbox.Standard
 
         public CorrelationVector Cv { get; set; }
 
-        public PathVector Tag { get; set; }
+        public StringVector Tag { get; set; }
 
         public IServiceProvider? Container { get; set; }
 
@@ -59,9 +59,9 @@ namespace Toolbox.Standard
         /// </summary>
         /// <param name="tag">code tag</param>
         /// <returns>this</returns>
-        public WorkContextBuilder Set(PathVector tag)
+        public WorkContextBuilder Set(StringVector tag)
         {
-            tag.Verify(nameof(tag)).IsNotNull();
+            tag.Verify().IsNotNull();
 
             Tag = Tag.With(tag);
             return this;
@@ -74,7 +74,7 @@ namespace Toolbox.Standard
         /// <returns>this</returns>
         public WorkContextBuilder Set(CorrelationVector cv)
         {
-            cv.Verify(nameof(cv)).IsNotNull();
+            cv.Verify().IsNotNull();
 
             Cv = cv;
             return this;
@@ -87,7 +87,7 @@ namespace Toolbox.Standard
         /// <returns>this</returns>
         public WorkContextBuilder Set(ITelemetry eventLog)
         {
-            eventLog.Verify(nameof(eventLog)).IsNotNull();
+            eventLog.Verify().IsNotNull();
 
             EventLog = eventLog;
             return this;
@@ -100,7 +100,7 @@ namespace Toolbox.Standard
         /// <returns>this</returns>
         public WorkContextBuilder Set(IEventDimensions eventDimension)
         {
-            eventDimension.Verify(nameof(eventDimension)).IsNotNull();
+            eventDimension.Verify().IsNotNull();
 
             Dimensions = new EventDimensions(eventDimension);
             return this;
@@ -113,7 +113,7 @@ namespace Toolbox.Standard
         /// <returns>this</returns>
         public WorkContextBuilder Set(IServiceProvider container)
         {
-            container.Verify(nameof(container)).IsNotNull();
+            container.Verify().IsNotNull();
 
             Container = container;
             return this;

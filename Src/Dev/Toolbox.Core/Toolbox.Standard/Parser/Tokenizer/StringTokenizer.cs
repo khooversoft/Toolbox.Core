@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     public class StringTokenizer
     {

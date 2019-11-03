@@ -1,4 +1,8 @@
-﻿using FluentAssertions;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using FluentAssertions;
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -23,9 +27,9 @@ namespace Toolbox.Standard.Test.Tools
         [Fact]
         public void GivenVerifyOnNullString_WhenBinded_ShouldReturnVerifyContext()
         {
-            string root = null;
+            string? root = null;
 
-            VerifyContext<string> context = root.Verify(nameof(root));
+            VerifyContext<string?> context = root.Verify(nameof(root));
 
             context.Should().NotBeNull();
             context.Name.Should().Be(nameof(root));
@@ -73,19 +77,48 @@ namespace Toolbox.Standard.Test.Tools
         {
             string root = "   ";
 
-            const string msg = "length root must be greater then 5";
-            Action act = () => root.Verify(nameof(root)).IsNotEmpty().Assert(x => x.Length > 5, msg);
+            Action act = () => root.Verify(nameof(root)).IsNotEmpty().Assert(x => x.Length > 5, "length root must be greater then 5");
 
             act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
+        public void GivenVerifyOnInt_WhenValueIsValid_ShouldNotThrow()
+        {
+            int value = 10;
+
+            Action act = () => value.Verify().Assert(x => x > 5, "message");
+
+            act.Should().NotThrow<ArgumentException>();
+        }
+
+        [Fact]
+        public void GivenVerifyOnInt_WhenValueIsNotValid_ShouldThrow()
+        {
+            int value = 10;
+
+            Action act = () => value.Verify().Assert(x => x > 10, "message");
+
+            act.Should().Throw<ArgumentException>();
+        }
+
+        [Fact]
+        public void GivenVerifyOnInt_WhenValueIsNotValid_ShouldThrowCustom()
+        {
+            int value = 10;
+
+            Action act = () => value.Verify().Assert<int, FormatException>(x => x > 10, "message");
+
+            act.Should().Throw<FormatException>();
+        }
+
+        [Fact]
         public void GivenVerifyOnString_WhenNull_ShouldThrow()
         {
-            string root = null;
+            string? root = null;
 
             const string msg = "length root must be greater then 5";
-            Action act = () => root.Verify(nameof(root)).IsNotEmpty().Assert(x => x.Length > 5, msg);
+            Action act = () => root!.Verify(nameof(root)).IsNotEmpty().Assert(x => x.Length > 5, msg);
 
             act.Should().Throw<ArgumentException>();
         }
@@ -110,6 +143,39 @@ namespace Toolbox.Standard.Test.Tools
             Action act = () => root.Verify(nameof(root)).Assert(x => !x.IsEmpty() && x.Length > 5, msg);
 
             act.Should().Throw<ArgumentException>();
+        }
+
+        [Fact]
+        public void GivenVerifyIsNotNull_WhenNull_ShouldThrow()
+        {
+            string? root = null;
+
+            Action act = () => root!.Verify(nameof(root)).IsNotEmpty();
+
+            act.Should()
+                .Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void GivenVerifyIsEmpty_WhenEmpty_ShouldThrow()
+        {
+            string? root = "";
+
+            Action act = () => root.Verify(nameof(root)).IsNotEmpty();
+
+            act.Should()
+                .Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void GivenVerifyIsEmpty_WhenNotEmpty_ShouldNotThrow()
+        {
+            string? root = "data";
+
+            Action act = () => root.Verify(nameof(root)).IsNotEmpty();
+
+            act.Should()
+                .NotThrow();
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     /// <summary>
     /// Immutable execution context
@@ -22,7 +22,7 @@ namespace Toolbox.Standard
         public WorkContext()
         {
             Cv = new CorrelationVector();
-            Tag = PathVector.Empty;
+            Tag = StringVector.Empty;
             Telemetry = new TelemetryLogNull();
             Dimensions = EventDimensions.Empty;
         }
@@ -53,15 +53,15 @@ namespace Toolbox.Standard
         /// <param name="dimensions"></param>
         public WorkContext(
             CorrelationVector cv,
-            PathVector tag,
+            StringVector tag,
             IServiceProvider? container,
             CancellationToken? cancellationToken = null,
             ITelemetry? eventLog = null,
             IEventDimensions? dimensions = null
             )
         {
-            cv.Verify(nameof(cv)).IsNotNull();
-            cv.Verify(nameof(tag)).IsNotNull();
+            cv.Verify().IsNotNull();
+            cv.Verify().IsNotNull();
 
             Cv = cv;
             Tag = tag;
@@ -78,7 +78,7 @@ namespace Toolbox.Standard
 
         public CorrelationVector Cv { get; private set; }
 
-        public PathVector Tag { get; private set; }
+        public StringVector Tag { get; private set; }
 
         public IServiceProvider? Container { get; }
 
@@ -186,9 +186,9 @@ namespace Toolbox.Standard
         /// <param name="tag">code tag</param>
         /// <param name="memberName">method name (compiler will fill in)</param>
         /// <returns>new work context</returns>
-        public IWorkContext WithTag(PathVector tag, [CallerMemberName] string? memberName = null)
+        public IWorkContext WithTag(StringVector tag, [CallerMemberName] string? memberName = null)
         {
-            Verify.IsNotNull(nameof(tag), tag);
+            tag.Verify(nameof(tag)).IsNotNull();
 
             return new WorkContext(this)
             {

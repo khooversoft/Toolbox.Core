@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     public static class ObjectExtensions
     {

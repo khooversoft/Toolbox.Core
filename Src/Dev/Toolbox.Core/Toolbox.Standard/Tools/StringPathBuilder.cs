@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     /// <summary>
     /// Path builder
@@ -139,7 +139,7 @@ namespace Toolbox.Standard
         /// Build string path
         /// </summary>
         /// <returns>string path</returns>
-        public PathVector Build() => new PathVector(_parts, Delimiter, HasRoot);
+        public StringVector Build() => new StringVector(_parts, Delimiter, HasRoot);
 
         public IEnumerator<string> GetEnumerator() => _parts.GetEnumerator();
 

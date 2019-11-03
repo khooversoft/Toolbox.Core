@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Text;
 
-namespace Toolbox.Standard
+namespace Khooversoft.Toolbox.Standard
 {
     public class TelemetryLogNull : ITelemetry
     {
