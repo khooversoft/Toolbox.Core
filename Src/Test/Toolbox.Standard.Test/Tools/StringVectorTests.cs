@@ -48,9 +48,9 @@ namespace Toolbox.Standard.Test.Tools
         }
 
         [Theory]
-        [InlineData(null, null)]
-        [InlineData("", "")]
-        public void GetAbsoultePathTest_RaiseException(string value, string expectedResult)
+        [InlineData(null)]
+        [InlineData("")]
+        public void GetAbsoultePathTest_RaiseException(string value)
         {
             Action act = () => value.GetAbsolutlePath();
             act.Should().Throw<ArgumentException>();

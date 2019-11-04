@@ -29,11 +29,11 @@ namespace Khooversoft.Toolbox.Standard
 
         public int Count { get; }
 
-        public float Tps => Value == 0 || Span.TotalSeconds == 0 ? Value / (float)Span.TotalSeconds : 0;
+        public float Tps => Count == 0 || Span.TotalSeconds == 0 ? 0 : Count / (float)Span.TotalSeconds;
 
         public override string ToString()
         {
-            return $"Recorded:{Recorded.ToString("u")}, Span:{Span}, Value: {Value}, Count: {Count}";
+            return $"Recorded:{Recorded.ToString("MM/dd/yyyyTHH:mm:ss.FFFF")}, Span:{Span}, Value: {Value}, Count: {Count}, Tps:{Tps}";
         }
     }
 
@@ -109,7 +109,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public IReadOnlyList<MetricSample> GetMetrics(bool clear = false)
         {
-            lock(_lock)
+            lock (_lock)
             {
                 var list = _events.ToList();
                 if (clear) _events.Clear();
@@ -124,11 +124,11 @@ namespace Khooversoft.Toolbox.Standard
 
             try
             {
+                _workProbe.Reset();
                 _workProbe = Interlocked.Exchange(ref _currentProbe, _workProbe);
 
-                _lastSample = DateTimeOffset.Now;
                 _actionBlock.Post(new MetricSample(_workProbe.Value, DateTimeOffset.Now - _workProbe.StartDate, _workProbe.Count));
-                _workProbe.Reset();
+                _lastSample = DateTimeOffset.Now;
             }
             finally
             {
@@ -170,9 +170,12 @@ namespace Khooversoft.Toolbox.Standard
 
             public void Reset()
             {
-                StartDate = DateTimeOffset.Now;
-                Value = 0;
-                Count = 0;
+                lock (_lock)
+                {
+                    StartDate = DateTimeOffset.Now;
+                    Value = 0;
+                    Count = 0;
+                }
             }
 
             public TimeSpan GetSpan() => DateTimeOffset.Now - StartDate;

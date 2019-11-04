@@ -6,6 +6,7 @@ using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace EventHubPerformanceTest
     {
         private readonly IOption _option;
         private readonly MetricSampler _sampler = new MetricSampler(TimeSpan.FromSeconds(1));
+        private static int _messageCount;
 
         public ReceiveEvents(IOption option)
         {
@@ -25,6 +27,9 @@ namespace EventHubPerformanceTest
 
         public async Task Run(IWorkContext context)
         {
+            Console.WriteLine("Receiving events...");
+            _messageCount = 0;
+
             var eventProcessorHost = new EventProcessorHost(
                 eventHubPath: _option.EventHub!.Name,
                 consumerGroupName: PartitionReceiver.DefaultConsumerGroupName,
@@ -38,7 +43,10 @@ namespace EventHubPerformanceTest
                 using Timer timer = new Timer(x => MetricsOutput(context), null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
 
                 // Registers the Event Processor Host and starts receiving messages
-                await eventProcessorHost.RegisterEventProcessorFactoryAsync(this);
+                EventProcessorOptions eventOption = EventProcessorOptions.DefaultOptions;
+                eventOption.ReceiveTimeout = TimeSpan.FromSeconds(5);
+
+                await eventProcessorHost.RegisterEventProcessorFactoryAsync(this, eventOption);
 
                 while (!context.CancellationToken.IsCancellationRequested)
                 {
@@ -47,30 +55,33 @@ namespace EventHubPerformanceTest
             }
             finally
             {
+                Console.WriteLine("Unregister event processing...");
+
                 // Disposes of the Event Processor Host
                 await eventProcessorHost.UnregisterEventProcessorAsync();
                 _sampler.Stop();
 
                 MetricsOutput(context);
             }
+
+            MetricsOutput(context);
+            Console.WriteLine($"Received {_messageCount} messages");
         }
 
         private void MetricsOutput(IWorkContext context)
         {
             IReadOnlyList<MetricSample> samples = _sampler.GetMetrics(true);
 
-            if( samples.Count == 0)
+            if (samples.Count == 0)
             {
-                Console.WriteLine("Empty metrics");
+                Console.WriteLine("Receive - empty metrics");
                 return;
             }
 
-            foreach (var item in samples)
-            {
-                Console.WriteLine(item.ToString());
-            }
+            double total = samples.Sum(x => x.Count);
+            TimeSpan span = TimeSpan.FromSeconds(samples.Sum(x => x.Span.TotalSeconds));
 
-            Console.WriteLine();
+            Console.WriteLine($"Receive: Total: {total}, Span: {span}, TPS:{total / span.TotalSeconds}");
         }
 
         public IEventProcessor CreateEventProcessor(PartitionContext context)
@@ -114,6 +125,7 @@ namespace EventHubPerformanceTest
                 {
                     var data = Encoding.UTF8.GetString(eventData.Body.Array!, eventData.Body.Offset, eventData.Body.Count);
                     _sampler.Add(1);
+                    _messageCount++;
                     //Console.WriteLine($"Message received. Partition: '{context.PartitionId}', Data: '{data}'");
                 }
 

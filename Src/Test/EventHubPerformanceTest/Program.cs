@@ -73,9 +73,9 @@ namespace EventHubPerformanceTest
             Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e) {
                 e.Cancel = true;
                 cancellationTokenSource.Cancel();
-            };
 
-            Console.CancelKeyPress += delegate { cancellationTokenSource.Cancel(); };
+                Console.WriteLine("Canceling...");
+            };
 
             Console.WriteLine("Hit Ctrl C to quite");
             Console.WriteLine();

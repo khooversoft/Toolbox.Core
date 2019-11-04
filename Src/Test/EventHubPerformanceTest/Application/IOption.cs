@@ -13,6 +13,8 @@ namespace EventHubPerformanceTest
 
         int Count { get; }
 
+        int TaskCount { get; }
+
         EventHub? EventHub { get; }
 
         StorageAccount? StorageAccount { get; }

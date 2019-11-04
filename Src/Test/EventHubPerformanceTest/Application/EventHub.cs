@@ -15,5 +15,8 @@ namespace EventHubPerformanceTest
 
         [Option("Event hub name")]
         public string? Name { get; set; }
+
+        [Option("Namespaces to use")]
+        public string[]? Namespaces { get; set; }
     }
 }

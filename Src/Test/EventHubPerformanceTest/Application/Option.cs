@@ -25,6 +25,9 @@ namespace EventHubPerformanceTest
         [Option("Number of events to send")]
         public int Count { get; private set; } = 1;
 
+        [Option("Number tasks to use in sending")]
+        public int TaskCount { get; private set; } = 5;
+
         [Option("Event Hub")]
         public EventHub? EventHub { get; private set; }
 
