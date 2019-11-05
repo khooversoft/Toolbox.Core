@@ -8,14 +8,14 @@ using Xunit;
 
 namespace Toolbox.Standard.Test.Tools
 {
-    public class QueueSizePolicyTest
+    public class RingQueueTests
     {
         [Fact]
-        public void GivenQueuePolicy_WhenLessThenMaxAdded_NoDataLoss()
+        public void GivenRingBuffer_WhenLessThenMaxAdded_NoDataLoss()
         {
             const int max = 10;
             const int count = 5;
-            IQueueSizePolicy<int> queue = new Queue<int>().SetFixSizePolicy(max);
+            var queue = new RingQueue<int>(max);
 
             Enumerable.Range(0, count).ForEach(x => queue.Enqueue(x));
 
@@ -32,7 +32,7 @@ namespace Toolbox.Standard.Test.Tools
         public void GivenQueuePolicy_WhenEqualMaxAdded_ShouldNoDataLoss()
         {
             const int max = 10;
-            IQueueSizePolicy<int> queue = new Queue<int>().SetFixSizePolicy(max);
+            var queue = new RingQueue<int>(max);
 
             Enumerable.Range(0, max).ForEach(x => queue.Enqueue(x));
 
@@ -50,7 +50,7 @@ namespace Toolbox.Standard.Test.Tools
         {
             const int max = 10;
             const int count = 11;
-            IQueueSizePolicy<int> queue = new Queue<int>().SetFixSizePolicy(max);
+            var queue = new RingQueue<int>(max);
 
             Enumerable.Range(0, count).ForEach(x => queue.Enqueue(x));
 

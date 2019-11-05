@@ -39,7 +39,7 @@ namespace Khooversoft.Toolbox.Standard
 
     public class MetricSampler
     {
-        private readonly IQueueSizePolicy<MetricSample> _events = new Queue<MetricSample>().SetFixSizePolicy(100);
+        private readonly RingQueue<MetricSample> _events = new RingQueue<MetricSample>(100);
         private readonly TimeSpan _sampleRate;
         private readonly ActionBlock<MetricSample> _actionBlock;
 
