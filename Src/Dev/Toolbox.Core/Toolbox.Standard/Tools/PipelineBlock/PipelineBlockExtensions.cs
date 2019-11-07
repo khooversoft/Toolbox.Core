@@ -7,25 +7,30 @@ namespace Khooversoft.Toolbox.Standard
 {
     public static class PipelineBlockExtensions
     {
-        public static IPipelineBlock<T> RouteTo<T>(this IPipelineBlock<T> block, Action<T> action, Predicate<T>? predicate = null)
+        public static IPipelineBlock<T> DoAction<T>(this IPipelineBlock<T> block, Action<T> action, Predicate<T>? predicate = null)
         {
-            block.Count.Verify().Assert(x => x > 0, "No block sources registered");
-
             var actionBlock = new ActionBlock<T>(action);
-            block.Add(actionBlock);
-            block.Current.LinkToWithPredicate(actionBlock, predicate);
 
+            if (block.Count > 0)
+            {
+                block.Current.LinkToWithPredicate(actionBlock, predicate);
+            }
+
+            block.Add(actionBlock);
             return block;
         }
 
-        public static IPipelineBlock<T> RouteTo<T>(this IPipelineBlock<T> block, Action<T> action, out IDisposable disposable, Predicate<T>? predicate = null)
+        public static IPipelineBlock<T> DoAction<T>(this IPipelineBlock<T> block, Action<T> action, out IDisposable? disposable, Predicate<T>? predicate = null)
         {
-            block.Count.Verify().Assert(x => x > 0, "No block sources registered");
-
             var actionBlock = new ActionBlock<T>(action);
-            block.Add(actionBlock);
-            disposable = block.Current.LinkToWithPredicate(actionBlock, predicate);
 
+            disposable = default;
+            if (block.Count > 0)
+            {
+                disposable = block.Current.LinkToWithPredicate(actionBlock, predicate);
+            }
+
+            block.Add(actionBlock);
             return block;
         }
 
@@ -52,6 +57,12 @@ namespace Khooversoft.Toolbox.Standard
             }
 
             block.Add(broadcastBlock);
+            return block;
+        }
+
+        public static IPipelineBlock<T> Register<T>(this IPipelineBlock<T> block, IPipelineBlock<T> blockToRegister)
+        {
+            block.Add(blockToRegister);
             return block;
         }
 

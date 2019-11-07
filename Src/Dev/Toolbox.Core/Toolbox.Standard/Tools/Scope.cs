@@ -11,7 +11,7 @@ namespace Khooversoft.Toolbox.Standard
     /// <typeparam name="T">value type</typeparam>
     public sealed class Scope<T> : IDisposable
     {
-        private Action<T> _action;
+        private Action<T>? _action;
 
         public Scope(T value, Action<T> disposeAction)
         {
@@ -25,7 +25,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public void Dispose()
         {
-            Action<T> action = Interlocked.Exchange(ref _action, null);
+            Action<T>? action = Interlocked.Exchange(ref _action, null);
             action?.Invoke(Value);
         }
     }

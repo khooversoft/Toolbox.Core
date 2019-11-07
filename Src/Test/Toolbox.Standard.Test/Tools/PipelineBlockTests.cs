@@ -39,7 +39,7 @@ namespace Toolbox.Standard.Test.Tools
         }
 
         [Fact]
-        public void GivenBroadcastBlock_WhenAsyncSendMessage_ShouldReceiveMessage()
+        public void GivenPipelineBlock_WhenAsyncSendMessage_ShouldReceiveMessage()
         {
             const int max = 10;
             int count = 0;
@@ -47,8 +47,8 @@ namespace Toolbox.Standard.Test.Tools
 
             var pipeline = new PipelineBlock<string>()
                 .Broadcast()
-                .RouteTo(x => count++)
-                .RouteTo(x => list.Add(x));
+                .DoAction(x => count++)
+                .DoAction(x => list.Add(x));
 
             Enumerable.Range(0, max)
                 .ForEach(async x => await pipeline.SendAsync($"{x} message"));
@@ -61,7 +61,7 @@ namespace Toolbox.Standard.Test.Tools
         }
 
         [Fact]
-        public void GivenBroadcastBlock_WhenPostMessage_ShouldReceiveMessage()
+        public void GivenPipelineBlock_WhenPostMessage_ShouldReceiveMessage()
         {
             const int max = 10;
             int count = 0;
@@ -69,8 +69,8 @@ namespace Toolbox.Standard.Test.Tools
 
             var pipeline = new PipelineBlock<string>()
                 .Broadcast()
-                .RouteTo(x => count++)
-                .RouteTo(x => list.Add(x));
+                .DoAction(x => count++)
+                .DoAction(x => list.Add(x));
 
             Enumerable.Range(0, max)
                 .ForEach(x => pipeline.Post($"{x} message"));
@@ -83,7 +83,7 @@ namespace Toolbox.Standard.Test.Tools
         }
 
         [Fact]
-        public void GivenBroadcastBlock_WhenSendMessage_ShouldReceiveMessage()
+        public void GivenPipelineBlock_WhenSendMessage_ShouldReceiveMessage()
         {
             const int max = 100;
             var list = new List<int>();
@@ -91,8 +91,8 @@ namespace Toolbox.Standard.Test.Tools
 
             var jobs = new PipelineBlock<int>()
                 .Broadcast()
-                .RouteTo(x => list.Add(x))
-                .RouteTo(x => list2.Add(x + 1000));
+                .DoAction(x => list.Add(x))
+                .DoAction(x => list2.Add(x + 1000));
 
             Enumerable.Range(0, max)
                 .ForEach(x => jobs.Post(x).Verify().Assert(x => x == true, "Failed to post"));
@@ -115,17 +115,18 @@ namespace Toolbox.Standard.Test.Tools
         }
 
         [Fact]
-        public void GivenBuffer_ApplyTransform_ShouldPass()
+        public void GivenPipelineBlock_ApplyTransform_ShouldPass()
         {
-            const int max = 100;
+            const int max = 1000;
+            const int offset = 10000;
             var list = new List<int>();
             var list2 = new List<int>();
 
             var jobs = new PipelineBlock<int>()
                 .Select(x => x + 5)
                 .Broadcast()
-                .RouteTo(x => list.Add(x))
-                .RouteTo(x => list2.Add(x + 1000));
+                .DoAction(x => list.Add(x))
+                .DoAction(x => list2.Add(x + offset));
 
             Enumerable.Range(0, max)
                 .ForEach(async x => await jobs.SendAsync(x));
@@ -136,15 +137,69 @@ namespace Toolbox.Standard.Test.Tools
             list.Count.Should().Be(max);
             list2.Count.Should().Be(max);
 
-            var x1 = list
+            list
                 .Select((x, i) => new { x, i })
             .All(x => x.x == x.i + 5)
             .Should().BeTrue();
 
-            var x = list2
+            list2
                 .Select((x, i) => new { i, x })
-            .All(x => x.i + 1000 + 5 == x.x)
+            .All(x => x.i + offset + 5 == x.x)
             .Should().BeTrue();
+        }
+
+        [Fact]
+        public void GivenBuffer_ApplyTransformAndTwoSubpiplines_ShouldPass()
+        {
+            const int max = 1000;
+            const int offset = 10000;
+            var list = new List<int>();
+            var list2 = new List<int>();
+
+            var s1 = new List<int>();
+            var s1Pipeline = new PipelineBlock<int>().DoAction(x => s1.Add(x));
+
+            var s2 = new List<int>();
+            var s2Pipeline = new PipelineBlock<int>().DoAction(x => s2.Add(x));
+
+            var jobs = new PipelineBlock<int>()
+                .Register(s1Pipeline)
+                .Register(s2Pipeline)
+                .Select(x => x + 5)
+                .Broadcast()
+                .DoAction(x => list.Add(x))
+                .DoAction(x => list2.Add(x + offset))
+                .DoAction(x => s1Pipeline.Post(x))
+                .DoAction(x => s2Pipeline.Post(x));
+
+            Enumerable.Range(0, max)
+                .ForEach(async x => await jobs.SendAsync(x));
+
+            jobs.Complete();
+            jobs.Completion.Wait();
+
+            list.Count.Should().Be(max);
+            list2.Count.Should().Be(max);
+
+            list
+                .Select((x, i) => new { x, i })
+                .All(x => x.x == x.i + 5)
+                .Should().BeTrue();
+
+            list2
+                .Select((x, i) => new { i, x })
+                .All(x => x.i + offset + 5 == x.x)
+                .Should().BeTrue();
+
+            s1
+                .Select((x, i) => new { x, i })
+                .All(x => x.x == x.i + 5)
+                .Should().BeTrue();
+
+            s2
+                .Select((x, i) => new { x, i })
+                .All(x => x.x == x.i + 5)
+                .Should().BeTrue();
         }
     }
 }

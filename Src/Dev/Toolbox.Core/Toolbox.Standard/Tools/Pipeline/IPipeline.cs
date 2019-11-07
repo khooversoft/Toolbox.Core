@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
-    public interface ITelemetryService : ITelemetryLogger
+    public interface IPipeline<TContext, T>
     {
-        ITelemetry CreateLogger(string eventSourceName);
+        bool Post(TContext context, T message);
     }
 }

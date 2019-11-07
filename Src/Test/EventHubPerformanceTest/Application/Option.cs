@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using Khooversoft.Toolbox.Core.Extensions.Configuration;
 using Khooversoft.Toolbox.Standard;
+using System.IO;
 
 namespace EventHubPerformanceTest
 {
@@ -27,6 +28,12 @@ namespace EventHubPerformanceTest
 
         [Option("Number tasks to use in sending")]
         public int TaskCount { get; private set; } = 5;
+
+        [Option("Logging folder path where all log files are written to.", "  Default is temp folder + program name.")]
+        public string LoggingFolder { get; private set; } = Path.Combine(Path.GetTempPath(), $"{nameof(EventHubPerformanceTest)}_{Guid.NewGuid()}");
+
+        [Option("Set the trace level for console. [Critical, Error, Warning, Informational, or Verbose]")]
+        public TelemetryType ConsoleLevel { get; private set; } = TelemetryType.Informational;
 
         [Option("Event Hub")]
         public EventHub? EventHub { get; private set; }

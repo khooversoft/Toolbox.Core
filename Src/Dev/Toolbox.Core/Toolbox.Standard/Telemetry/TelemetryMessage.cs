@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Khooversoft.Toolbox.Standard
 {
     public class TelemetryMessage
     {
-        public TelemetryMessage(IWorkContext context, TelemetryType telemetryType, string eventSourceName, string eventName, string message, Exception exception, IEventDimensions eventDimensions)
+        public TelemetryMessage(IWorkContext context, TelemetryType telemetryType, string eventSourceName, string eventName, string? message, Exception? exception = null, IEventDimensions? eventDimensions = null)
         {
             context = context ?? throw new ArgumentNullException(nameof(context));
 
@@ -15,11 +16,11 @@ namespace Khooversoft.Toolbox.Standard
             EventSourceName = eventSourceName;
             EventName = eventName;
             Message = message;
-            EventDimensions = (EventDimensions)eventDimensions + context.Dimensions;
+            EventDimensions = new EventDimensions(eventDimensions?.Select(x => x) ?? Standard.EventDimensions.Empty) + context.Dimensions;
             Exception = exception;
         }
 
-        public TelemetryMessage(IWorkContext context, TelemetryType telemetryType, string eventSourceName, string eventName, string message, double value, IEventDimensions eventDimensions)
+        public TelemetryMessage(IWorkContext context, TelemetryType telemetryType, string eventSourceName, string eventName, string? message, double value, IEventDimensions? eventDimensions = null)
         {
             context = context ?? throw new ArgumentNullException(nameof(context));
 
@@ -29,7 +30,7 @@ namespace Khooversoft.Toolbox.Standard
             EventName = eventName;
             Message = message;
             Value = value;
-            EventDimensions = (EventDimensions)eventDimensions + context.Dimensions;
+            EventDimensions = new EventDimensions(eventDimensions?.Select(x => x) ?? Standard.EventDimensions.Empty) + context.Dimensions;
         }
 
         public TelemetryMessage(TelemetryMessage message)
@@ -45,7 +46,7 @@ namespace Khooversoft.Toolbox.Standard
             Message = message.Message;
             Duration = message.Duration;
             Value = message.Value;
-            EventDimensions = message.EventDimensions;
+            EventDimensions = new EventDimensions(message.EventDimensions.Select(x => x));
             Exception = message.Exception;
         }
 
@@ -63,7 +64,7 @@ namespace Khooversoft.Toolbox.Standard
             Message = messageDeserialize.Message;
             Duration = messageDeserialize.Duration;
             Value = messageDeserialize.Value;
-            //EventDimensions = messageDeserialize.Dimensions?.ToEventDimensions();
+            EventDimensions = new EventDimensions(messageDeserialize.Dimensions?.Select(x => x) ?? Standard.EventDimensions.Empty) + context.Dimensions;
         }
 
         public Guid MessageId { get; } = Guid.NewGuid();

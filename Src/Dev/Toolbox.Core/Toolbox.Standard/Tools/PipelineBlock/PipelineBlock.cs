@@ -11,6 +11,7 @@ namespace Khooversoft.Toolbox.Standard
     {
         private const string _assertText = "Empty list";
         private readonly List<IDataflowBlock> _blockList = new List<IDataflowBlock>();
+        private readonly List<IPipelineBlock<T>> _register = new List<IPipelineBlock<T>>();
         private readonly object _lock = new object();
 
         public PipelineBlock()
@@ -53,13 +54,14 @@ namespace Khooversoft.Toolbox.Standard
 
                 var tasks = _blockList.OfType<IDataflowBlock>()
                     .Select(x => x.Completion)
+                    .Concat(_register.Select(x => x.Completion))
                     .ToArray();
 
                 return Task.WhenAll(tasks);
             }
         }
 
-        public PipelineBlock<T> Add(IDataflowBlock source)
+        public IPipelineBlock<T> Add(IDataflowBlock source)
         {
             source.Verify(nameof(source)).IsNotNull();
 
@@ -72,11 +74,24 @@ namespace Khooversoft.Toolbox.Standard
             return this;
         }
 
+        public IPipelineBlock<T> Add(IPipelineBlock<T> source)
+        {
+            source.Verify(nameof(source)).IsNotNull();
+
+            lock (_lock)
+            {
+                _register.Add(source);
+            }
+
+            return this;
+        }
+
         public void Complete()
         {
             lock (_lock)
             {
                 Root.Complete();
+                _register.ForEach(x => x.Complete());
             }
         }
 

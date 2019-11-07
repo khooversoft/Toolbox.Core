@@ -10,7 +10,8 @@ namespace Khooversoft.Toolbox.Standard
         IDataflowBlock Root { get; }
         int Count { get; }
 
-        PipelineBlock<T> Add(IDataflowBlock source);
+        IPipelineBlock<T> Add(IDataflowBlock source);
+        IPipelineBlock<T> Add(IPipelineBlock<T> source);
         void Complete();
         Task<bool> SendAsync(T value);
         bool Post(T value);
