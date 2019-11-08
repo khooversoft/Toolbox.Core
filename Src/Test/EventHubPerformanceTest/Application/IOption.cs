@@ -5,7 +5,7 @@ using Khooversoft.Toolbox.Standard;
 
 namespace EventHubPerformanceTest
 {
-    public interface IOption
+    internal interface IOption
     {
         bool Help { get; }
 

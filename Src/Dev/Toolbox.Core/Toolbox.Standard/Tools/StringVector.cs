@@ -25,6 +25,11 @@ namespace Khooversoft.Toolbox.Standard
         {
         }
 
+        public StringVector(string name)
+            : this(name.ToEnumerable(), "/", false)
+        {
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -99,6 +104,6 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="delimiter">delimiter</param>
         /// <param name="hasRoot">has root</param>
         /// <returns></returns>
-        public static StringVector Parse(string path, string delimiter = "/") => new StringPathBuilder(delimiter).Parse(path).Build();
+        public static StringVector Parse(string path, string delimiter = "/") => new StringVectorBuilder(delimiter).Parse(path).Build();
     }
 }

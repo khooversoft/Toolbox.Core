@@ -1,6 +1,7 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using Autofac.Features.OwnedInstances;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.EventHubs;
 using System;
@@ -12,32 +13,38 @@ using System.Threading.Tasks;
 
 namespace EventHubPerformanceTest
 {
-    public class SendEvents : IAction
+    internal class SendEvents : IAction
     {
         private readonly IOption _option;
+        private readonly Owned<ISendEvent> _sendEvent;
         private int _messageCount;
 
-        public SendEvents(IOption option)
+        public SendEvents(IOption option, Owned<ISendEvent> eventSend)
         {
             _option = option;
+            _sendEvent = eventSend;
         }
 
         public async Task Run(IWorkContext context)
         {
-            Console.WriteLine($"Sending events, Task Count:{_option.TaskCount}, ...");
+            context.Verify(nameof(context)).IsNotNull();
 
-            var connectionStringBuilder = new EventHubsConnectionStringBuilder(_option.EventHub!.ConnectionString);
+            context.Telemetry.Info(context, $"Sending events, Task Count:{_option.TaskCount}, ...");
 
-            EventHubClient client = EventHubClient.CreateFromConnectionString(connectionStringBuilder.ToString());
+            try
+            {
+                await SendMessagesToEventHub(context);
+            }
+            finally
+            {
+                await _sendEvent.Value.CloseAsync(context);
+                _sendEvent.Dispose();
+            }
 
-            await SendMessagesToEventHub(context, client);
-
-            await client.CloseAsync();
-
-            Console.WriteLine("Completed sending events...");
+            context.Telemetry.Info(context, "Completed sending events...");
         }
 
-        private Task SendMessagesToEventHub(IWorkContext context, EventHubClient client)
+        private Task SendMessagesToEventHub(IWorkContext context)
         {
             var metrics = new MetricSampler(TimeSpan.FromSeconds(1))
                 .Start();
@@ -48,7 +55,7 @@ namespace EventHubPerformanceTest
 
             var tasks = new List<Task>();
             Enumerable.Range(0, _option.TaskCount)
-                .ForEach(x => tasks.Add(SendMessages(context, client, metrics)));
+                .ForEach(x => tasks.Add(SendMessages(context, metrics)));
 
             Task.WaitAll(tasks.ToArray());
             Console.WriteLine($"Sent {_messageCount} messages");
@@ -56,14 +63,14 @@ namespace EventHubPerformanceTest
             return Task.FromResult(0);
         }
 
-        private async Task SendMessages(IWorkContext context, EventHubClient client, MetricSampler metrics)
+        private async Task SendMessages(IWorkContext context, MetricSampler metrics)
         {
             for (var i = 0; (_option.Count == 0 || i < _option.Count) && !context.CancellationToken.IsCancellationRequested; i++)
             {
                 try
                 {
                     var message = $"Message {i} ***";
-                    await client.SendAsync(new EventData(Encoding.UTF8.GetBytes(message)));
+                    await _sendEvent.Value.SendAsync(context, new EventData(Encoding.UTF8.GetBytes(message)));
                     metrics.Add(1);
                     _messageCount++;
                 }

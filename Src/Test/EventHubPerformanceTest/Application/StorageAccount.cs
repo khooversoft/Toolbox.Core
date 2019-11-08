@@ -8,7 +8,7 @@ using Khooversoft.Toolbox.Core.Extensions.Configuration;
 
 namespace EventHubPerformanceTest
 {
-    public class StorageAccount
+    internal class StorageAccount
     {
         [Option("Storage account name")]
         public string? AccountName { get; set; }

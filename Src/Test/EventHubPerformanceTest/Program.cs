@@ -55,10 +55,10 @@ namespace EventHubPerformanceTest
                 ITelemetry logger = container.Resolve<ITelemetry>();
 
                 IWorkContext context = new WorkContextBuilder()
-                .Set(cancellationTokenSource.Token)
-                .Set(logger)
-                .Set(new ServiceProviderProxy(x => container.Resolve(x)))
-                .Build();
+                    .Set(cancellationTokenSource.Token)
+                    .Set(logger)
+                    .Set(new ServiceProviderProxy(x => container.Resolve(x)))
+                    .Build();
 
                 if (option.Help)
                 {
@@ -67,8 +67,8 @@ namespace EventHubPerformanceTest
 
                 var actions = new IAction?[]
                 {
-                option.Send ? new SendEvents(option) : null,
-                option.Receive ? new ReceiveEvents(option) : null,
+                    option.Send ? container.Resolve<SendEvents>() : null,
+                    option.Receive ? container.Resolve<ReceiveEvents>() : null,
                 };
 
                 var runningTasks = new List<Task>();
@@ -100,18 +100,31 @@ namespace EventHubPerformanceTest
 
             builder.RegisterInstance(option).As<IOption>();
 
+            builder.RegisterType<SendEvents>().InstancePerLifetimeScope();
+            builder.RegisterType<ReceiveEvents>().InstancePerLifetimeScope();
+
+            builder.RegisterType<EventSendClient>().As<ISendEvent>();
+            builder.RegisterType<EventReceiverHost>().As<IEventReceiverHost>();
+
+            BuildTelemetry(option, builder);
+            return builder.Build();
+        }
+
+        private void BuildTelemetry(IOption option, ContainerBuilder builder)
+        {
             builder.Register(x => new ConsoleEventLogger()).As<ConsoleEventLogger>().InstancePerLifetimeScope();
 
             string logType = option.Send ? "Send" : (option.Receive ? "Receive" : "SendReceive");
             builder.Register(x => new FileEventLogger(option.LoggingFolder, logType)).As<FileEventLogger>().InstancePerLifetimeScope();
 
-            builder.Register(x =>
+            Action<IComponentContext> telemetryService = x =>
+            {
                 new TelemetryService()
-                .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
-                .AddFileLogger(x.Resolve<FileEventLogger>())
-                ).As<FileEventLogger>().InstancePerLifetimeScope();
+                    .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
+                    .AddFileLogger(x.Resolve<FileEventLogger>());
+            };
 
-            return builder.Build();
+            builder.Register(x => telemetryService).As<ITelemetry>().InstancePerLifetimeScope();
         }
     }
 }

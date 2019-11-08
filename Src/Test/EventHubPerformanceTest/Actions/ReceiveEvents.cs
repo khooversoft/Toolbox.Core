@@ -13,29 +13,28 @@ using System.Threading.Tasks;
 
 namespace EventHubPerformanceTest
 {
-    public class ReceiveEvents : IAction, IEventProcessorFactory
+    internal class ReceiveEvents : IAction
     {
         private readonly IOption _option;
+        private readonly IEventReceiverHost _eventReceiverHost;
         private readonly MetricSampler _sampler = new MetricSampler(TimeSpan.FromSeconds(1));
         private static int _messageCount;
+        private static readonly StringVector _tag = new StringVector(nameof(ReceiveEvents));
 
-        public ReceiveEvents(IOption option)
+
+        public ReceiveEvents(IOption option, IEventReceiverHost eventReceiverHost)
         {
             _option = option;
+            _eventReceiverHost = eventReceiverHost;
         }
 
 
         public async Task Run(IWorkContext context)
         {
-            Console.WriteLine("Receiving events...");
-            _messageCount = 0;
+            context = context.With(_tag);
 
-            var eventProcessorHost = new EventProcessorHost(
-                eventHubPath: _option.EventHub!.Name,
-                consumerGroupName: PartitionReceiver.DefaultConsumerGroupName,
-                eventHubConnectionString: _option.EventHub.ConnectionString,
-                storageConnectionString: _option.StorageAccount!.ConnectionString,
-                leaseContainerName: _option.StorageAccount.ContainerName);
+            context.Telemetry.Info(context, "Receiving events...");
+            _messageCount = 0;
 
             try
             {
@@ -46,90 +45,111 @@ namespace EventHubPerformanceTest
                 EventProcessorOptions eventOption = EventProcessorOptions.DefaultOptions;
                 eventOption.ReceiveTimeout = TimeSpan.FromSeconds(5);
 
-                await eventProcessorHost.RegisterEventProcessorFactoryAsync(this, eventOption);
+                await _eventReceiverHost.RegisterEventProcessorFactoryAsync(new EventProcessFactory(context, _sampler), eventOption);
 
                 while (!context.CancellationToken.IsCancellationRequested)
                 {
                     await Task.Delay(500);
                 }
             }
+            catch (Exception ex)
+            {
+                context.Telemetry.Error(context, "Send failed", ex);
+                throw;
+            }
             finally
             {
-                Console.WriteLine("Unregister event processing...");
+                context.Telemetry.Info(context, "Unregister event processing...");
 
                 // Disposes of the Event Processor Host
-                await eventProcessorHost.UnregisterEventProcessorAsync();
+                await _eventReceiverHost.UnregisterEventProcessorAsync();
                 _sampler.Stop();
 
                 MetricsOutput(context);
             }
 
             MetricsOutput(context);
-            Console.WriteLine($"Received {_messageCount} messages");
+            context.Telemetry.Info(context, $"Received {_messageCount} messages");
         }
 
         private void MetricsOutput(IWorkContext context)
         {
+            context = context.WithMethodName();
             IReadOnlyList<MetricSample> samples = _sampler.GetMetrics(true);
 
             if (samples.Count == 0)
             {
-                Console.WriteLine("Receive - empty metrics");
+                context.Telemetry.Info(context, "Receive - empty metrics");
                 return;
             }
 
             double total = samples.Sum(x => x.Count);
             TimeSpan span = TimeSpan.FromSeconds(samples.Sum(x => x.Span.TotalSeconds));
 
-            Console.WriteLine($"Receive: Total: {total}, Span: {span}, TPS:{total / span.TotalSeconds}");
+            context.Telemetry.Info(context, $"Receive: Total: {total}, Span: {span}, TPS:{total / span.TotalSeconds}");
         }
 
-        public IEventProcessor CreateEventProcessor(PartitionContext context)
+        private class EventProcessFactory : IEventProcessorFactory
         {
-            return new EventProcessor(_sampler);
+            private readonly IWorkContext _context;
+            private readonly MetricSampler _sampler;
+
+            public EventProcessFactory(IWorkContext context, MetricSampler sampler)
+            {
+                _context = context;
+                _sampler = sampler;
+            }
+
+            public IEventProcessor CreateEventProcessor(PartitionContext context)
+            {
+                return new EventProcessor(_context, _sampler);
+            }
         }
 
         private class EventProcessor : IEventProcessor
         {
+            private readonly IWorkContext _context;
             private readonly MetricSampler _sampler;
+            private static readonly StringVector _tag = new StringVector(nameof(EventProcessor));
 
-            public EventProcessor(MetricSampler sampler)
+            public EventProcessor(IWorkContext context, MetricSampler sampler)
             {
+                _context = context.With(_tag);
                 _sampler = sampler;
             }
 
-            public Task CloseAsync(PartitionContext context, CloseReason reason)
+            public Task CloseAsync(PartitionContext partitionContext, CloseReason reason)
             {
-                Console.WriteLine($"Processor Shutting Down. Partition '{context.PartitionId}', Reason: '{reason}'.");
+                _context.Telemetry.Verbose(_context, $"Processor Shutting Down. Partition '{partitionContext.PartitionId}', Reason: '{reason}'.");
                 return Task.CompletedTask;
             }
 
-            public Task OpenAsync(PartitionContext context)
+            public Task OpenAsync(PartitionContext partitionContext)
             {
-                Console.WriteLine($"SimpleEventProcessor initialized. Partition: '{context.PartitionId}'");
+                _context.Telemetry.Verbose(_context, $"SimpleEventProcessor initialized. Partition: '{partitionContext.PartitionId}'");
                 return Task.CompletedTask;
             }
 
-            public Task ProcessErrorAsync(PartitionContext context, Exception error)
+            public Task ProcessErrorAsync(PartitionContext partitionContext, Exception error)
             {
-                Console.WriteLine($"Error on Partition: {context.PartitionId}, Error: {error.Message}");
+                _context.Telemetry.Error(_context, $"Error on Partition: {partitionContext.PartitionId}, Error: {error.Message}", error);
                 return Task.CompletedTask;
             }
 
-            public Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventData> messages)
+            public Task ProcessEventsAsync(PartitionContext partitionContext, IEnumerable<EventData> messages)
             {
                 messages.Verify().IsNotNull();
-                if (messages == null) return context.CheckpointAsync();
+                if (messages == null) return partitionContext.CheckpointAsync();
 
                 foreach (var eventData in messages)
                 {
                     var data = Encoding.UTF8.GetString(eventData.Body.Array!, eventData.Body.Offset, eventData.Body.Count);
                     _sampler.Add(1);
                     _messageCount++;
-                    //Console.WriteLine($"Message received. Partition: '{context.PartitionId}', Data: '{data}'");
+                    _context.Telemetry.Verbose(_context, $"Message received. Partition: '{partitionContext.PartitionId}', Data: '{data}'");
                 }
 
-                return context.CheckpointAsync();
+                return partitionContext.CheckpointAsync();
             }
         }
     }

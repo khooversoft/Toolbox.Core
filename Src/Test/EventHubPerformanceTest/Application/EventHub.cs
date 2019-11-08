@@ -8,7 +8,7 @@ using Khooversoft.Toolbox.Core.Extensions.Configuration;
 
 namespace EventHubPerformanceTest
 {
-    public class EventHub
+    internal class EventHub
     {
         [Option("Event hub connection string")]
         public string? ConnectionString { get; set; }
@@ -16,7 +16,7 @@ namespace EventHubPerformanceTest
         [Option("Event hub name")]
         public string? Name { get; set; }
 
-        [Option("Namespaces to use")]
-        public string[]? Namespaces { get; set; }
+        [Option("Consumer group name to use")]
+        public string? ConsumerGroupName { get; set; }
     }
 }

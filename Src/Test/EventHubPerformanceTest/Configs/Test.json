@@ -2,13 +2,12 @@
   "Send": false,
   "Receive": false,
   "Count": 0,
+  "LoggingFolder": "log",
 
   "EventHub": {
     "ConnectionString": "Endpoint=sb://actor-demo.servicebus.windows.net/;SharedAccessKeyName=ReaderWriter;SharedAccessKey=uUBYbwvJDO+9hepVs/a8WsItn4xF5jH3+DAe7tMXIaM=;EntityPath=actor-demo-rapids",
     "Name": "actor-demo-rapids",
-    "Namespaces": [
-      "$Default"
-    ]
+    "ConsumerGroupName": "$Default"
   },
 
   "StorageAccount": {

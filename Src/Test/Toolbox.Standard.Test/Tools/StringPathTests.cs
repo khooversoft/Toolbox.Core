@@ -22,7 +22,7 @@ namespace Toolbox.Standard.Test.Tools
         [InlineData("/root/second/third", new string[] { "root", "second", "third" }, true)]
         public void TestPartPatterns(string value, string[] expectedParts, bool hasRoot)
         {
-            StringVector subject = new StringPathBuilder().Parse(value).Build();
+            StringVector subject = new StringVectorBuilder().Parse(value).Build();
 
             subject
                 .Zip(expectedParts, (o, i) => (o, i))
@@ -50,7 +50,7 @@ namespace Toolbox.Standard.Test.Tools
         [InlineData("/root/second/third", new string[] { "root", "second", "third" }, false)]
         public void TestPartPatternsFailures(string value, string[] expectedParts, bool hasRoot)
         {
-            StringVector subject = new StringPathBuilder().Parse(value).Build();
+            StringVector subject = new StringVectorBuilder().Parse(value).Build();
 
             subject
                 .Zip(expectedParts, (o, i) => (o, i))
@@ -69,7 +69,7 @@ namespace Toolbox.Standard.Test.Tools
         [InlineData(true, new string[] { "first", "second" }, "/first/second")]
         public void TestStringPathBuilder_WhenBuilt_ShouldNotFail(bool hasRoot, string[] parts, string expected)
         {
-            StringVector path = new StringPathBuilder()
+            StringVector path = new StringVectorBuilder()
                 .SetHasRoot(hasRoot)
                 .Add(parts)
                 .Build();

@@ -14,11 +14,11 @@ namespace Khooversoft.Toolbox.Standard
     /// 
     /// Path is a string composed of part separated by a delimiter
     /// </summary>
-    public class StringPathBuilder : IEnumerable<string>
+    public class StringVectorBuilder : IEnumerable<string>
     {
         private readonly List<string> _parts;
 
-        public StringPathBuilder(string delimiter = "/")
+        public StringVectorBuilder(string delimiter = "/")
         {
             _parts = new List<string>();
             Delimiter = delimiter;
@@ -54,7 +54,7 @@ namespace Khooversoft.Toolbox.Standard
         /// Clear parts collection
         /// </summary>
         /// <returns></returns>
-        public StringPathBuilder Clear()
+        public StringVectorBuilder Clear()
         {
             _parts.Clear();
             return this;
@@ -65,7 +65,7 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="delimiter">delimiter to use</param>
         /// <returns>this</returns>
-        public StringPathBuilder SetDelimiter(string delimiter)
+        public StringVectorBuilder SetDelimiter(string delimiter)
         {
             Delimiter = delimiter;
             return this;
@@ -76,7 +76,7 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="hasRoot">use root if true</param>
         /// <returns>this</returns>
-        public StringPathBuilder SetHasRoot(bool hasRoot)
+        public StringVectorBuilder SetHasRoot(bool hasRoot)
         {
             HasRoot = hasRoot;
             return this;
@@ -87,7 +87,7 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="values"></param>
         /// <returns>this</returns>
-        public StringPathBuilder Parse(params string[] values)
+        public StringVectorBuilder Parse(params string[] values)
         {
             string value = string.Join(Delimiter, values).Trim();
             HasRoot = value.Length >= Delimiter.Length && value.Substring(0, Delimiter.Length) == Delimiter;
@@ -118,7 +118,7 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="values"></param>
         /// <returns>this</returns>
-        public StringPathBuilder Add(params string[] values)
+        public StringVectorBuilder Add(params string[] values)
         {
             _parts.AddRange(values.SelectMany(x => x.Split(Delimiter, StringSplitOptions.RemoveEmptyEntries)));
             return this;
@@ -129,7 +129,7 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="index">index to remove</param>
         /// <returns>this</returns>
-        public StringPathBuilder RemoveAt(int index)
+        public StringVectorBuilder RemoveAt(int index)
         {
             _parts.RemoveAt(index);
             return this;
@@ -151,7 +151,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="builder">builder</param>
         /// <param name="value">value</param>
         /// <returns>builder</returns>
-        public static StringPathBuilder operator +(StringPathBuilder builder, string value) => builder.Add(value);
+        public static StringVectorBuilder operator +(StringVectorBuilder builder, string value) => builder.Add(value);
 
         /// <summary>
         /// + operator to add parts
@@ -159,6 +159,6 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="builder">builder</param>
         /// <param name="values">value</param>
         /// <returns>builder</returns>
-        public static StringPathBuilder operator +(StringPathBuilder builder, IEnumerable<string> values) => builder.Add(values.ToArray());
+        public static StringVectorBuilder operator +(StringVectorBuilder builder, IEnumerable<string> values) => builder.Add(values.ToArray());
     }
 }

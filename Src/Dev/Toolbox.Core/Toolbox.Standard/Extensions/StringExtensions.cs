@@ -18,7 +18,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns></returns>
         public static StringVector ParsePath(this string value, string delimiter = "/")
         {
-            return new StringPathBuilder(delimiter)
+            return new StringVectorBuilder(delimiter)
                 .Parse(value)
                 .Build();
         }

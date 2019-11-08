@@ -186,13 +186,13 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="tag">code tag</param>
         /// <param name="memberName">method name (compiler will fill in)</param>
         /// <returns>new work context</returns>
-        public IWorkContext WithTag(StringVector tag, [CallerMemberName] string? memberName = null)
+        public IWorkContext With(StringVector tag, [CallerMemberName] string? memberName = null)
         {
             tag.Verify(nameof(tag)).IsNotNull();
 
             return new WorkContext(this)
             {
-                Tag = Tag.With(memberName!),
+                Tag = Tag.With(tag, memberName!),
             };
         }
 

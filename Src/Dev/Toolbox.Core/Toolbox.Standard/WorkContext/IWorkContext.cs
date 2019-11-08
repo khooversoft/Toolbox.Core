@@ -26,7 +26,7 @@ namespace Khooversoft.Toolbox.Standard
         IWorkContext WithNewCv();
         IWorkContext WithExtended();
         IWorkContext WithIncrement();
-        IWorkContext WithTag(StringVector tag, [CallerMemberName] string? memberName = null);
+        IWorkContext With(StringVector tag, [CallerMemberName] string? memberName = null);
         IWorkContext WithMethodName([CallerMemberName] string? memberName = null);
         IWorkContext With(ITelemetry eventLog);
         IWorkContext With(IEventDimensions eventDimenensions);

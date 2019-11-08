@@ -12,7 +12,7 @@ using System.IO;
 
 namespace EventHubPerformanceTest
 {
-    public class Option : IOption
+    internal class Option : IOption
     {
         [Option("Display help", ShortCuts = new string[] { "?" })]
         public bool Help { get; private set; }
@@ -54,6 +54,7 @@ namespace EventHubPerformanceTest
             option.EventHub.Verify().IsNotNull("Must specify Event hub details");
             option.EventHub!.ConnectionString!.Verify().IsNotEmpty("Event hub connection string is required");
             option.EventHub!.Name!.Verify().IsNotEmpty("Event hub name is required");
+            option.EventHub!.ConsumerGroupName!.Verify().IsNotEmpty("Event hub consumer group name is required");
             option.Count.Verify().Assert(x => x >= 0, "Count must be greater then 0, or 0 for no limit");
 
             if (option.Receive)
@@ -66,5 +67,7 @@ namespace EventHubPerformanceTest
 
             return option;
         }
+
+
     }
 }

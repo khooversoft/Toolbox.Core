@@ -21,14 +21,6 @@ namespace Khooversoft.Toolbox.Core.Extensions.Configuration
         /// <returns>json files to include, first is the configuration</returns>
         public static IReadOnlyList<string> GetIncludeFiles(this IEnumerable<string> args, params string[] searchForKeys)
         {
-            var files = new List<string>();
-            var searchForKeyList = new List<string>(searchForKeys);
-
-            if (args.Count() == 0 || searchForKeyList.Count == 0)
-            {
-                return files;
-            }
-
             // Get argument key-value pairs
             var arguments = args
                 .Select(x => x.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries))
@@ -37,11 +29,10 @@ namespace Khooversoft.Toolbox.Core.Extensions.Configuration
                 .ToList();
 
             // Add json file using the order of 'includeArgumentNames' as precedent
-            searchForKeyList
-                .ForEach(x => arguments
-                    .Where(y => y.Key.Equals(x, StringComparison.OrdinalIgnoreCase))
-                    .ForEach(y => files.Add(y.Value.Do(Path.GetFullPath)))
-                    );
+            var files = arguments
+                .Join(searchForKeys, x => x.Key, x => x, (arg, key) => arg, StringComparer.OrdinalIgnoreCase)
+                .Select(x => x.Value.Do(Path.GetFullPath))
+                .ToList();
 
             var filesToSearch = files
                 .Reverse<string>()
@@ -55,7 +46,7 @@ namespace Khooversoft.Toolbox.Core.Extensions.Configuration
 
                 string configFolder = Path.GetDirectoryName(file);
 
-                var newFiles = searchForKeyList
+                var newFiles = searchForKeys
                     .SelectMany(x => configuration.GetSection(x).GetChildren())
                     .Select(x => Path.Combine(configFolder, x.Value).Do(Path.GetFullPath))
                     .Where(x => !files.Any(y => y.Equals(x, StringComparison.OrdinalIgnoreCase)))
@@ -82,7 +73,9 @@ namespace Khooversoft.Toolbox.Core.Extensions.Configuration
             where T : class, new()
         {
             var switches = typeof(T).GetProperties()
-                .Where(x => x.CanWrite && x.PropertyType == typeof(bool) && x.GetCustomAttribute<OptionAttribute>() != null)
+                .Where(x => x.CanWrite)
+                .Where(x => x.PropertyType == typeof(bool))
+                .Where(x => x.GetCustomAttribute<OptionAttribute>() != null)
                 .SelectMany(x => x.Name.ToEnumerable().Concat(x.GetCustomAttribute<OptionAttribute>().ShortCuts ?? Enumerable.Empty<string>()))
                 .ToList();
 
@@ -103,10 +96,7 @@ namespace Khooversoft.Toolbox.Core.Extensions.Configuration
         {
             // Get argument key-value pairs
             var arguments = args
-                .Select(x =>
-                {
-                    return new { Arg = x, Split = x.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries) };
-                });
+                .Select(x => new { Arg = x, Split = x.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries) });
 
             var returnArguments = new List<string>(arguments.Where(x => x.Split.Length != 1).Select(x => x.Arg));
 
