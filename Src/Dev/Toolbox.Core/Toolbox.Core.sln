@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Standard.Test", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventHubPerformanceTest", "..\..\Test\EventHubPerformanceTest\EventHubPerformanceTest.csproj", "{B3D18F3B-C59B-4490-9E9F-9D85D8D71673}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Core.Extensions.Configuration", "Toolbox.Core.Extensions.Configuration\Toolbox.Core.Extensions.Configuration.csproj", "{9A08829A-6762-490D-8108-DC0B63969511}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Extensions.Configuration", "Toolbox.Extensions.Configuration\Toolbox.Extensions.Configuration.csproj", "{9A08829A-6762-490D-8108-DC0B63969511}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Core.Extensions.Configuration.Test", "..\..\Test\Toolbox.Core.Extensions.Configuration.Test\Toolbox.Core.Extensions.Configuration.Test.csproj", "{CC7BED2E-53C1-4FC1-BBAC-6458AE6815AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Extensions.Configuration.Test", "..\..\Test\Toolbox.Extensions.Configuration.Test\Toolbox.Extensions.Configuration.Test.csproj", "{CC7BED2E-53C1-4FC1-BBAC-6458AE6815AD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{9CFC2CA8-284D-4042-B6E7-D18D5C110ED8}"
 EndProject

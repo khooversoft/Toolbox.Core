@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
@@ -109,6 +110,50 @@ namespace Khooversoft.Toolbox.Standard
                 Verify.Assert(propertyStack.Count == 0, $"{propertyPath} is invalid when scanning class type");
                 objectToSet.SetPropertyValue(pi!.Name, valueToSet);
             }
+        }
+
+        /// <summary>
+        /// Get class properties values with path
+        /// </summary>
+        /// <typeparam name="T">class type</typeparam>
+        /// <param name="objectToRead">object to read</param>
+        /// <param name="filter">filter which class properties to use (optional)</param>
+        /// <returns>list of path and properties</returns>
+        public static IReadOnlyList<KeyValuePair<string, object>> GetPropertyValuesWithPath<T>(this T objectToRead, Func<PropertyInfo, bool>? filter = null)
+        {
+            var propertyList = new List<KeyValuePair<string, object>>();
+            if (objectToRead == null) return propertyList;
+
+            var stack = new Stack<(object Instance, string? ClassPath)>(new (object Instance, string? ClassPath)[] { (objectToRead, null) });
+            filter ??= (x => true);
+
+            Func<string?, string, string> createPath = (x, n) => (x != null ? x + ":" : string.Empty) + n;
+
+            while (stack.Count > 0)
+            {
+                (object Instance, string? ClassPath) current = stack.Pop();
+
+                var properties = current.Instance.GetType().GetProperties()
+                    .Where(x => x.CanWrite && (!x.PropertyType.IsClass || x.PropertyType == typeof(string)))
+                    .Where(x => filter(x))
+                    .ToList();
+
+                properties
+                    .ForEach(x => propertyList.Add(new KeyValuePair<string, object>(createPath(current.ClassPath, x.Name), x.GetValue(current.Instance, null))));
+
+                var classProperties = current.Instance.GetType().GetProperties()
+                    .Where(x => x.CanWrite)
+                    .Where(x => x.PropertyType.IsClass && x.PropertyType != typeof(string) && filter(x))
+                    .Select(x => new { PropertyInfo = x, Value = x.GetValue(current.Instance, null) })
+                    .Where(x => x.Value != null)
+                    .ToArray();
+
+                classProperties
+                    .Reverse()
+                    .ForEach(x => stack.Push((x.Value, createPath(current.ClassPath, x.PropertyInfo.Name))));
+            }
+
+            return propertyList;
         }
     }
 }

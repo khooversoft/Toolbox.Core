@@ -64,10 +64,7 @@ namespace Khooversoft.Toolbox.Standard
 
             lock (_lock)
             {
-                if (setColor != null)
-                {
-                    Console.ForegroundColor = (ConsoleColor)setColor;
-                }
+                if (setColor != null) Console.ForegroundColor = (ConsoleColor)setColor;
 
                 Console.WriteLine(string.Join(", ", list.Where(x => !x.IsEmpty())));
 
@@ -78,10 +75,7 @@ namespace Khooversoft.Toolbox.Standard
                     Console.WriteLine(message.Exception.ToString());
                 }
 
-                if (setColor != null)
-                {
-                    Console.ResetColor();
-                }
+                if (setColor != null) Console.ResetColor();
             }
         }
     }

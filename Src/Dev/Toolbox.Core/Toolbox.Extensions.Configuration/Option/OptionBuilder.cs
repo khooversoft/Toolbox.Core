@@ -9,7 +9,7 @@ using System.Text;
 using System.Reflection;
 using Khooversoft.Toolbox.Standard;
 
-namespace Khooversoft.Toolbox.Core.Extensions.Configuration
+namespace Khooversoft.Toolbox.Extensions.Configuration
 {
     /// <summary>
     /// Option builder uses the .NET Configuration to parse command line, json, memory, and secret values
@@ -32,6 +32,10 @@ namespace Khooversoft.Toolbox.Core.Extensions.Configuration
             BuildMap();
         }
 
+        /// <summary>
+        /// Build option class
+        /// </summary>
+        /// <returns>created option</returns>
         public T Build()
         {
             T option = new T();
@@ -40,6 +44,10 @@ namespace Khooversoft.Toolbox.Core.Extensions.Configuration
             return option;
         }
 
+        /// <summary>
+        /// Apply configuration data to option
+        /// </summary>
+        /// <param name="option"></param>
         private void ApplyOption(T option)
         {
             foreach (var decode in _singleMap)

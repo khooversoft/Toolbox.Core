@@ -9,7 +9,7 @@ using System.Linq;
 using System.Reflection;
 using Khooversoft.Toolbox.Standard;
 
-namespace Khooversoft.Toolbox.Core.Extensions.Configuration
+namespace Khooversoft.Toolbox.Extensions.Configuration
 {
     public static class ArgsExtensions
     {

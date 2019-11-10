@@ -23,15 +23,12 @@ namespace EventHubPerformanceTest
         {
             context = context.With(_tag);
 
-            context.Telemetry.Verbose(context, $"Closing Event Hub client for {_conntectionString.EntityPath}");
+            context.Telemetry.Verbose(context, $"Closing event hub client for {_conntectionString.EntityPath}");
             return _client.CloseAsync();
         }
 
         public Task SendAsync(IWorkContext context, EventData eventData)
         {
-            context = context.With(_tag);
-
-            context.Telemetry.Verbose(context, $"Closing Event Hub client for {_conntectionString.EntityPath}");
             return _client.SendAsync(eventData);
         }
     }

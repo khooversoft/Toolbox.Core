@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
 namespace Khooversoft.Toolbox.Standard
 {
-    public class TelemetryService : ITelemetryService
+    public class TelemetryService : ITelemetryService, IDisposable
     {
-        private readonly IPipelineBlock<TelemetryMessage> _pipeline;
+        private IPipelineBlock<TelemetryMessage> _pipeline;
         private Func<TelemetryMessage, TelemetryMessage> _transform = x => x;
 
         public TelemetryService()
         {
             _pipeline = new PipelineBlock<TelemetryMessage>()
-                .Select(_transform);
+                .Select(_transform)
+                .Broadcast();
         }
 
         public ITelemetry CreateLogger(string eventSourceName)
@@ -88,6 +91,14 @@ namespace Khooversoft.Toolbox.Standard
             _pipeline.DoAction(action, filter);
 
             return this;
+        }
+
+        public void Dispose()
+        {
+            var pipeline = Interlocked.Exchange(ref _pipeline, null!);
+
+            pipeline?.Complete();
+            pipeline?.Completion?.Wait();
         }
     }
 }

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Khooversoft.Toolbox.Core.Extensions.Configuration
+namespace Khooversoft.Toolbox.Extensions.Configuration
 {
     public class OptionHelp
     {

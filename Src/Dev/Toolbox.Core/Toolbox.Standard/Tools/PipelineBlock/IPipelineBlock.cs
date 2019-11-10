@@ -13,7 +13,7 @@ namespace Khooversoft.Toolbox.Standard
         IPipelineBlock<T> Add(IDataflowBlock source);
         IPipelineBlock<T> Add(IPipelineBlock<T> source);
         void Complete();
-        Task<bool> SendAsync(T value);
+        Task<bool> Send(T value);
         bool Post(T value);
     }
 }

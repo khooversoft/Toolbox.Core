@@ -17,6 +17,7 @@ namespace EventHubPerformanceTest
     {
         private readonly IOption _option;
         private readonly Owned<ISendEvent> _sendEvent;
+        private static readonly StringVector _tag = new StringVector(nameof(SendEvents));
         private int _messageCount;
 
         public SendEvents(IOption option, Owned<ISendEvent> eventSend)
@@ -28,6 +29,9 @@ namespace EventHubPerformanceTest
         public async Task Run(IWorkContext context)
         {
             context.Verify(nameof(context)).IsNotNull();
+            context = context
+                .WithCreateLogger(nameof(SendEvents))
+                .With(_tag);
 
             context.Telemetry.Info(context, $"Sending events, Task Count:{_option.TaskCount}, ...");
 
@@ -76,7 +80,7 @@ namespace EventHubPerformanceTest
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine($"{DateTime.Now} > Exception: {exception.Message}");
+                    context.Telemetry.Error(context, $"{DateTime.Now} > Exception: {exception.Message}");
                 }
             }
         }
@@ -87,14 +91,14 @@ namespace EventHubPerformanceTest
 
             if (samples.Count == 0)
             {
-                Console.WriteLine("Send - empty metrics");
+                context.Telemetry.Info(context, "Send - empty metrics");
                 return;
             }
 
             double total = samples.Sum(x => x.Count);
             TimeSpan span = TimeSpan.FromSeconds(samples.Sum(x => x.Span.TotalSeconds));
 
-            Console.WriteLine($"Send: Total: {total}, Span: {span}, TPS:{total / span.TotalSeconds}");
+            context.Telemetry.Info(context, $"Send: Total: {total}, Span: {span}, TPS:{total / span.TotalSeconds}");
         }
     }
 }

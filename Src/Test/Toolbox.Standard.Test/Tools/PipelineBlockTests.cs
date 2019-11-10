@@ -51,7 +51,7 @@ namespace Toolbox.Standard.Test.Tools
                 .DoAction(x => list.Add(x));
 
             Enumerable.Range(0, max)
-                .ForEach(async x => await pipeline.SendAsync($"{x} message"));
+                .ForEach(async x => await pipeline.Send($"{x} message"));
 
             pipeline.Complete();
             pipeline.Completion.Wait();
@@ -129,7 +129,7 @@ namespace Toolbox.Standard.Test.Tools
                 .DoAction(x => list2.Add(x + offset));
 
             Enumerable.Range(0, max)
-                .ForEach(async x => await jobs.SendAsync(x));
+                .ForEach(async x => await jobs.Send(x));
 
             jobs.Complete();
             jobs.Completion.Wait();
@@ -173,7 +173,7 @@ namespace Toolbox.Standard.Test.Tools
                 .DoAction(x => s2Pipeline.Post(x));
 
             Enumerable.Range(0, max)
-                .ForEach(async x => await jobs.SendAsync(x));
+                .ForEach(async x => await jobs.Send(x));
 
             jobs.Complete();
             jobs.Completion.Wait();

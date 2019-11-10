@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Khooversoft.Toolbox.Core.Extensions.Configuration
+namespace Khooversoft.Toolbox.Extensions.Configuration
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class OptionHelpAttribute : Attribute

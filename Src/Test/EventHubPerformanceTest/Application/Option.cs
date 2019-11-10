@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Khooversoft.Toolbox.Core.Extensions.Configuration;
+using Khooversoft.Toolbox.Extensions.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System.IO;
 
@@ -49,6 +49,8 @@ namespace EventHubPerformanceTest
                 .Build()
                 .BuildOption<Option>();
 
+            if( option.Help) { return option; }
+
             option.Verify(nameof(option)).IsNotNull();
             (option.Send || option.Receive).Verify().Assert("Send and/or Receive must be specified");
             option.EventHub.Verify().IsNotNull("Must specify Event hub details");
@@ -67,7 +69,5 @@ namespace EventHubPerformanceTest
 
             return option;
         }
-
-
     }
 }

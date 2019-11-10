@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using Autofac;
+using Khooversoft.Toolbox.Extensions.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,14 @@ namespace EventHubPerformanceTest
 
             IOption option = Option.Build(args);
 
+            if( option.Help)
+            {
+                option.FormatHelp()
+                    .ForEach(x => Console.WriteLine(x));
+
+                return _ok;
+            }
+
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
             using (ILifetimeScope container = CreateContainer(option).BeginLifetimeScope(_lifetimeScopeTag))
@@ -60,23 +69,18 @@ namespace EventHubPerformanceTest
                     .Set(new ServiceProviderProxy(x => container.Resolve(x)))
                     .Build();
 
-                if (option.Help)
-                {
-                    return _ok;
-                }
+                option
+                    .FormatSettings()
+                    .ForEach(x => context.Telemetry.Info(context, x));
 
-                var actions = new IAction?[]
+                List<Task> runningTasks = new IAction?[]
                 {
                     option.Send ? container.Resolve<SendEvents>() : null,
                     option.Receive ? container.Resolve<ReceiveEvents>() : null,
-                };
-
-                var runningTasks = new List<Task>();
-
-                foreach (var item in actions.Where(x => x != null))
-                {
-                    runningTasks.Add(item!.Run(context));
                 }
+                .Where(x => x != null)
+                .Select(x => Task.Run(() =>  x!.Run(context)))
+                .ToList();
 
                 Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
                 {
@@ -107,6 +111,9 @@ namespace EventHubPerformanceTest
             builder.RegisterType<EventReceiverHost>().As<IEventReceiverHost>();
 
             BuildTelemetry(option, builder);
+
+            builder.Register(x => x.Resolve<ITelemetryService>().CreateLogger("Main")).As<ITelemetry>().InstancePerLifetimeScope();
+
             return builder.Build();
         }
 
@@ -117,14 +124,13 @@ namespace EventHubPerformanceTest
             string logType = option.Send ? "Send" : (option.Receive ? "Receive" : "SendReceive");
             builder.Register(x => new FileEventLogger(option.LoggingFolder, logType)).As<FileEventLogger>().InstancePerLifetimeScope();
 
-            Action<IComponentContext> telemetryService = x =>
-            {
-                new TelemetryService()
+            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryService()
                     .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
                     .AddFileLogger(x.Resolve<FileEventLogger>());
-            };
 
-            builder.Register(x => telemetryService).As<ITelemetry>().InstancePerLifetimeScope();
+            builder.Register(x => telemetryService(x)).As<ITelemetryService>().InstancePerLifetimeScope();
+
+
         }
     }
 }

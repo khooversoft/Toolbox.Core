@@ -7,6 +7,10 @@ using System.Threading.Tasks.Dataflow;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Pipeline block used to process messages, handles finalization of all blocks in the pipeline
+    /// </summary>
+    /// <typeparam name="T">message type</typeparam>
     public class PipelineBlock<T> : IPipelineBlock<T>
     {
         private const string _assertText = "Empty list";
@@ -18,8 +22,14 @@ namespace Khooversoft.Toolbox.Standard
         {
         }
 
+        /// <summary>
+        /// Return number of block in the pipeline
+        /// </summary>
         public int Count => _blockList.Count;
 
+        /// <summary>
+        /// Get current "Source Block", last added to the pipeline
+        /// </summary>
         public ISourceBlock<T> Current
         {
             get
@@ -33,6 +43,9 @@ namespace Khooversoft.Toolbox.Standard
             }
         }
 
+        /// <summary>
+        /// Get root block used to send message
+        /// </summary>
         public IDataflowBlock Root
         {
             get
@@ -46,6 +59,9 @@ namespace Khooversoft.Toolbox.Standard
             }
         }
 
+        /// <summary>
+        /// Get completion task
+        /// </summary>
         public Task Completion
         {
             get
@@ -61,6 +77,11 @@ namespace Khooversoft.Toolbox.Standard
             }
         }
 
+        /// <summary>
+        /// Add dataflow block to pipeline
+        /// </summary>
+        /// <param name="source">block</param>
+        /// <returns>this</returns>
         public IPipelineBlock<T> Add(IDataflowBlock source)
         {
             source.Verify(nameof(source)).IsNotNull();
@@ -74,6 +95,11 @@ namespace Khooversoft.Toolbox.Standard
             return this;
         }
 
+        /// <summary>
+        /// Add pipline block to pipeline
+        /// </summary>
+        /// <param name="source">pipeline</param>
+        /// <returns>this</returns>
         public IPipelineBlock<T> Add(IPipelineBlock<T> source)
         {
             source.Verify(nameof(source)).IsNotNull();
@@ -86,6 +112,9 @@ namespace Khooversoft.Toolbox.Standard
             return this;
         }
 
+        /// <summary>
+        /// Issue complete to pipeline
+        /// </summary>
         public void Complete()
         {
             lock (_lock)
@@ -95,12 +124,22 @@ namespace Khooversoft.Toolbox.Standard
             }
         }
 
-        public async Task<bool> SendAsync(T value)
+        /// <summary>
+        /// Send message to pipeline
+        /// </summary>
+        /// <param name="value">message to send</param>
+        /// <returns>true if sent</returns>
+        public async Task<bool> Send(T value)
         {
             ITargetBlock<T> target = Root as ITargetBlock<T> ?? throw new InvalidOperationException("First block is not a target to send");
             return await target.SendAsync(value);
         }
 
+        /// <summary>
+        /// Send message to pipeline
+        /// </summary>
+        /// <param name="value">message to send</param>
+        /// <returns>true if message is sent</returns>
         public bool Post(T value)
         {
             ITargetBlock<T> target = Root as ITargetBlock<T> ?? throw new InvalidOperationException("First block is not a target to send");

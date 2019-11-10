@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using Khooversoft.Toolbox.Standard;
 
-namespace Khooversoft.Toolbox.Core.Extensions.Configuration
+namespace Khooversoft.Toolbox.Extensions.Configuration
 {
     public static class ConfigurationExtensions
     {

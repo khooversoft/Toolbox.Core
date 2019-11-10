@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
-    <AssemblyName>Toolbox.Core.Extensions.Configuration</AssemblyName>
-    <RootNamespace>Khooversoft.Toolbox.Core.Extensions.Configuration</RootNamespace>
+    <AssemblyName>Toolbox.Extensions.Configuration</AssemblyName>
+    <RootNamespace>Khooversoft.Toolbox.Extensions.Configuration</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
