@@ -70,5 +70,25 @@ namespace Toolbox.Standard.Test.Tools
             result.Should().Be(expectedResult);
             StringVector sv = StringVector.Parse(value);
         }
+
+        [Fact]
+        public void GivenPath_WhenHasRoot_HasRootIsTrue()
+        {
+            string value = "/path/value";
+
+            var sv = new StringVector(value, "/");
+            sv.Should().NotBeNull();
+            sv.HasRoot.Should().BeTrue();
+        }
+
+        [Fact]
+        public void GivenPath_WhenDoesNotHaveRoot_HasRootIsFalse()
+        {
+            string value = "path/value";
+
+            var sv = new StringVector(value, "/");
+            sv.Should().NotBeNull();
+            sv.HasRoot.Should().BeFalse();
+        }
     }
 }

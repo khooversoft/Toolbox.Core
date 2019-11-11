@@ -25,9 +25,16 @@ namespace Khooversoft.Toolbox.Standard
         {
         }
 
-        public StringVector(string name)
-            : this(name.ToEnumerable(), "/", false)
+        public StringVector(string name, string delimiter)
         {
+            name.Verify(nameof(name)).IsNotEmpty();
+            delimiter.Verify(nameof(delimiter)).IsNotEmpty();
+
+            Delimiter = delimiter;
+            HasRoot = name.Length > 0 && name[0] == '/' ? true : false;
+
+            _parts = name.Split(Delimiter, StringSplitOptions.RemoveEmptyEntries).ToArray();
+            _deferred = new Deferred<string>(() => (HasRoot ? Delimiter : string.Empty) + string.Join(Delimiter, _parts));
         }
 
         /// <summary>
@@ -43,7 +50,7 @@ namespace Khooversoft.Toolbox.Standard
             Delimiter = delimiter;
             HasRoot = hasRoot;
 
-            _parts = parts.SelectMany(x => x.Split(Delimiter)).ToArray();
+            _parts = parts.SelectMany(x => x.Split(Delimiter, StringSplitOptions.RemoveEmptyEntries)).ToArray();
             _deferred = new Deferred<string>(() => (HasRoot ? Delimiter : string.Empty) + string.Join(Delimiter, _parts));
         }
 
