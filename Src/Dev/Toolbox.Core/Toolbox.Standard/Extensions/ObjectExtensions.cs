@@ -34,8 +34,11 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="objectToSet">base object</param>
         /// <param name="propertyName">property name</param>
         /// <param name="valueToSet">value to set</param>
-        public static void SetPropertyValue(this object objectToSet, string propertyName, object valueToSet)
+        public static void SetPropertyValue(this object objectToSet, string propertyName, object? valueToSet)
         {
+            objectToSet.Verify(nameof(objectToSet)).IsNotNull();
+            propertyName.Verify(nameof(propertyName)).IsNotEmpty();
+
             Type type = objectToSet.GetType();
 
             PropertyInfo propertyInfo = type.GetProperty(propertyName);
@@ -154,6 +157,17 @@ namespace Khooversoft.Toolbox.Standard
             }
 
             return propertyList;
+        }
+
+        /// <summary>
+        /// Deserialze to key value pairs
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public static IReadOnlyList<KeyValuePair<string, object>>? SerializeToKeyValue<T>(this T value, Func<PropertyInfo, bool>? filter = null)
+        {
+            return new ObjectToKeyValue<T>().ToKeyValue(value, filter);
         }
     }
 }

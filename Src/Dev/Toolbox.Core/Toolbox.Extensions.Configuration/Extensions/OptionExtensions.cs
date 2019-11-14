@@ -28,7 +28,7 @@ namespace Khooversoft.Toolbox.Extensions.Configuration
         /// </summary>
         /// <param name="type">option class's type</param>
         /// <param name="onlyProperties">return only properties, no subclasses</param>
-        /// <returns></returns>
+        /// <returns>help details</returns>
         public static IReadOnlyList<OptionHelp> GetHelpData(this Type type, bool onlyProperties = false)
         {
             type.Verify(nameof(type)).IsNotNull();

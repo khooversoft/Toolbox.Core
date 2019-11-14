@@ -25,15 +25,23 @@ namespace Khooversoft.Toolbox.Standard
         {
         }
 
-        public StringVector(string name, string delimiter)
+        /// <summary>
+        /// Default empty
+        /// </summary>
+        public StringVector(string value)
+            : this(value, "/")
         {
-            name.Verify(nameof(name)).IsNotEmpty();
+        }
+
+        public StringVector(string value, string delimiter)
+        {
+            value.Verify(nameof(value)).IsNotEmpty();
             delimiter.Verify(nameof(delimiter)).IsNotEmpty();
 
             Delimiter = delimiter;
-            HasRoot = name.Length > 0 && name[0] == '/' ? true : false;
+            HasRoot = value.Length > 0 && value[0] == '/' ? true : false;
 
-            _parts = name.Split(Delimiter, StringSplitOptions.RemoveEmptyEntries).ToArray();
+            _parts = value.Split(Delimiter, StringSplitOptions.RemoveEmptyEntries).ToArray();
             _deferred = new Deferred<string>(() => (HasRoot ? Delimiter : string.Empty) + string.Join(Delimiter, _parts));
         }
 
