@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,7 +83,7 @@ namespace Khooversoft.Toolbox.Extensions.Configuration
         {
             option.Verify(nameof(option)).IsNotNull();
 
-            IReadOnlyList<KeyValuePair<string, object>> properties = option.GetPropertyValuesWithPath(x => x.GetCustomAttribute<OptionAttribute>() != null)
+            IReadOnlyList<KeyValuePair<string, object>> properties = option.SerializeToKeyValue(x => x.GetCustomAttribute<OptionAttribute>() != null)
                 .OrderBy(x => x.Key)
                 .ToList();
 

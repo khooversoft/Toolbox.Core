@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -16,9 +19,9 @@ namespace Toolbox.Standard.Test.Extensions
         {
             TestClass? testClass = null;
 
-            IReadOnlyList<KeyValuePair<string, object>> subject = testClass.GetPropertyValuesWithPath();
-            subject.Should().NotBeNull();
-            subject.Count.Should().Be(0);
+            Action subject = () => testClass.SerializeToKeyValue();
+
+            subject.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -36,7 +39,7 @@ namespace Toolbox.Standard.Test.Extensions
             };
 
             IReadOnlyDictionary<string, object> properties = testClass
-                .GetPropertyValuesWithPath()
+                .SerializeToKeyValue()
                 .ToDictionary(x => x.Key, x => x.Value);
 
             properties.Should().NotBeNull();
@@ -79,7 +82,7 @@ namespace Toolbox.Standard.Test.Extensions
             };
 
             IReadOnlyDictionary<string, object> properties = testClass
-                .GetPropertyValuesWithPath()
+                .SerializeToKeyValue()
                 .ToDictionary(x => x.Key, x => x.Value);
 
             properties.Should().NotBeNull();

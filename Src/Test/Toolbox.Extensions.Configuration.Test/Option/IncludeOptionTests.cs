@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Extensions.Configuration;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Extensions.Configuration;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -18,7 +21,7 @@ namespace Toolbox.Core.Extensions.Configuration.Test.Option
         public IncludeOptionTests()
         {
             Stream stream = Assembly.GetAssembly(typeof(IncludeOptionTests))
-                ?.GetManifestResourceStream("Toolbox.Core.Extensions.Configuration.Test.Option.Test.json")
+                ?.GetManifestResourceStream("Toolbox.Extensions.Configuration.Test.Option.Test.json")
                 .Verify()
                 .IsNotNull("Cannot find Test.json in resources")
                 .Value!;

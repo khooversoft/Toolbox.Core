@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,21 +11,25 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
-    public class ObjectToKeyValue<T>
+    /// <summary>
+    /// Serialize class to key value list
+    /// </summary>
+    /// <typeparam name="T">type to serialize</typeparam>
+    public class SerializeToKeyValue<T> where T : class
     {
         private readonly Stack<PropertyPath> _stack = new Stack<PropertyPath>();
         private readonly Func<string?, string, string> _createPath = (x, n) => (x != null ? x + ":" : string.Empty) + n;
 
-        public ObjectToKeyValue()
+        public SerializeToKeyValue()
         {
         }
 
-        public IReadOnlyList<KeyValuePair<string, object>>? ToKeyValue(T subject, Func<PropertyInfo, bool>? filter = null)
+        public IReadOnlyList<KeyValuePair<string, object>> ToKeyValue(T subject, Func<PropertyInfo, bool>? filter = null)
         {
-            if (subject == null) return null;
+            subject.Verify(nameof(subject)).IsNotNull();
 
             _stack.Clear();
-            _stack.Push(new PropertyPath(subject, null));
+            _stack.Push(new PropertyPath(subject!, null));
             var propertyList = new List<KeyValuePair<string, object>>();
             filter ??= (x => true);
 
@@ -55,20 +62,21 @@ namespace Khooversoft.Toolbox.Standard
 
                 foreach (var collectionItem in collection)
                 {
-                    int index = 0;
+                    int index = -1;
                     foreach (var item in (IEnumerable)collectionItem.Value)
                     {
-                        _stack.Push(new PropertyPath(item, _createPath(current.Path, $"{collectionItem.PropertyInfo.Name}:{index}")));
                         index++;
+
+                        Type type = item.GetType();
+                        if (type == typeof(string) || type.IsValueType)
+                        {
+                            propertyList.Add(new KeyValuePair<string, object>(_createPath(current.Path, $"{collectionItem.PropertyInfo.Name}:{index}"), item));
+                            continue;
+                        }
+
+                        _stack.Push(new PropertyPath(item, _createPath(current.Path, $"{collectionItem.PropertyInfo.Name}:{index}")));
                     }
                 }
-
-                //var values = collection
-                //    .SelectMany(x => (IEnumerable)x.Value)
-                //    .ToList();
-
-                //collection
-                //    .ForEach(x => _stack.Push(new PropertyPath(x.Value, _createPath(current.Path, $"{x.Index}:{x.PropertyInfo.Name}"))));
             }
 
             return propertyList;

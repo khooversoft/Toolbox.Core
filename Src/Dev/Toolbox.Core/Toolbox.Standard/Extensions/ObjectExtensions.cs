@@ -17,7 +17,12 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="type">type to test</param>
         /// <returns>true if nullable, false if not</returns>
-        public static bool IsNullableType(this Type type) => type.IsGenericType && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
+        public static bool IsNullableType(this Type type)
+        {
+            type.Verify(nameof(type)).IsNotNull();
+
+            return type.IsGenericType && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
+        }
 
         /// <summary>
         /// Do action on any object, used for fluent patterns, acts like a F# function in a pipe
@@ -116,58 +121,27 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
-        /// Get class properties values with path
-        /// </summary>
-        /// <typeparam name="T">class type</typeparam>
-        /// <param name="objectToRead">object to read</param>
-        /// <param name="filter">filter which class properties to use (optional)</param>
-        /// <returns>list of path and properties</returns>
-        public static IReadOnlyList<KeyValuePair<string, object>> GetPropertyValuesWithPath<T>(this T objectToRead, Func<PropertyInfo, bool>? filter = null)
-        {
-            var propertyList = new List<KeyValuePair<string, object>>();
-            if (objectToRead == null) return propertyList;
-
-            var stack = new Stack<(object Instance, string? ClassPath)>(new (object Instance, string? ClassPath)[] { (objectToRead, null) });
-            filter ??= (x => true);
-
-            Func<string?, string, string> createPath = (x, n) => (x != null ? x + ":" : string.Empty) + n;
-
-            while (stack.Count > 0)
-            {
-                (object Instance, string? ClassPath) current = stack.Pop();
-
-                var properties = current.Instance.GetType().GetProperties()
-                    .Where(x => x.CanWrite && (!x.PropertyType.IsClass || x.PropertyType == typeof(string)))
-                    .Where(x => filter(x))
-                    .ToList();
-
-                properties
-                    .ForEach(x => propertyList.Add(new KeyValuePair<string, object>(createPath(current.ClassPath, x.Name), x.GetValue(current.Instance, null))));
-
-                var classProperties = current.Instance.GetType().GetProperties()
-                    .Where(x => x.CanWrite)
-                    .Where(x => x.PropertyType.IsClass && x.PropertyType != typeof(string) && filter(x))
-                    .Select(x => new { PropertyInfo = x, Value = x.GetValue(current.Instance, null) })
-                    .Where(x => x.Value != null)
-                    .ToArray();
-
-                classProperties
-                    .Reverse()
-                    .ForEach(x => stack.Push((x.Value, createPath(current.ClassPath, x.PropertyInfo.Name))));
-            }
-
-            return propertyList;
-        }
-
-        /// <summary>
-        /// Deserialze to key value pairs
+        /// Serialize to key value pairs
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="Value"></param>
-        /// <returns></returns>
-        public static IReadOnlyList<KeyValuePair<string, object>>? SerializeToKeyValue<T>(this T value, Func<PropertyInfo, bool>? filter = null)
+        /// <returns>list of path and values</returns>
+        public static IReadOnlyList<KeyValuePair<string, object>> SerializeToKeyValue<T>(this T value, Func<PropertyInfo, bool>? filter = null)
+            where T : class
         {
-            return new ObjectToKeyValue<T>().ToKeyValue(value, filter);
+            return new SerializeToKeyValue<T>().ToKeyValue(value, filter);
+        }
+
+        /// <summary>
+        /// Deserialize from key values
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="values"></param>
+        /// <returns>constructed class</returns>
+        public static T DeserializeFromKeyValue<T>(this IEnumerable<KeyValuePair<string, object>> values)
+            where T : class, new()
+        {
+            return new DeserializeFromKeyValue<T>().ToObject(values);
         }
     }
 }
