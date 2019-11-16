@@ -131,17 +131,5 @@ namespace Khooversoft.Toolbox.Standard
         {
             return new SerializeToKeyValue<T>().ToKeyValue(value, filter);
         }
-
-        /// <summary>
-        /// Deserialize from key values
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="values"></param>
-        /// <returns>constructed class</returns>
-        public static T DeserializeFromKeyValue<T>(this IEnumerable<KeyValuePair<string, object>> values)
-            where T : class, new()
-        {
-            return new DeserializeFromKeyValue<T>().ToObject(values);
-        }
     }
 }

@@ -21,9 +21,8 @@ namespace Toolbox.Core.Extensions.Configuration.Test.Option
         public IncludeOptionTests()
         {
             Stream stream = Assembly.GetAssembly(typeof(IncludeOptionTests))
-                ?.GetManifestResourceStream("Toolbox.Extensions.Configuration.Test.Option.Test.json")
-                .Verify()
-                .IsNotNull("Cannot find Test.json in resources")
+                .GetManifestResourceStream("Toolbox.Extensions.Configuration.Test.Option.Test.json")
+                .Verify().IsNotNull("Cannot find Test.json in resources")
                 .Value!;
 
             TestJsonFilePath = Path.GetTempFileName();
@@ -41,33 +40,35 @@ namespace Toolbox.Core.Extensions.Configuration.Test.Option
 
         private class Option
         {
-            [Option("Display help", ShortCuts = new string[] { "?" })]
-            public bool Help { get; private set; }
+            [Option("Display help")]
+            public bool Help { get; set; }
 
             [Option("Send events")]
-            public bool Send { get; private set; }
+            public bool Send { get; set; }
 
             [Option("Receive events")]
-            public bool Receive { get; private set; }
+            public bool Receive { get; set; }
 
             [Option("Number of events to send")]
-            public int Count { get; private set; } = 1;
+            public int Count { get; set; } = 1;
 
             [Option("Event Hub")]
-            public EventHub? EventHub { get; private set; }
+            public EventHub? EventHub { get; set; }
 
             [Option("Storage account")]
-            public StorageAccount? StorageAccount { get; private set; }
+            public StorageAccount? StorageAccount { get; set; }
 
             public CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
 
             public static Option Build(params string[] args)
             {
-                Option option = new ConfigurationBuilder()
+                IConfiguration configuration = new ConfigurationBuilder()
                     .AddIncludeFiles(args, "ConfigFile")
                     .AddCommandLine(args.ConflateKeyValue<Option>())
-                    .Build()
-                    .BuildOption<Option>();
+                    .Build();
+
+                Option option = new Option();
+                configuration.Bind(option);
 
                 option.Verify(nameof(option)).IsNotNull();
                 (option.Send || option.Receive).Verify().Assert("Send and/or Receive must be specified");

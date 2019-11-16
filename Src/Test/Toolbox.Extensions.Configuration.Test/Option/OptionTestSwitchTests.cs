@@ -57,24 +57,9 @@ namespace Toolbox.Core.Extensions.Configuration.Test.Option
             option.Help.Should().BeTrue();
         }
 
-        [Fact]
-        public void GivenBooleanOption_WhenShortCut_HelpShouldBeTrue()
-        {
-            var args = new string[]
-            {
-                "?",
-                "FileName=name1",
-            };
-
-            Option option = Option.Build(args);
-
-            option.Should().NotBeNull();
-            option.Help.Should().BeTrue();
-        }
-
         private class Option
         {
-            [Option("Display help", ShortCuts = new string[] { "?" })]
+            [Option("Display help")]
             public bool Help { get; set; }
 
             public static Option Build(params string[] args)
@@ -83,7 +68,8 @@ namespace Toolbox.Core.Extensions.Configuration.Test.Option
                     .AddCommandLine(args.ConflateKeyValue<Option>())
                     .Build();
 
-                Option option = configuration.BuildOption<Option>();
+                Option option = new Option();
+                configuration.Bind(option);
 
                 return option;
             }

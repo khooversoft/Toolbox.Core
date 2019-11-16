@@ -18,8 +18,6 @@ namespace Khooversoft.Toolbox.Extensions.Configuration
 
         public string? Name { get; set; }
 
-        public string[]? ShortCuts { get; set; }
-
         public string? Syntax { get; set; }
 
         public string[] HelpText { get; set; }

@@ -63,7 +63,7 @@ namespace Khooversoft.Toolbox.Extensions.Configuration
         }
 
         /// <summary>
-        /// Based on 
+        /// Expand 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="args"></param>
@@ -76,7 +76,7 @@ namespace Khooversoft.Toolbox.Extensions.Configuration
                 .Where(x => x.CanWrite)
                 .Where(x => x.PropertyType == typeof(bool))
                 .Where(x => x.GetCustomAttribute<OptionAttribute>() != null)
-                .SelectMany(x => x.Name.ToEnumerable().Concat(x.GetCustomAttribute<OptionAttribute>().ShortCuts ?? Enumerable.Empty<string>()))
+                .Select(x => x.Name)
                 .ToList();
 
             return args.ConflateKeyValue(switches, value);

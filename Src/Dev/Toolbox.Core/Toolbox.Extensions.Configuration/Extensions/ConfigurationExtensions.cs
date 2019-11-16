@@ -12,17 +12,6 @@ namespace Khooversoft.Toolbox.Extensions.Configuration
     public static class ConfigurationExtensions
     {
         /// <summary>
-        /// Build option from configuration collection
-        /// </summary>
-        /// <typeparam name="T">type of option</typeparam>
-        /// <param name="configuration">instance of the configuration collection</param>
-        /// <returns>option</returns>
-        public static T BuildOption<T>(this IConfiguration configuration) where T : class, new()
-        {
-            return new OptionBuilder<T>(configuration).Build();
-        }
-
-        /// <summary>
         /// Search for include configuration files on the command line.
         /// </summary>
         /// <param name="builder">configuration builder reference</param>
@@ -37,6 +26,23 @@ namespace Khooversoft.Toolbox.Extensions.Configuration
                 .ForEach(x => builder.AddJsonFile(x, true));
 
             return builder;
+        }
+
+        /// <summary>
+        /// Build option based on configuration
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="configuration">configuration built</param>
+        /// <returns>option</returns>
+        public static T BuildOption<T>(this IConfiguration configuration)
+            where T : class, new()
+        {
+            configuration.Verify(nameof(configuration)).IsNotNull();
+
+            T option = new T();
+            configuration.Bind(option);
+
+            return option;
         }
     }
 }

@@ -139,7 +139,7 @@ namespace Toolbox.Core.Extensions.Configuration.Test.Option
         [OptionHelp(HelpArea.Header, "Class help text line #2")]
         private class Option : IOption
         {
-            [Option("Display help", ShortCuts = new string[] { "?" })]
+            [Option("Display help")]
             public bool Help { get; set; }
 
             [Option("Set file name", "Second line of text")]
@@ -181,7 +181,8 @@ namespace Toolbox.Core.Extensions.Configuration.Test.Option
                     .AddCommandLine(args)
                     .Build();
 
-                IOption option = configuration.BuildOption<Option>();
+                IOption option = new Option();
+                configuration.Bind(option);
 
                 return option;
             }
