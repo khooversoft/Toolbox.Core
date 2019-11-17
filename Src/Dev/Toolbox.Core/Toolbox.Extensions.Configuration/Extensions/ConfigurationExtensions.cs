@@ -40,7 +40,7 @@ namespace Khooversoft.Toolbox.Extensions.Configuration
             configuration.Verify(nameof(configuration)).IsNotNull();
 
             T option = new T();
-            configuration.Bind(option);
+            configuration.Bind(option, x => x.BindNonPublicProperties = true);
 
             return option;
         }
