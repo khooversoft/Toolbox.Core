@@ -1,0 +1,18 @@
+{
+  "Send": false,
+  "Receive": false,
+  "Count": 0,
+  "LoggingFolder": "log",
+
+  "EventHub": {
+    "ConnectionString": "Endpoint=sb://actor-demo.servicebus.windows.net/;SharedAccessKeyName=ReaderWriter;SharedAccessKey=uUBYbwvJDO+9hepVs/a8WsItn4xF5jH3+DAe7tMXIaM=;EntityPath=actor-demo-rapids",
+    "Name": "actor-demo-rapids",
+    "ConsumerGroupName": "$Default"
+  },
+
+  "StorageAccount": {
+    "AccountName": "actordemo",
+    "AccountKey": "XCChpza+anB8qe30MLpDjoQA0r2mjgFJ9ENrcllHSH9MsNvw6V8cjLDUWtajURI2904HTw60xcgvgG7al6z/pg==",
+    "ContainerName": "actor-demo-event-hub-tracker2"
+  }
+}

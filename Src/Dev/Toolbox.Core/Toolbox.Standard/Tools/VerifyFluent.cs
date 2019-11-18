@@ -8,30 +8,6 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
-    public struct VerifyContext<T>
-    {
-        public VerifyContext(T value)
-        {
-            Value = value;
-            Name = null;
-        }
-
-        public VerifyContext(T value, string name)
-        {
-            Value = value;
-            Name = name;
-        }
-
-        public T Value { get; }
-
-        public string? Name { get; }
-
-        public string Format(string? message)
-        {
-            return (Name == null ? string.Empty : Name + ": ") + (message ?? "Verification failed");
-        }
-    }
-
     public static class VerifyFluent
     {
         [DebuggerStepThrough]

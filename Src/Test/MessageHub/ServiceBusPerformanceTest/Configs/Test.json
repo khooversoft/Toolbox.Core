@@ -1,0 +1,9 @@
+{
+  "Send": false,
+  "Receive": false,
+  "Count": 1000,
+  "LoggingFolder": "log",
+
+  "ServiceBusConnectionString": "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=SendListen;SharedAccessKey=atdSPQf/nryf4LBDPaSGgev5adEtigEDA8UJiJdUsNI=;TransportType=Amqp",
+  "QueueName": "default"
+}
