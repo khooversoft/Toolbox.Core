@@ -1,6 +1,7 @@
 ﻿using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,7 +28,7 @@ namespace MessageHub.Management
             _registerStore.Set(context, queueRegistration);
 
             return await new StateManagerBuilder()
-                .Add(new CreateQueueState(_serviceBusConnection, queueRegistration))
+                .Add(new CreateQueueState(_serviceBusConnection, queueRegistration.QueueDefinition))
                 .Build()
                 .Set(context);
         }
@@ -42,6 +43,18 @@ namespace MessageHub.Management
                 .Add(new RemoveQueueState(_serviceBusConnection, nodeId))
                 .Build()
                 .Set(context);
+        }
+
+        public Task<IReadOnlyList<QueueRegistration>> Search(string search)
+        {
+            search.Verify(nameof(search)).IsNotEmpty();
+
+            if (!_registerStore.TryGet(search, out QueueRegistration queueRegistration))
+            {
+                return Task.FromResult<IReadOnlyList<QueueRegistration>>(Enumerable.Empty<QueueRegistration>().ToList());
+            }
+
+            return Task.FromResult<IReadOnlyList<QueueRegistration>>(queueRegistration.ToEnumerable().ToList());
         }
     }
 }

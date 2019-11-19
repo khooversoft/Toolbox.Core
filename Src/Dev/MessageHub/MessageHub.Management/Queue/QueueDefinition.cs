@@ -12,7 +12,7 @@ namespace MessageHub.Management
 
         public bool RequiresDuplicateDetection { get; set; } = false;
 
-        public TimeSpan DuplicateDetectionHistoryTimeWindow { get; set; } = TimeSpan.FromMinutes(2);
+        public TimeSpan DuplicateDetectionHistoryTimeWindow { get; set; } = TimeSpan.FromMinutes(10);
 
         public bool RequiresSession { get; set; } = false;
 

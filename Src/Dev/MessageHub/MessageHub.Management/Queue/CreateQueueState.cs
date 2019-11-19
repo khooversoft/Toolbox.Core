@@ -12,19 +12,20 @@ namespace MessageHub.Management
     /// </summary>
     public class CreateQueueState : IStateItem
     {
-        private readonly QueueRegistration _queueRegistration;
-        private readonly ManagementClient _managementClient;
+        private readonly QueueDefinition _queueDefinition;
+        private readonly IQueueManagement _managementClient;
 
-        public CreateQueueState(ServiceBusConnection serviceBusConnection, QueueRegistration queueRegistration)
+        public CreateQueueState(ServiceBusConnection serviceBusConnection, QueueDefinition queueDefinition)
         {
             serviceBusConnection.Verify(nameof(serviceBusConnection)).IsNotNull();
-            queueRegistration.Verify(nameof(queueRegistration)).IsNotNull();
+            queueDefinition.Verify(nameof(queueDefinition)).IsNotNull();
+            queueDefinition.QueueName.Verify(nameof(queueDefinition.QueueName)).IsNotNull();
 
-            _queueRegistration = queueRegistration;
-            _managementClient = new ManagementClient(serviceBusConnection.ConnectionString);
+            _queueDefinition = queueDefinition;
+            _managementClient = new QueueManagement(serviceBusConnection);
         }
 
-        public string Name => _queueRegistration.QueueDefinition!.QueueName!;
+        public string Name => _queueDefinition!.QueueName!;
 
         public bool IgnoreError => false;
 
@@ -32,29 +33,25 @@ namespace MessageHub.Management
         {
             if (await Test(context)) return true;
 
-            if (await _managementClient.QueueExistsAsync(_queueRegistration.QueueDefinition.QueueName, context.CancellationToken))
+            if (await _managementClient.QueueExists(context, _queueDefinition.QueueName!))
             {
                 // Queue exist, so update it
-                QueueDescription updateDescription = _queueRegistration.QueueDefinition.ConvertTo();
-                await _managementClient.UpdateQueueAsync(updateDescription, context.CancellationToken);
+                await _managementClient.UpdateQueue(context, _queueDefinition);
 
                 (await Test(context)).Verify().Assert<bool, InvalidOperationException>(x => x, "Test did not verify update");
                 return true;
             }
 
-            QueueDescription queueDescription = _queueRegistration.QueueDefinition.ConvertTo();
-            QueueDescription createdDescription = await _managementClient.CreateQueueAsync(queueDescription, context.CancellationToken);
-
-            return createdDescription != null;
+            await _managementClient.CreateQueue(context, _queueDefinition);
+            return true;
         }
 
         public async Task<bool> Test(IWorkContext context)
         {
-            QueueDescription queueDescription = await _managementClient.GetQueueAsync(_queueRegistration.QueueDefinition.QueueName, context.CancellationToken);
-            if (queueDescription == null) return false;
+            if ((await _managementClient.QueueExists(context, _queueDefinition.QueueName!) == false)) return false;
 
-            var currentDescription = queueDescription.ConvertTo();
-            return currentDescription == _queueRegistration.QueueDefinition;
+            QueueDefinition subject = await _managementClient.GetQueue(context, _queueDefinition.QueueName!);
+            return (_queueDefinition == subject);
         }
     }
 }

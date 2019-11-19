@@ -12,19 +12,18 @@ namespace MessageHub.Management
     /// </summary>
     public class RemoveQueueState : IStateItem
     {
-        private readonly string _nodeId;
-        private readonly ManagementClient _managementClient;
+        private readonly IQueueManagement _managementClient;
 
         public RemoveQueueState(ServiceBusConnection serviceBusConnection, string nodeId)
         {
             serviceBusConnection.Verify(nameof(serviceBusConnection)).IsNotNull();
-            nodeId.Verify(nameof(nodeId)).IsNotNull();
+            nodeId.Verify(nameof(nodeId)).IsNotEmpty();
 
-            _nodeId = nodeId;
-            _managementClient = new ManagementClient(serviceBusConnection.ConnectionString);
+            _managementClient = new QueueManagement(serviceBusConnection);
+            Name = nodeId;
         }
 
-        public string Name => _nodeId;
+        public string Name { get; }
 
         public bool IgnoreError => false;
 
@@ -32,15 +31,14 @@ namespace MessageHub.Management
         {
             if (await Test(context)) return true;
 
-            await _managementClient.DeleteQueueAsync(_nodeId, context.CancellationToken);
+            await _managementClient.DeleteQueue(context, Name);
             return true;
         }
 
         public async Task<bool> Test(IWorkContext context)
         {
-            QueueDescription queueDescription = await _managementClient.GetQueueAsync(_nodeId, context.CancellationToken);
-
-            return queueDescription == null ? true : false;
+            bool state = await _managementClient.QueueExists(context, Name);
+            return !state;
         }
     }
 }
