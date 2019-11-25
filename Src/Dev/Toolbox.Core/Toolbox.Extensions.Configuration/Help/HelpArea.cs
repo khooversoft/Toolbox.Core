@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Khooversoft.Toolbox.Extensions.Configuration
+namespace Khooversoft.Toolbox.Configuration
 {
     public enum HelpArea
     {

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Khooversoft.Toolbox.Extensions.Configuration;
+using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 
 namespace EventHubPerformanceTest

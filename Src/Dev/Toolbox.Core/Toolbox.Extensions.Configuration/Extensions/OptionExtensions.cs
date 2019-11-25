@@ -9,7 +9,7 @@ using System.Text;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Khooversoft.Toolbox.Extensions.Configuration
+namespace Khooversoft.Toolbox.Configuration
 {
     public static class OptionExtensions
     {

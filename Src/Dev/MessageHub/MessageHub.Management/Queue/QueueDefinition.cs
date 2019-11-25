@@ -8,6 +8,8 @@ namespace MessageHub.Management
     {
         public string? QueueName { get; set; }
 
+        public Uri? ResourcePath { get; set; }
+
         public TimeSpan LockDuration { get; set; } = TimeSpan.FromSeconds(45);
 
         public bool RequiresDuplicateDetection { get; set; } = false;
@@ -33,6 +35,7 @@ namespace MessageHub.Management
             return obj != null &&
                 compareTo! != null! &&
                 QueueName == compareTo?.QueueName &&
+                ResourcePath == compareTo!.ResourcePath &&
                 LockDuration == compareTo!.LockDuration &&
                 RequiresDuplicateDetection == compareTo.RequiresDuplicateDetection &&
                 DuplicateDetectionHistoryTimeWindow == compareTo.DuplicateDetectionHistoryTimeWindow &&

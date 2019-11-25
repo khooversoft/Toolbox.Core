@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Khooversoft.Toolbox.Standard
 {
@@ -33,6 +34,20 @@ namespace Khooversoft.Toolbox.Standard
             foreach (var item in list)
             {
                 action(item);
+            }
+        }
+
+        /// <summary>
+        /// Execute 'action' on each item
+        /// </summary>
+        /// <typeparam name="T">type</typeparam>
+        /// <param name="list">list to operate on</param>
+        /// <param name="action">action to execute</param>
+        public static async Task ForEachAsync<T>(this IEnumerable<T> list, Func<T, Task> action)
+        {
+            foreach (var item in list)
+            {
+                await action(item);
             }
         }
 

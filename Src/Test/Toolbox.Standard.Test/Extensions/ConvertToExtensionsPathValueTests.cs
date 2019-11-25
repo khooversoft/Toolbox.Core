@@ -19,7 +19,7 @@ namespace Toolbox.Standard.Test.Extensions
         {
             TestClass? testClass = null;
 
-            Action subject = () => testClass.SerializeToKeyValue();
+            Action subject = () => testClass!.SerializeToKeyValue();
 
             subject.Should().Throw<ArgumentNullException>();
         }

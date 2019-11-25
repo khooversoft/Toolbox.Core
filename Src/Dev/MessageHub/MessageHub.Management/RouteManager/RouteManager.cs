@@ -1,4 +1,5 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿using Khooversoft.Toolbox.Actor;
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,51 +10,75 @@ namespace MessageHub.Management
 {
     public class RouteManager
     {
-        private readonly ServiceBusConnection _serviceBusConnection;
+        private readonly IQueueManagement _queueManagement;
         private readonly IRegisterStore _registerStore;
+        private readonly IActorManager _actorManager;
+        private readonly Deferred _deferredRegister;
 
-        public RouteManager(ServiceBusConnection serviceBusConnection, IRegisterStore registerStore)
+        public RouteManager(IQueueManagement queueManagement, IRegisterStore registerStore)
         {
-            serviceBusConnection.Verify(nameof(serviceBusConnection)).IsNotNull();
+            queueManagement.Verify(nameof(queueManagement)).IsNotNull();
             registerStore.Verify(nameof(registerStore)).IsNotNull();
 
-            _serviceBusConnection = serviceBusConnection;
+            _queueManagement = queueManagement;
             _registerStore = registerStore;
+            _actorManager = new ActorManager();
+
+            _deferredRegister = new Deferred(x => _actorManager.Register<INodeRegistrationActor>(x, c => new NodeRegistrationActor(_registerStore)));
         }
 
-        public async Task<bool> Register(IWorkContext context, QueueRegistration queueRegistration)
+        /// <summary>
+        /// Register Node by NodeId
+        /// </summary>
+        /// <param name="context">context</param>
+        /// <param name="request">request</param>
+        /// <returns></returns>
+        public async Task<RouteRegistrationResponse> Register(IWorkContext context, RouteRegistrationRequest request)
         {
-            queueRegistration.Verify(nameof(queueRegistration)).IsNotNull();
+            request.Verify(nameof(request)).IsNotNull();
+            request.NodeId.Verify(nameof(request.NodeId)).IsNotNull();
 
-            _registerStore.Set(context, queueRegistration);
+            _deferredRegister.Execute(context);
 
-            return await new StateManagerBuilder()
-                .Add(new CreateQueueState(_serviceBusConnection, queueRegistration.QueueDefinition))
-                .Build()
-                .Set(context);
+            Uri uri = new ResourcePathBuilder()
+                .SetScheme(ResourceScheme.Queue)
+                .SetServiceBusName("Default")
+                .SetEntityName(request.NodeId!)
+                .Build();
+
+            INodeRegistrationActor subject = await _actorManager.CreateProxy<INodeRegistrationActor>(context, uri.ToString());
+            await subject.Set(context, request.ConvertTo());
+
+            return new RouteRegistrationResponse
+            {
+                InputQueueUri = uri.ToString(),
+            };
         }
 
-        public async Task<bool> Unregister(IWorkContext context, string nodeId)
+        public async Task Unregister(IWorkContext context, string nodeId)
         {
             nodeId.Verify(nameof(nodeId)).IsNotNull();
 
-            _registerStore.Remove(context, nodeId);
+            Uri uri = new ResourcePathBuilder()
+                .SetScheme(ResourceScheme.Queue)
+                .SetServiceBusName("Default")
+                .SetEntityName(nodeId)
+                .Build();
 
-            return await new StateManagerBuilder()
-                .Add(new RemoveQueueState(_serviceBusConnection, nodeId))
-                .Build()
-                .Set(context);
+            INodeRegistrationActor subject = await _actorManager.CreateProxy<INodeRegistrationActor>(context, uri.ToString());
+            await subject.Remove(context);
         }
 
         public Task<IReadOnlyList<QueueRegistration>> Search(string search)
         {
             search.Verify(nameof(search)).IsNotEmpty();
 
-            if (!_registerStore.TryGet(search, out QueueRegistration queueRegistration))
-            {
-                return Task.FromResult<IReadOnlyList<QueueRegistration>>(Enumerable.Empty<QueueRegistration>().ToList());
-            }
+            //if (!_registerStore.TryGet(search, out QueueRegistration queueRegistration))
+            //{
+            //    return Task.FromResult<IReadOnlyList<QueueRegistration>>(Enumerable.Empty<QueueRegistration>().ToList());
+            //}
 
+            QueueRegistration queueRegistration = null;
             return Task.FromResult<IReadOnlyList<QueueRegistration>>(queueRegistration.ToEnumerable().ToList());
         }
     }

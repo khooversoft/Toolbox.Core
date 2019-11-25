@@ -25,9 +25,9 @@ namespace Khooversoft.Toolbox.Standard
             _properties = values.ToList();
         }
 
-        public EventDimensionsBuilder Add(string key, object value)
+        public EventDimensionsBuilder Add(string key, object? value)
         {
-            _properties.Add(new KeyValuePair<string, object>(key, value));
+            _properties.Add(new KeyValuePair<string, object>(key, value!));
             return this;
         }
 

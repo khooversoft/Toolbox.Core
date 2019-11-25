@@ -54,7 +54,7 @@ namespace Khooversoft.Toolbox.Standard
         public IReadOnlyList<IToken> Parse(string source)
         {
             ITokenSyntax[] syntaxRules = _syntaxList
-                .OrderBy(x => x.Priority)
+                .OrderByDescending(x => x.Priority)
                 .ToArray();
 
             var tokenList = new List<IToken>();

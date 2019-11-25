@@ -12,11 +12,13 @@ namespace MessageHub.Management
     public class QueueManagement : IQueueManagement
     {
         private readonly ManagementClient _managementClient;
+        private readonly ServiceBusConnection _serviceBusConnection;
 
         public QueueManagement(ServiceBusConnection serviceBusConnection)
         {
             serviceBusConnection.Verify(nameof(serviceBusConnection)).IsNotNull();
 
+            _serviceBusConnection = serviceBusConnection;
             _managementClient = new ManagementClient(serviceBusConnection.ConnectionString);
         }
 
@@ -64,16 +66,15 @@ namespace MessageHub.Management
             return _managementClient.DeleteQueueAsync(queueName, context.CancellationToken);
         }
 
-        public async Task<IReadOnlyList<QueueDefinition>> Search(IWorkContext context, string queueName, int maxSize = 100)
+        public async Task<IReadOnlyList<QueueDefinition>> Search(IWorkContext context, string? search = null, int maxSize = 100)
         {
             context.Verify(nameof(context)).IsNotNull();
-            queueName.Verify(nameof(queueName)).IsNotEmpty();
 
             List<QueueDefinition> list = new List<QueueDefinition>();
             int windowSize = 100;
             int index = 0;
 
-            string regPattern = "^" + Regex.Escape(queueName).Replace("\\*", ".*") + "$";
+            string regPattern = "^" + Regex.Escape(search ?? string.Empty).Replace("\\*", ".*") + "$";
             Func<string, bool> isMatch = x => Regex.IsMatch(x, regPattern, RegexOptions.IgnoreCase);
 
             while (list.Count < maxSize)
@@ -82,7 +83,7 @@ namespace MessageHub.Management
                 if (subjects.Count == 0) break;
 
                 index += subjects.Count;
-                list.AddRange(subjects.Where(x => isMatch(x.Path)).Select(x => x.ConvertTo()));
+                list.AddRange(subjects.Where(x => search == null || isMatch(x.Path)).Select(x => x.ConvertTo()));
             }
 
             return list;

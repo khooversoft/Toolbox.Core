@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
@@ -69,6 +70,25 @@ namespace Khooversoft.Toolbox.Standard
             }
 
             return (vectorValue.HasRoot ? "/" : string.Empty) + string.Join("/", stack.Reverse());
+        }
+
+        /// <summary>
+        /// Convert string to guid
+        /// </summary>
+        /// <param name="self">string to convert, empty string will return empty guid</param>
+        /// <returns>guid or empty guid</returns>
+        public static Guid ToGuid(this string self)
+        {
+            if (self.IsEmpty())
+            {
+                return Guid.Empty;
+            }
+
+            using (var md5 = MD5.Create())
+            {
+                byte[] data = md5.ComputeHash(Encoding.UTF8.GetBytes(self));
+                return new Guid(data);
+            }
         }
     }
 }

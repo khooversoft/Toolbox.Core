@@ -116,5 +116,29 @@ namespace Toolbox.Standard.Test.Parser
                 .All(x => x.o.Value == x.i.Value)
                 .Should().BeTrue();
         }
+
+        [Fact]
+        public void PropertyName_WhenEscapeIsUsed_ShouldReturnValidTokens()
+        {
+            IReadOnlyList<IToken> tokens = new StringTokenizer()
+                .Add("{", "}", "{{", "}}")
+                .Parse("Escape {{firstName}} end");
+
+            var expectedTokens = new IToken[]
+            {
+                new TokenValue("Escape "),
+                new TokenValue("{{"),
+                new TokenValue("firstName"),
+                new TokenValue("}}"),
+                new TokenValue(" end"),
+            };
+
+            tokens.Count.Should().Be(expectedTokens.Length);
+
+            tokens
+                .Zip(expectedTokens, (o, i) => (o, i))
+                .All(x => x.o.Value == x.i.Value)
+                .Should().BeTrue();
+        }
     }
 }

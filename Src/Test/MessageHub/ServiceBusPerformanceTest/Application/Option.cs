@@ -1,4 +1,4 @@
-﻿using Khooversoft.Toolbox.Extensions.Configuration;
+﻿using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Extensions.Configuration;
 using System;

@@ -131,5 +131,31 @@ namespace Khooversoft.Toolbox.Standard
         {
             return new SerializeToKeyValue<T>().ToKeyValue(value, filter);
         }
+
+        /// <summary>
+        /// Get key value properties for a class and any sub classes based on an attribute
+        /// </summary>
+        /// <typeparam name="T">attribute type</typeparam>
+        /// <param name="classToScan">class to scan</param>
+        /// <returns>list of property path and values</returns>
+        public static IReadOnlyList<KeyValuePair<string, object>> ToKeyValuesForAttribute<T>(this object classToScan)
+            where T : Attribute
+        {
+            return classToScan.SerializeToKeyValue(x => x.GetCustomAttributes<T>().Count() > 0);
+        }
+
+        /// <summary>
+        /// Convert object to cache object
+        /// </summary>
+        /// <typeparam name="T">type</typeparam>
+        /// <param name="value">value to cache</param>
+        /// <param name="lifeTime">how long to cache object</param>
+        /// <returns></returns>
+        public static CacheObject<T> ToCacheObject<T>(this T? value, TimeSpan lifeTime)
+            where T : class
+        {
+            return new CacheObject<T>(lifeTime)
+                .Set(value!);
+        }
     }
 }

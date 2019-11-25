@@ -14,12 +14,12 @@ namespace MessageHub.Management
     {
         private readonly IQueueManagement _managementClient;
 
-        public RemoveQueueState(ServiceBusConnection serviceBusConnection, string nodeId)
+        public RemoveQueueState(IQueueManagement queueManagement, string nodeId)
         {
-            serviceBusConnection.Verify(nameof(serviceBusConnection)).IsNotNull();
+            queueManagement.Verify(nameof(queueManagement)).IsNotNull();
             nodeId.Verify(nameof(nodeId)).IsNotEmpty();
 
-            _managementClient = new QueueManagement(serviceBusConnection);
+            _managementClient = queueManagement;
             Name = nodeId;
         }
 

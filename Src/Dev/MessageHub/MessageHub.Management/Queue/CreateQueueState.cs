@@ -15,14 +15,14 @@ namespace MessageHub.Management
         private readonly QueueDefinition _queueDefinition;
         private readonly IQueueManagement _managementClient;
 
-        public CreateQueueState(ServiceBusConnection serviceBusConnection, QueueDefinition queueDefinition)
+        public CreateQueueState(IQueueManagement queueManagement, QueueDefinition queueDefinition)
         {
-            serviceBusConnection.Verify(nameof(serviceBusConnection)).IsNotNull();
+            queueManagement.Verify(nameof(queueManagement)).IsNotNull();
             queueDefinition.Verify(nameof(queueDefinition)).IsNotNull();
             queueDefinition.QueueName.Verify(nameof(queueDefinition.QueueName)).IsNotNull();
 
             _queueDefinition = queueDefinition;
-            _managementClient = new QueueManagement(serviceBusConnection);
+            _managementClient = queueManagement;
         }
 
         public string Name => _queueDefinition!.QueueName!;

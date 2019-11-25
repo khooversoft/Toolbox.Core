@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Khooversoft.Toolbox.Extensions.Configuration;
+using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System.IO;
 

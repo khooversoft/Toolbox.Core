@@ -1,4 +1,4 @@
-﻿using Khooversoft.Toolbox.Extensions.Configuration;
+﻿using Khooversoft.Toolbox.Configuration;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
