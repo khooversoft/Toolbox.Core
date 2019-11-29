@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +9,7 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Actor
 {
-    public class ActorConfiguration : IActorConfiguration
+    public class ActorConfiguration
     {
         public ActorConfiguration(
             int capacity,
@@ -27,7 +30,7 @@ namespace Khooversoft.Toolbox.Actor
             WorkContext = workContext ?? Standard.WorkContext.Empty;
         }
 
-        public static IActorConfiguration Default { get; } = new ActorConfigurationBuilder().Build();
+        public static ActorConfiguration Default { get; } = new ActorConfigurationBuilder().Build();
 
         public int Capacity { get; }
 

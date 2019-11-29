@@ -12,13 +12,46 @@ namespace Toolbox.Standard.Test.Tools
     public class CacheObjectTests
     {
         [Fact]
-        public void EmptyTest()
+        public void GivenCacheObject_Initialize_ShouldBeFalseState()
         {
             var cache = new CacheObject<string>(TimeSpan.FromSeconds(10));
 
             cache.IsValid().Should().BeFalse();
             cache.TryGetValue(out string value).Should().BeFalse();
             value.Should().BeNullOrEmpty();
+        }
+
+        [Fact]
+        public void GivenNullValue_WhenCached_ShouldBeTure()
+        {
+            string item = null!;
+            var cache = item.ToCacheObject(TimeSpan.FromSeconds(10));
+
+            cache.IsValid().Should().BeTrue();
+            cache.TryGetValue(out string value).Should().BeTrue();
+            value.Should().BeNullOrEmpty();
+
+            string item2 = "this is the item";
+            cache.Set(item2);
+            cache.TryGetValue(out string value2).Should().BeTrue();
+            value2.Should().Be(item2);
+            cache.IsValid().Should().BeTrue();
+        }
+
+        [Fact]
+        public void GivenValue_WhenCachedAndCleard_ShouldBeFalseState()
+        {
+            const string valueToCache = "value to be cached";
+            string item = valueToCache;
+            var cache = item.ToCacheObject(TimeSpan.FromSeconds(10));
+
+            cache.IsValid().Should().BeTrue();
+            cache.TryGetValue(out string value).Should().BeTrue();
+            value.Should().Be(valueToCache);
+
+            cache.Clear();
+            cache.TryGetValue(out string value2).Should().BeFalse();
+            value2.Should().BeNull();
         }
 
         [Fact]

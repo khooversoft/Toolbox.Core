@@ -1,4 +1,8 @@
-﻿using Khooversoft.Toolbox.Actor;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.MessageHub.Interface;
+using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
@@ -6,25 +10,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MessageHub.Management
+namespace Khooversoft.MessageHub.Management
 {
     public class RouteManager
     {
-        private readonly IQueueManagement _queueManagement;
-        private readonly IRegisterStore _registerStore;
         private readonly IActorManager _actorManager;
-        private readonly Deferred _deferredRegister;
 
-        public RouteManager(IQueueManagement queueManagement, IRegisterStore registerStore)
+        public RouteManager(IActorManager actorManager)
         {
-            queueManagement.Verify(nameof(queueManagement)).IsNotNull();
-            registerStore.Verify(nameof(registerStore)).IsNotNull();
-
-            _queueManagement = queueManagement;
-            _registerStore = registerStore;
-            _actorManager = new ActorManager();
-
-            _deferredRegister = new Deferred(x => _actorManager.Register<INodeRegistrationActor>(x, c => new NodeRegistrationActor(_registerStore)));
+            actorManager.Verify(nameof(actorManager)).IsNotNull();
+            _actorManager = actorManager;
         }
 
         /// <summary>
@@ -32,13 +27,11 @@ namespace MessageHub.Management
         /// </summary>
         /// <param name="context">context</param>
         /// <param name="request">request</param>
-        /// <returns></returns>
+        /// <returns>response</returns>
         public async Task<RouteRegistrationResponse> Register(IWorkContext context, RouteRegistrationRequest request)
         {
             request.Verify(nameof(request)).IsNotNull();
             request.NodeId.Verify(nameof(request.NodeId)).IsNotNull();
-
-            _deferredRegister.Execute(context);
 
             Uri uri = new ResourcePathBuilder()
                 .SetScheme(ResourceScheme.Queue)
@@ -46,8 +39,16 @@ namespace MessageHub.Management
                 .SetEntityName(request.NodeId!)
                 .Build();
 
-            INodeRegistrationActor subject = await _actorManager.CreateProxy<INodeRegistrationActor>(context, uri.ToString());
-            await subject.Set(context, request.ConvertTo());
+            INodeRegistrationActor registgrationActor = await _actorManager.CreateProxy<INodeRegistrationActor>(request.NodeId!);
+            await registgrationActor.Set(context, request.ConvertTo(uri));
+
+            QueueDefinition queueDefinition = new QueueDefinition
+            {
+                QueueName = request.NodeId,
+            };
+
+            IQueueManagementActor queueActor = await _actorManager.CreateProxy<IQueueManagementActor>(request.NodeId!);
+            await queueActor.Set(context, queueDefinition);
 
             return new RouteRegistrationResponse
             {
@@ -55,6 +56,12 @@ namespace MessageHub.Management
             };
         }
 
+        /// <summary>
+        /// Unregistered route
+        /// </summary>
+        /// <param name="context">context</param>
+        /// <param name="nodeId">node id</param>
+        /// <returns>task</returns>
         public async Task Unregister(IWorkContext context, string nodeId)
         {
             nodeId.Verify(nameof(nodeId)).IsNotNull();
@@ -65,21 +72,30 @@ namespace MessageHub.Management
                 .SetEntityName(nodeId)
                 .Build();
 
-            INodeRegistrationActor subject = await _actorManager.CreateProxy<INodeRegistrationActor>(context, uri.ToString());
+            INodeRegistrationActor subject = await _actorManager.CreateProxy<INodeRegistrationActor>(nodeId);
             await subject.Remove(context);
         }
 
-        public Task<IReadOnlyList<QueueRegistration>> Search(string search)
+        /// <summary>
+        /// Search for node registration
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<IReadOnlyList<RouteLookupResponse>> Search(IWorkContext context, RouteLookupRequest request)
         {
-            search.Verify(nameof(search)).IsNotEmpty();
+            request.Verify(nameof(request)).IsNotNull();
 
-            //if (!_registerStore.TryGet(search, out QueueRegistration queueRegistration))
-            //{
-            //    return Task.FromResult<IReadOnlyList<QueueRegistration>>(Enumerable.Empty<QueueRegistration>().ToList());
-            //}
+            INodeRegistrationManagementActor managementActor = await _actorManager.CreateProxy<INodeRegistrationManagementActor>("default");
+            IReadOnlyList<NodeRegistrationModel> registrations = await managementActor.List(context, request.SearchNodeId!);
 
-            QueueRegistration queueRegistration = null;
-            return Task.FromResult<IReadOnlyList<QueueRegistration>>(queueRegistration.ToEnumerable().ToList());
+            return registrations
+                .Select(x => new RouteLookupResponse
+                {
+                    NodeId = x.NodeId,
+                    InputUri = x.InputUri,
+                })
+                .ToList();
         }
     }
 }

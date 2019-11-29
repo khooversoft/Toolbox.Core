@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +11,7 @@ using Khooversoft.Toolbox.Standard;
 using Newtonsoft.Json;
 using Khooversoft.Toolbox.Actor;
 
-namespace MessageHub.Management
+namespace Khooversoft.MessageHub.Management
 {
     public class BlobStore : IRegisterStore
     {
@@ -41,14 +44,15 @@ namespace MessageHub.Management
             _createContainer.Execute(context);
 
             string data = await _blobRepository.Get(context, path);
-            return JsonConvert.DeserializeObject<NodeRegistrationModel>(data);
+
+            return data == null ? null : JsonConvert.DeserializeObject<NodeRegistrationModel>(data);
         }
 
-        public async Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context)
+        public async Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context, string search)
         {
             _createContainer.Execute(context);
 
-            IReadOnlyList<string> list = await _blobRepository.List(context);
+            IReadOnlyList<string> list = await _blobRepository.List(context, search);
 
             IReadOnlyList<NodeRegistrationModel> result = list
                 .Select(x => JsonConvert.DeserializeObject<NodeRegistrationModel>(x))

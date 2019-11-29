@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -49,10 +52,7 @@ namespace Khooversoft.Toolbox.Standard
         {
             get
             {
-                if (TryGetValue(key, out T value))
-                {
-                    return value;
-                }
+                if (TryGetValue(key, out T value)) return value;
 
                 return default!;
             }
@@ -214,10 +214,8 @@ namespace Khooversoft.Toolbox.Standard
             lock (_lock)
             {
                 LinkedListNode<CacheItem> node;
-                if (_cacheMap.TryGetValue(key, out node))
-                {
-                    return node.Value;
-                }
+
+                if (_cacheMap.TryGetValue(key, out node)) return node.Value;
             }
 
             return null;
@@ -242,10 +240,7 @@ namespace Khooversoft.Toolbox.Standard
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         private void RemoveFirst()
         {

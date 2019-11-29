@@ -1,5 +1,5 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox;
 using Khooversoft.Toolbox.Standard;
@@ -15,8 +15,8 @@ namespace Khooversoft.Toolbox.Actor
     /// </summary>
     public class ActorManager : IActorManager, IDisposable
     {
-        private static StringVector _tag = new StringVector(nameof(ActorManager));
-        private static IWorkContext _actorManagerWorkContext = new WorkContextBuilder().Set(_tag).Build();
+        private static readonly StringVector _tag = new StringVector(nameof(ActorManager));
+        private static readonly IWorkContext _actorManagerWorkContext = new WorkContextBuilder().Set(_tag).Build();
 
         private readonly IActorRepository _actorRepository;
         private readonly ActorTypeManager _typeManager = new ActorTypeManager();
@@ -29,7 +29,7 @@ namespace Khooversoft.Toolbox.Actor
         {
         }
 
-        public ActorManager(IActorConfiguration configuration)
+        public ActorManager(ActorConfiguration configuration)
         {
             configuration.Verify(nameof(configuration)).IsNotNull();
 
@@ -45,12 +45,27 @@ namespace Khooversoft.Toolbox.Actor
         /// <summary>
         /// Configuration
         /// </summary>
-        public IActorConfiguration Configuration { get; private set; }
+        public ActorConfiguration Configuration { get; private set; }
 
         /// <summary>
         /// Is actor manager running (not disposed)
         /// </summary>
         public bool IsRunning { get { return _disposed == 0 || _disposing; } }
+
+        /// <summary>
+        /// Register actor by interface type
+        /// </summary>
+        /// <typeparam name="T">actor interface</typeparam>
+        /// <param name="context">context</param>
+        /// <param name="createImplementation">creator</param>
+        /// <returns>this</returns>
+        public IActorManager Register<T>() where T : IActor
+        {
+            Verify.Assert(IsRunning, _disposedTestText);
+
+            _typeManager.Register(Configuration.WorkContext.With(_tag), x => x.Container!.Resolve<T>());
+            return this;
+        }
 
         /// <summary>
         /// Register actor and lambda creator
@@ -59,13 +74,12 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="context">context</param>
         /// <param name="createImplementation">creator</param>
         /// <returns>this</returns>
-        public IActorManager Register<T>(IWorkContext context, Func<IWorkContext, T> createImplementation) where T : IActor
+        public IActorManager Register<T>(Func<IWorkContext, T> createImplementation) where T : IActor
         {
             Verify.Assert(IsRunning, _disposedTestText);
-            context.Verify(nameof(context)).IsNotNull();
             createImplementation.Verify(nameof(createImplementation)).IsNotNull();
 
-            _typeManager.Register<T>(context.With(_tag), createImplementation);
+            _typeManager.Register(Configuration.WorkContext.With(_tag), createImplementation);
             return this;
         }
 
@@ -76,9 +90,9 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="context">context</param>
         /// <param name="actorKey">actor key</param>
         /// <returns></returns>
-        public Task<T> CreateProxy<T>(IWorkContext context, string actorKey) where T : IActor
+        public Task<T> CreateProxy<T>(string actorKey) where T : IActor
         {
-            return CreateProxy<T>(context, new ActorKey(actorKey));
+            return CreateProxy<T>(new ActorKey(actorKey));
         }
 
         /// <summary>
@@ -88,14 +102,11 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="context">context</param>
         /// <param name="actorKey">actor key</param>
         /// <returns>actor proxy interface</returns>
-        public async Task<T> CreateProxy<T>(IWorkContext context, ActorKey actorKey) where T : IActor
+        public async Task<T> CreateProxy<T>(ActorKey actorKey) where T : IActor
         {
             Verify.Assert(IsRunning, _disposedTestText);
 
-            context.Verify(nameof(context)).IsNotNull();
-            context.Verify(nameof(context)).IsNotNull();
             actorKey.Verify(nameof(actorKey)).IsNotNull();
-            context = context.With(_tag);
 
             Type actorType = typeof(T);
 
@@ -107,21 +118,21 @@ namespace Khooversoft.Toolbox.Actor
             }
 
             // Create actor
-            IActor actorObject = _typeManager.Create<T>(context, actorKey, this);
+            IActor actorObject = _typeManager.Create<T>(Configuration.WorkContext.With(_tag), actorKey, this);
 
             IActorBase? actorBase = actorObject as IActorBase;
             if (actorBase == null)
             {
                 var ex = new ArgumentException($"Actor {actorObject.GetType().FullName} does not implement IActorBase");
-                Configuration.WorkContext.Telemetry.Error(context, "Cannot create", ex);
+                Configuration.WorkContext.Telemetry.Error(Configuration.WorkContext.With(_tag), "Cannot create", ex);
                 throw ex;
             }
 
             // Create proxy
-            T actorInterface = ActorProxy<T>.Create(context, actorBase, this);
+            T actorInterface = ActorProxy<T>.Create(Configuration.WorkContext.With(_tag), actorBase, this);
             actorRegistration = new ActorRegistration(typeof(T), actorKey, actorBase, actorInterface);
 
-            await _actorRepository.Set(context, actorRegistration).ConfigureAwait(false);
+            await _actorRepository.Set(Configuration.WorkContext.With(_tag), actorRegistration).ConfigureAwait(false);
 
             // Create proxy for interface
             return actorRegistration.GetInstance<T>();
@@ -134,13 +145,12 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="context">context</param>
         /// <param name="actorKey">actor key</param>
         /// <returns>true if deactivated, false if not found</returns>
-        public async Task<bool> Deactivate<T>(IWorkContext context, ActorKey actorKey)
+        public async Task<bool> Deactivate<T>(ActorKey actorKey)
         {
             Verify.Assert(IsRunning, _disposedTestText);
-            context.Verify(nameof(context)).IsNotNull();
             actorKey.Verify(nameof(actorKey)).IsNotNull();
 
-            IActorRegistration? actorRegistration = await _actorRepository.Remove(context, typeof(T), actorKey).ConfigureAwait(false);
+            IActorRegistration? actorRegistration = await _actorRepository.Remove(Configuration.WorkContext.With(_tag), typeof(T), actorKey).ConfigureAwait(false);
             if (actorRegistration == null)
             {
                 return false;
@@ -156,13 +166,12 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="context">context</param>
         /// <param name="actorKey">actor key</param>
         /// <returns>true if deactivated, false if not found</returns>
-        public async Task<bool> Deactivate(IWorkContext context, Type actorType, ActorKey actorKey)
+        public async Task<bool> Deactivate(Type actorType, ActorKey actorKey)
         {
             Verify.Assert(IsRunning, _disposedTestText);
-            context.Verify(nameof(context)).IsNotNull();
             actorType.Verify(nameof(actorType)).IsNotNull();
 
-            IActorRegistration? subject = await _actorRepository.Remove(context, actorType, actorKey).ConfigureAwait(false);
+            IActorRegistration? subject = await _actorRepository.Remove(Configuration.WorkContext.With(_tag), actorType, actorKey).ConfigureAwait(false);
             if (subject == null)
             {
                 return false;
@@ -176,12 +185,11 @@ namespace Khooversoft.Toolbox.Actor
         /// </summary>
         /// <param name="context">context</param>
         /// <returns>task</returns>
-        public async Task DeactivateAll(IWorkContext context)
+        public async Task DeactivateAll()
         {
             IsRunning.Verify().Assert(x => x == true, _disposedTestText);
-            context.Verify(nameof(context)).IsNotNull();
 
-            await _actorRepository.Clear(context).ConfigureAwait(false);
+            await _actorRepository.Clear(Configuration.WorkContext.With(_tag)).ConfigureAwait(false);
         }
 
         /// <summary>

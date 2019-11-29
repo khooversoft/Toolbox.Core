@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -7,7 +10,9 @@ namespace Khooversoft.Toolbox.Standard
 {
     /// <summary>
     /// Cache object, valid for only a specific amount of time specified in lifetime.
-    /// If specified, refresh, can indicate when a refresh operations should be done
+    /// If specified, refresh, can indicate when a refresh operations should be done.
+    /// 
+    /// This object is thread protected by using non-locking methods.
     /// </summary>
     /// <typeparam name="T">type of object cached</typeparam>
     public class CacheObject<T>

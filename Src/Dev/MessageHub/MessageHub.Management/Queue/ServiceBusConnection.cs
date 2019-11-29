@@ -1,10 +1,13 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MessageHub.Management
+namespace Khooversoft.MessageHub.Management
 {
     public class ServiceBusConnection
     {
@@ -18,8 +21,8 @@ namespace MessageHub.Management
             ServiceBusName = new ServiceBusConnectionStringBuilder(ConnectionString).Endpoint;
         }
 
-        public string ConnectionString { get; set; }
+        public string ConnectionString { get; }
 
-        public string ServiceBusName { get; set; }
+        public string ServiceBusName { get; }
     }
 }

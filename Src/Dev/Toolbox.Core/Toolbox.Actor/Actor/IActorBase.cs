@@ -1,5 +1,5 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox;
 using Khooversoft.Toolbox.Standard;
@@ -14,6 +14,8 @@ namespace Khooversoft.Toolbox.Actor
     public interface IActorBase : IDisposable
     {
         ActorKey ActorKey { get; }
+
+        bool Active { get; }
 
         Task Activate(IWorkContext context);
 

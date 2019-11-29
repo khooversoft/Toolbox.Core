@@ -1,8 +1,11 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MessageHub.Management
+namespace Khooversoft.MessageHub.Management
 {
     public interface IRegisterStore
     {
@@ -12,6 +15,6 @@ namespace MessageHub.Management
 
         Task<NodeRegistrationModel?> Get(IWorkContext context, string path);
 
-        Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context);
+        Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context, string search);
     }
 }

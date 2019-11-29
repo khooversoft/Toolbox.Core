@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +17,7 @@ namespace Khooversoft.Toolbox.Actor
         {
         }
 
-        public ActorConfigurationBuilder(IActorConfiguration configuration)
+        public ActorConfigurationBuilder(ActorConfiguration configuration)
         {
             configuration.Verify(nameof(configuration)).IsNotNull();
 
@@ -89,6 +92,12 @@ namespace Khooversoft.Toolbox.Actor
             return this;
         }
 
+        public ActorConfigurationBuilder Register<T>() where T : IActor
+        {
+            Registration.Add(new ActorTypeRegistration(typeof(T), x => x.Container!.Resolve<T>()));
+            return this;
+        }
+
         public ActorConfigurationBuilder SetActorCallTimeout(TimeSpan span)
         {
             ActorCallTimeout = span;
@@ -107,7 +116,7 @@ namespace Khooversoft.Toolbox.Actor
             return this;
         }
 
-        public IActorConfiguration Build()
+        public ActorConfiguration Build()
         {
             return new ActorConfiguration(
                 capacity: Capacity,
@@ -118,16 +127,6 @@ namespace Khooversoft.Toolbox.Actor
                 registrations: Registration,
                 workContext: WorkContext!
             );
-        }
-    }
-
-    public static class ActorConfigurationBuilderExtensions
-    {
-        public static IActorManager ToActorManager(this IActorConfiguration self)
-        {
-            self.Verify(nameof(self)).IsNotNull();
-
-            return new ActorManager(self);
         }
     }
 }

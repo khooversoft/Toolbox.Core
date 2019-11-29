@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus.Management;
 using System;
 using System.Collections.Generic;
@@ -7,18 +10,16 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace MessageHub.Management
+namespace Khooversoft.MessageHub.Management
 {
     public class QueueManagement : IQueueManagement
     {
         private readonly ManagementClient _managementClient;
-        private readonly ServiceBusConnection _serviceBusConnection;
 
         public QueueManagement(ServiceBusConnection serviceBusConnection)
         {
             serviceBusConnection.Verify(nameof(serviceBusConnection)).IsNotNull();
 
-            _serviceBusConnection = serviceBusConnection;
             _managementClient = new ManagementClient(serviceBusConnection.ConnectionString);
         }
 

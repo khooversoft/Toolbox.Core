@@ -1,5 +1,5 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox;
 using Khooversoft.Toolbox.Standard;
@@ -17,11 +17,11 @@ namespace Khooversoft.Toolbox.Actor
     /// </summary>
     public abstract class ActorBase : IActorBase
     {
-        private int _lockValue;
         private int _timerLockValue;
         private Timer? _timer;
         private readonly StringVector _tag = new StringVector(nameof(ActorBase));
         private readonly IWorkContext _workContext = WorkContext.Empty;
+        private int _running = 0;
 
         /// <summary>
         /// Get actor key
@@ -39,6 +39,11 @@ namespace Khooversoft.Toolbox.Actor
         public Type ActorType { get; internal set; } = null!;
 
         /// <summary>
+        /// Actor is active (running)
+        /// </summary>
+        public bool Active => _running == 1;
+
+        /// <summary>
         /// Activate actor
         /// </summary>
         /// <param name="context">context</param>
@@ -48,7 +53,7 @@ namespace Khooversoft.Toolbox.Actor
             context.Verify(nameof(context)).IsNotNull();
             context = context.With(_tag);
 
-            int currentValue = Interlocked.CompareExchange(ref _lockValue, 1, 0);
+            int currentValue = Interlocked.CompareExchange(ref _running, 1, 0);
             if (currentValue != 0)
             {
                 return;
@@ -69,7 +74,7 @@ namespace Khooversoft.Toolbox.Actor
             context.Verify(nameof(context)).IsNotNull();
             context = context.With(_tag);
 
-            int currentValue = Interlocked.CompareExchange(ref _lockValue, 0, 1);
+            int currentValue = Interlocked.CompareExchange(ref _running, 0, 1);
             if (currentValue != 1)
             {
                 return;
@@ -78,8 +83,6 @@ namespace Khooversoft.Toolbox.Actor
             ActorManager.Configuration.ActorDeactivateEvent(context, ActorKey, this.GetType());
             StopTimer();
             await OnDeactivate(context).ConfigureAwait(false);
-
-            await ActorManager.Deactivate(context, ActorType, ActorKey);
         }
 
         /// <summary>

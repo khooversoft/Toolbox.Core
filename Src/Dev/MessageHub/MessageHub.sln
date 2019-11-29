@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{CA15BE8F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Actor", "..\Toolbox.Core\Toolbox.Actor\Toolbox.Actor.csproj", "{BBEA57F6-A357-4322-8DFF-42578E14538F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Interface", "MessageHub.Interface\MessageHub.Interface.csproj", "{B5358CC6-77E7-41AC-B9E5-2368A4189A89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{BBEA57F6-A357-4322-8DFF-42578E14538F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBEA57F6-A357-4322-8DFF-42578E14538F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBEA57F6-A357-4322-8DFF-42578E14538F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

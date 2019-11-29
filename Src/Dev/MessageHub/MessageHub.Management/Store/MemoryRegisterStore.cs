@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -7,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MessageHub.Management
+namespace Khooversoft.MessageHub.Management
 {
     public class MemoryRegisterStore : IRegisterStore
     {
@@ -27,9 +30,15 @@ namespace MessageHub.Management
             return Task.FromResult<NodeRegistrationModel?>(null);
         }
 
-        public Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context)
+        public Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context, string search)
         {
-            return Task.FromResult<IReadOnlyList<NodeRegistrationModel>>(_data.Values.ToList());
+            var nodeIdCompare = new NodeIdCompare(search);
+
+            var results = _data.Values
+                .Where(x => nodeIdCompare.Test(x.NodeId!))
+                .ToList();
+
+            return Task.FromResult<IReadOnlyList<NodeRegistrationModel>>(results);
         }
 
         public Task Remove(IWorkContext context, string path)

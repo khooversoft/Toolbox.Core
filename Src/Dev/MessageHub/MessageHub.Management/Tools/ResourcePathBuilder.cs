@@ -1,9 +1,12 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MessageHub.Management
+namespace Khooversoft.MessageHub.Management
 {
     public enum ResourceScheme
     {
@@ -19,23 +22,23 @@ namespace MessageHub.Management
         {
         }
 
-        public ResourcePathBuilder(ResourceScheme scheme, string serviceBusName, string entityName)
+        public ResourcePathBuilder(ResourceScheme scheme, string serviceBusName, params string[] entityNames)
         {
             scheme.Verify(nameof(scheme)).IsNotNull();
             scheme.Verify(nameof(scheme)).Assert(x => x != ResourceScheme.None, "Scheme is invalid");
             serviceBusName.Verify(nameof(serviceBusName)).IsNotEmpty();
-            entityName.Verify(nameof(entityName)).IsNotEmpty();
+            entityNames.Verify(nameof(entityNames)).IsNotNull();
 
             Scheme = scheme;
             ServiceBusName = serviceBusName;
-            EntityName = entityName;
+            EntityName = new StringVector(entityNames, "/", false);
         }
 
         public ResourceScheme Scheme { get; set; } = ResourceScheme.None;
 
         public string? ServiceBusName { get; set; }
 
-        public string? EntityName { get; set; }
+        public StringVector? EntityName { get; set; }
 
         public ResourcePathBuilder SetScheme(ResourceScheme resourceScheme)
         {
@@ -51,11 +54,11 @@ namespace MessageHub.Management
             return this;
         }
 
-        public ResourcePathBuilder SetEntityName(string entityName)
+        public ResourcePathBuilder SetEntityName(params string[] entityNames)
         {
-            entityName.Verify(nameof(entityName)).IsNotEmpty();
+            entityNames.Verify(nameof(entityNames)).IsNotNull();
 
-            EntityName = entityName;
+            EntityName = new StringVector(entityNames, "/", false);
             return this;
         }
 
@@ -63,18 +66,14 @@ namespace MessageHub.Management
         {
             Scheme.Verify(nameof(Scheme)).Assert(x => x != ResourceScheme.None, "Scheme is required");
             ServiceBusName!.Verify(nameof(ServiceBusName)).IsNotEmpty();
-            EntityName!.Verify(nameof(EntityName)).IsNotEmpty();
+            EntityName!.Verify(nameof(EntityName)).IsNotNull();
 
-            var builder = new UriBuilder();
-            builder.Scheme = Scheme.ToString();
-
-            var pathItems = new string[]
+            var builder = new UriBuilder
             {
-                ServiceBusName!,
-                EntityName!,
+                Scheme = Scheme.ToString(),
+                Host = ServiceBusName!,
+                Path = EntityName!
             };
-
-            builder.Path = string.Join("/", pathItems);
 
             return builder.Uri;
         }

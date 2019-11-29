@@ -1,4 +1,7 @@
-﻿using Azure.Storage.Blobs;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Khooversoft.Toolbox.Standard;
 using System;
@@ -7,7 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MessageHub.Management
+namespace Khooversoft.MessageHub.Management
 {
     public class BlobRepository : IBlobRepository
     {
@@ -39,7 +42,7 @@ namespace MessageHub.Management
                     await _containerClient.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: context.CancellationToken);
                     return;
                 }
-                catch(Azure.RequestFailedException ex)
+                catch (Azure.RequestFailedException ex)
                 {
                     save = ex;
                     await Task.Delay(TimeSpan.FromMilliseconds(count * 500));
@@ -68,7 +71,7 @@ namespace MessageHub.Management
             }
         }
 
-        public async Task<string> Get(IWorkContext context, string path)
+        public async Task<string?> Get(IWorkContext context, string path)
         {
             context.Verify(nameof(context)).IsNotNull();
             path.Verify(nameof(path)).IsNotEmpty();
@@ -98,13 +101,15 @@ namespace MessageHub.Management
             return _containerClient.DeleteBlobIfExistsAsync(path, cancellationToken: context.CancellationToken);
         }
 
-        public async Task<IReadOnlyList<string>> List(IWorkContext context)
+        public async Task<IReadOnlyList<string>> List(IWorkContext context, string search)
         {
+            var nodeIdCompare = new NodeIdCompare(search);
+
             var list = new List<string>();
 
             await foreach (BlobItem blobItem in _containerClient.GetBlobsAsync())
             {
-                list.Add(blobItem.Name);
+                if (nodeIdCompare.Test(blobItem.Name)) list.Add(blobItem.Name);
             }
 
             return list;

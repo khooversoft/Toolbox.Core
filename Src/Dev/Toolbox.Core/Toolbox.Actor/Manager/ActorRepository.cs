@@ -1,5 +1,5 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox;
 using Khooversoft.Toolbox.Standard;
@@ -25,9 +25,9 @@ namespace Khooversoft.Toolbox.Actor
         private readonly object _lock = new object();
         private int _timerLockValue;
         private readonly Timer _timer;
-        private readonly IActorConfiguration _configuration;
+        private readonly ActorConfiguration _configuration;
 
-        public ActorRepository(IActorConfiguration configuration)
+        public ActorRepository(ActorConfiguration configuration)
         {
             configuration.Verify(nameof(configuration)).IsNotNull();
             configuration.Capacity.Verify().Assert(x => x > 0, $"Capacity {configuration.Capacity} must be greater than 0");
@@ -121,6 +121,7 @@ namespace Khooversoft.Toolbox.Actor
             lock (_lock)
             {
                 var key = new RegistrationKey(actorType, actorKey.Key);
+
                 if (_actorCache.TryGetValue(key, out IActorRegistration registration)) return registration;
 
                 return null;
@@ -170,7 +171,8 @@ namespace Khooversoft.Toolbox.Actor
 
                 foreach (var item in _actorCache)
                 {
-                    if (item.LastAccessed < retireDate)
+                    // Check if actor is active or last access is after the retire date
+                    if (!item.Value.Instance.Active || item.LastAccessed < retireDate)
                     {
                         _actorRemove.Post(item.Value);
                     }
@@ -190,7 +192,7 @@ namespace Khooversoft.Toolbox.Actor
         {
             var key = new RegistrationKey(actorRegistration.ActorType, actorRegistration.ActorKey.Key);
             _actorCache.Remove(key);
-            
+
             await Remove(_workContext, actorRegistration.ActorType, actorRegistration.ActorKey).ConfigureAwait(false);
         }
 
