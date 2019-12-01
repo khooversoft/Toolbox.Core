@@ -2,23 +2,26 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
-    public class ServiceProviderProxy : IServiceProvider
+    public class ServiceProviderProxy : ServiceProviderProxySimple, IServiceProviderProxy
     {
-        private readonly Func<Type, object> _getService;
+        private readonly Func<Type, object> _getServiceOptional;
 
-        public ServiceProviderProxy(Func<Type, object> getService)
+        public ServiceProviderProxy(Func<Type, object> getService, Func<Type, object> getServiceOptional)
+            :base(getService)
         {
-            _getService = getService;
+            getService.Verify(nameof(getServiceOptional)).IsNotNull();
+
+            _getServiceOptional = getServiceOptional;
         }
 
-        public object GetService(Type serviceType)
+        public object GetServiceOptional(Type serviceType)
         {
-            return _getService(serviceType);
+            serviceType.Verify(nameof(serviceType)).IsNotNull();
+
+            return _getServiceOptional(serviceType);
         }
     }
 }

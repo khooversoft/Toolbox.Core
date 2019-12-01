@@ -19,10 +19,10 @@ namespace Khooversoft.Toolbox.Test.Actor
         public async Task ActorSimpleTimerTest()
         {
             IActorManager manager = new ActorManager();
-            manager.Register<ITimerActor>(_context, _ => new TimeActor());
+            manager.Register<ITimerActor>(_ => new TimeActor());
 
             ActorKey key = new ActorKey("timer/test");
-            ITimerActor timerActor = await manager.CreateProxy<ITimerActor>(_context, key);
+            ITimerActor timerActor = await manager.CreateProxy<ITimerActor>(key);
 
             foreach (var index in Enumerable.Range(0, 20))
             {
@@ -32,7 +32,7 @@ namespace Khooversoft.Toolbox.Test.Actor
             }
 
             (await timerActor.GetCount()).Should().BeGreaterThan(2);
-            await manager.Deactivate<ITimerActor>(_context, key);
+            await manager.Deactivate<ITimerActor>(key);
         }
 
         private interface ITimerActor : IActor

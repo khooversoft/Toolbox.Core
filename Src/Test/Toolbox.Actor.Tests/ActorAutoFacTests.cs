@@ -13,7 +13,7 @@ namespace Khooversoft.Toolbox.Test.Actor
         private IWorkContext _context = WorkContext.Empty;
 
         [Fact]
-        public async Task ActorAutoFacActionSimpleTest()
+        public async Task GivenAutofac_WhenProxyCreated_ShouldPass()
         {
             IActorManager manager = new ActorManager();
 
@@ -24,42 +24,71 @@ namespace Khooversoft.Toolbox.Test.Actor
 
             using (container.BeginLifetimeScope())
             {
-                manager.Register<ICache>(_context, _ => container.Resolve<ICache>());
+                manager.Register<ICache>(_ => container.Resolve<ICache>());
 
                 ActorKey key = new ActorKey("cache/test");
-                ICache cache = await manager.CreateProxy<ICache>(_context, key);
+                ICache cache = await manager.CreateProxy<ICache>(key);
 
                 (await cache.GetCount()).Should().Be(1);
-                await manager.Deactivate<ICache>(_context, key);
+                await manager.Deactivate<ICache>(key);
                 (await cache.GetCount()).Should().Be(2);
             }
 
-            await manager.DeactivateAll(_context);
+            await manager.DeactivateAll();
         }
 
         [Fact]
-        public async Task ActorAutoFacSimpleTest()
+        public async Task GivenAutofac_ConstructedFromBuilder_ShouldPass()
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<StringCache>().As<ICache>();
             ILifetimeScope container = builder.Build();
 
-            IActorManager manager = new ActorConfigurationBuilder()
-                .Register<ICache>(_ => container.Resolve<ICache>())
+            IActorManager? manager = new ActorConfigurationBuilder()
+                .Register(_ => container.Resolve<ICache>())
                 .Build()
                 .ToActorManager();
 
             using (container.BeginLifetimeScope())
             {
                 ActorKey key = new ActorKey("cache/test");
-                ICache cache = await manager.CreateProxy<ICache>(_context, key);
+                ICache cache = await manager.CreateProxy<ICache>(key);
 
                 (await cache.GetCount()).Should().Be(1);
-                await manager.Deactivate<ICache>(_context, key);
+                await manager.Deactivate<ICache>(key);
                 (await cache.GetCount()).Should().Be(2);
             }
 
-            await manager.DeactivateAll(_context);
+            await manager.DeactivateAll();
+        }
+
+        [Fact]
+        public async Task GivenAutofacOnlyRegistration_WithResolveOptional_ShouldPass()
+        {
+            var builder = new ContainerBuilder();
+            builder.RegisterType<StringCache>().As<ICache>();
+            ILifetimeScope container = builder.Build();
+
+            IWorkContext context = new WorkContextBuilder()
+                .Set(new ServiceProviderProxy(x => container.Resolve<ICache>(), x => container.ResolveOptional<ICache>()))
+                .Build();
+
+            IActorManager? manager = new ActorConfigurationBuilder()
+                .Set(context)
+                .Build()
+                .ToActorManager();
+
+            using (container.BeginLifetimeScope())
+            {
+                ActorKey key = new ActorKey("cache/test");
+                ICache cache = await manager.CreateProxy<ICache>(key);
+
+                (await cache.GetCount()).Should().Be(1);
+                await manager.Deactivate<ICache>(key);
+                (await cache.GetCount()).Should().Be(2);
+            }
+
+            await manager.DeactivateAll();
         }
 
         private interface ICache : IActor

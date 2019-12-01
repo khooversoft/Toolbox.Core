@@ -18,10 +18,10 @@ namespace Toolbox.Actor.Tests
         public async Task GivenActor_WhenDeactivated_ShouldPass()
         {
             ActorManager manager = new ActorManager();
-            manager.Register<ICache>(_context, _ => new StringCache());
+            manager.Register<ICache>(_ => new StringCache());
 
             ActorKey actorKey = new ActorKey("Cache/Test1");
-            ICache cache = await manager.CreateProxy<ICache>(_context, actorKey);
+            ICache cache = await manager.CreateProxy<ICache>(actorKey);
 
             int count = await cache.GetCount();
             count.Should().Be(1);

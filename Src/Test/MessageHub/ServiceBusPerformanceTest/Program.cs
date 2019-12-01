@@ -10,6 +10,7 @@ using System.Threading;
 using Autofac;
 using System.Collections.Generic;
 using System.Linq;
+using Khooversoft.MessageHub.Interface;
 
 namespace ServiceBusPerformanceTest
 {
@@ -66,7 +67,7 @@ namespace ServiceBusPerformanceTest
                 IWorkContext context = new WorkContextBuilder()
                     .Set(cancellationTokenSource.Token)
                     .Set(logger)
-                    .Set(new ServiceProviderProxy(x => container.Resolve(x)))
+                    .Set(new ServiceProviderProxySimple(x => container.Resolve(x)))
                     .Build();
 
                 option
@@ -107,7 +108,7 @@ namespace ServiceBusPerformanceTest
             builder.RegisterType<SendMessages>().InstancePerLifetimeScope();
             builder.RegisterType<ReceiveMessages>().InstancePerLifetimeScope();
 
-            builder.RegisterType<MessageClient>().As<IMessageClient>();
+            builder.RegisterType<MessageClientService>().As<IMessageClient>();
             builder.RegisterType<MessageProcessor>().As<IMessageProcessor>();
 
             BuildTelemetry(option, builder);

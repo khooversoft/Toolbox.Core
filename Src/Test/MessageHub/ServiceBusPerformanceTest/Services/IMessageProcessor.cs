@@ -11,6 +11,7 @@ namespace ServiceBusPerformanceTest
     internal interface IMessageProcessor
     {
         Task Close();
+
         Task Register(IWorkContext context, Func<Message, Task> receiver);
     }
 }

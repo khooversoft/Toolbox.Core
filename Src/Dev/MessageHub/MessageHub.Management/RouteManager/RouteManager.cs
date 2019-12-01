@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageHub.Management
 {
-    public class RouteManager
+    public class RouteManager : IRouteManager
     {
         private readonly IActorManager _actorManager;
 

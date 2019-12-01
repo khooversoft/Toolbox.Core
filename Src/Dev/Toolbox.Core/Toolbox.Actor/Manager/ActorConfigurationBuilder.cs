@@ -84,17 +84,17 @@ namespace Khooversoft.Toolbox.Actor
             return this;
         }
 
+        public ActorConfigurationBuilder Register<T>() where T : IActor
+        {
+            Registration.Add(new ActorTypeRegistration(typeof(T), x => x.Container!.Resolve<T>()));
+            return this;
+        }
+
         public ActorConfigurationBuilder Register<T>(Func<IWorkContext, T> createImplementation) where T : IActor
         {
             createImplementation.Verify(nameof(createImplementation)).IsNotNull();
 
             Registration.Add(new ActorTypeRegistration(typeof(T), x => createImplementation(x)));
-            return this;
-        }
-
-        public ActorConfigurationBuilder Register<T>() where T : IActor
-        {
-            Registration.Add(new ActorTypeRegistration(typeof(T), x => x.Container!.Resolve<T>()));
             return this;
         }
 

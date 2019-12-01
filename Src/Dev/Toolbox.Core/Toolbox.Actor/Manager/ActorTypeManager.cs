@@ -81,7 +81,9 @@ namespace Khooversoft.Toolbox.Actor
 
             Type actorType = typeof(T);
 
-            if (!_actorRegistration.TryGetValue(actorType, out ActorTypeRegistration typeRegistration))
+            ActorTypeRegistration? typeRegistration = GetTypeRegistration(actorType) ?? GetTypeFromDi(context, actorType);
+
+            if (typeRegistration == null)
             {
                 var ex = new KeyNotFoundException($"Registration for {actorType.FullName} was not found");
                 context.Telemetry.Error(context.With(_tag), "create failure", ex);
@@ -91,12 +93,38 @@ namespace Khooversoft.Toolbox.Actor
             IActor actorObject = typeRegistration.CreateImplementation(context);
 
             // Set actor key and manager
-            ActorBase actorBase = actorObject as ActorBase ?? throw new InvalidOperationException($"Created actor type does not derive from ActorBase");
+            ActorBase? actorBase = actorObject as ActorBase;
+            if( actorBase == null)
+            {
+                string failureMsg = $"Created actor type {actorObject.GetType()} does not derive from ActorBase";
+                context.Telemetry.Error(context.With(_tag), failureMsg);
+                throw new InvalidOperationException(failureMsg);
+            }
+
             actorBase.ActorKey = actorKey;
             actorBase.ActorManager = manager;
             actorBase.ActorType = actorType;
 
             return (T)actorObject;
+        }
+
+        private ActorTypeRegistration? GetTypeRegistration(Type actorType)
+        {
+            return _actorRegistration.TryGetValue(actorType, out ActorTypeRegistration typeRegistration) ? typeRegistration : null;
+        }
+
+        private ActorTypeRegistration? GetTypeFromDi(IWorkContext context, Type actorType)
+        {
+            IServiceProviderProxy? serviceProviderProxy = context.Container as IServiceProviderProxy;
+            if (serviceProviderProxy == null) return null;
+
+            var actor = serviceProviderProxy.GetServiceOptional(actorType);
+            if (actor == null) return null;
+
+            var registration = new ActorTypeRegistration(actorType, x => (IActor)actor);
+
+            _actorRegistration.AddOrUpdate(registration.InterfaceType, registration, (_, __) => registration);
+            return registration;
         }
     }
 }

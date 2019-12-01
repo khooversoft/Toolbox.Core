@@ -10,6 +10,7 @@ using System.Linq;
 using Khooversoft.Toolbox.Standard;
 using Newtonsoft.Json;
 using Khooversoft.Toolbox.Actor;
+using Khooversoft.MessageHub.Interface;
 
 namespace Khooversoft.MessageHub.Management
 {
@@ -43,7 +44,7 @@ namespace Khooversoft.MessageHub.Management
         {
             _createContainer.Execute(context);
 
-            string data = await _blobRepository.Get(context, path);
+            string? data = await _blobRepository.Get(context, path);
 
             return data == null ? null : JsonConvert.DeserializeObject<NodeRegistrationModel>(data);
         }

@@ -16,21 +16,14 @@ namespace Khooversoft.MessageHub.Management
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new NodeRegistrationModel
-            {
-                NodeId = subject.NodeId,
-                InputUri = uri.ToString(),
-            };
+            return new NodeRegistrationModel(subject.NodeId!, uri.ToString());
         }
 
         public static RouteRegistrationRequest ConvertTo(this NodeRegistrationModel subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new RouteRegistrationRequest
-            {
-                NodeId = subject.NodeId,
-            };
+            return new RouteRegistrationRequest(subject.NodeId);
         }
     }
 }

@@ -66,7 +66,7 @@ namespace EventHubPerformanceTest
                 IWorkContext context = new WorkContextBuilder()
                     .Set(cancellationTokenSource.Token)
                     .Set(logger)
-                    .Set(new ServiceProviderProxy(x => container.Resolve(x)))
+                    .Set(new ServiceProviderProxySimple(x => container.Resolve(x)))
                     .Build();
 
                 option

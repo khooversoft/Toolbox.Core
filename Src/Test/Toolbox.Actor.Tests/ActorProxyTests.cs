@@ -20,7 +20,7 @@ namespace Khooversoft.Toolbox.Test.Actor
             const int taskCount = 10;
 
             ActorManager manager = new ActorManager();
-            manager.Register<ICache>(_context, _ => new StringCache());
+            manager.Register<ICache>( _ => new StringCache());
 
             var tasks = new List<Task>();
             ActorKey key1 = new ActorKey("Cache/Test1");
@@ -36,14 +36,14 @@ namespace Khooversoft.Toolbox.Test.Actor
             tokenSource.Cancel();
             Task.WaitAll(tasks.ToArray());
 
-            (await manager.Deactivate<ICache>(_context, key1)).Should().BeTrue();
+            (await manager.Deactivate<ICache>(key1)).Should().BeTrue();
         }
 
         private async Task TestAccess(IActorManager manager, ActorKey actorKey, CancellationToken token)
         {
             const string firstText = "first";
 
-            ICache cache1 = await manager.CreateProxy<ICache>(_context, actorKey);
+            ICache cache1 = await manager.CreateProxy<ICache>(actorKey);
             while (!token.IsCancellationRequested)
             {
                 bool test = await cache1.IsCached(firstText);

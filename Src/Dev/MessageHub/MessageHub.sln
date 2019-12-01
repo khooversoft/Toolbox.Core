@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AF2513FD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Standard", "..\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj", "{54AC546A-5A28-43F1-86B8-3124EA22B274}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Extensions.Configuration", "..\Toolbox.Core\Toolbox.Extensions.Configuration\Toolbox.Extensions.Configuration.csproj", "{0075129F-353F-421C-81AB-6596F014F2C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Configuration", "..\Toolbox.Core\Toolbox.Configuration\Toolbox.Configuration.csproj", "{0075129F-353F-421C-81AB-6596F014F2C7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventHubPerformanceTest", "..\..\Test\MessageHub\EventHubPerformanceTest\EventHubPerformanceTest.csproj", "{23B84730-7E43-4DF5-8595-E2CCDBC6A456}"
 EndProject
@@ -17,13 +17,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceBusPerformanceTest",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.Management", "MessageHub.Management\MessageHub.Management.csproj", "{F19341C6-C2E2-4858-B919-142AA5DC6C1B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.Management.Test", "MessageHub.Management.Test\MessageHub.Management.Test.csproj", "{4F39174B-C96A-44DE-A967-DBDD996E6242}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{CA15BE8F-60FA-4A83-A96E-DA70CDB75C6B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Actor", "..\Toolbox.Core\Toolbox.Actor\Toolbox.Actor.csproj", "{BBEA57F6-A357-4322-8DFF-42578E14538F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Interface", "MessageHub.Interface\MessageHub.Interface.csproj", "{B5358CC6-77E7-41AC-B9E5-2368A4189A89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.Interface", "MessageHub.Interface\MessageHub.Interface.csproj", "{B5358CC6-77E7-41AC-B9E5-2368A4189A89}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.Client", "MessageHub.Client\MessageHub.Client.csproj", "{32622E33-9269-4086-8ABC-B142D66F9ACD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.NameServer", "MessageHub.NameServer\MessageHub.NameServer.csproj", "{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Autofac", "..\Toolbox.Core\Toolbox.Autofac\Toolbox.Autofac.csproj", "{462260A1-E3D3-49D7-98C7-3F2F04A3570B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.Management.Test", "..\..\Test\MessageHub\MessageHub.Management.Test\MessageHub.Management.Test.csproj", "{BA38F83D-A16F-474A-AFC8-C173DB1C20C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,10 +57,6 @@ Global
 		{F19341C6-C2E2-4858-B919-142AA5DC6C1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F19341C6-C2E2-4858-B919-142AA5DC6C1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F19341C6-C2E2-4858-B919-142AA5DC6C1B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F39174B-C96A-44DE-A967-DBDD996E6242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F39174B-C96A-44DE-A967-DBDD996E6242}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F39174B-C96A-44DE-A967-DBDD996E6242}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F39174B-C96A-44DE-A967-DBDD996E6242}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BBEA57F6-A357-4322-8DFF-42578E14538F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BBEA57F6-A357-4322-8DFF-42578E14538F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBEA57F6-A357-4322-8DFF-42578E14538F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,6 +65,22 @@ Global
 		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32622E33-9269-4086-8ABC-B142D66F9ACD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32622E33-9269-4086-8ABC-B142D66F9ACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32622E33-9269-4086-8ABC-B142D66F9ACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32622E33-9269-4086-8ABC-B142D66F9ACD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{462260A1-E3D3-49D7-98C7-3F2F04A3570B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{462260A1-E3D3-49D7-98C7-3F2F04A3570B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{462260A1-E3D3-49D7-98C7-3F2F04A3570B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{462260A1-E3D3-49D7-98C7-3F2F04A3570B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA38F83D-A16F-474A-AFC8-C173DB1C20C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA38F83D-A16F-474A-AFC8-C173DB1C20C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA38F83D-A16F-474A-AFC8-C173DB1C20C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA38F83D-A16F-474A-AFC8-C173DB1C20C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,9 +90,10 @@ Global
 		{0075129F-353F-421C-81AB-6596F014F2C7} = {91187767-1603-4119-A9C3-B08FDAA095CF}
 		{23B84730-7E43-4DF5-8595-E2CCDBC6A456} = {CA15BE8F-60FA-4A83-A96E-DA70CDB75C6B}
 		{AB3C25C9-5062-4922-BE7A-36579B35AC8F} = {CA15BE8F-60FA-4A83-A96E-DA70CDB75C6B}
-		{4F39174B-C96A-44DE-A967-DBDD996E6242} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
 		{CA15BE8F-60FA-4A83-A96E-DA70CDB75C6B} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
 		{BBEA57F6-A357-4322-8DFF-42578E14538F} = {91187767-1603-4119-A9C3-B08FDAA095CF}
+		{462260A1-E3D3-49D7-98C7-3F2F04A3570B} = {91187767-1603-4119-A9C3-B08FDAA095CF}
+		{BA38F83D-A16F-474A-AFC8-C173DB1C20C9} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4227659D-BED0-4F5F-ABA6-CA6CCA3575A9}

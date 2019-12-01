@@ -19,18 +19,18 @@ namespace Khooversoft.Toolbox.Test.Actor
             int count = 0;
 
             IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_context, _ => new StringCache(y => count += y));
+            manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key = new ActorKey("cache/test");
-            ICache cache = await manager.CreateProxy<ICache>(_context, key);
+            ICache cache = await manager.CreateProxy<ICache>(key);
             cache.GetActorKey().Should().Be(key);
             cache.GetActorManager().Should().Be(manager);
 
             count.Should().Be(1);
-            await manager.Deactivate<ICache>(_context, key);
+            await manager.Deactivate<ICache>(key);
             count.Should().Be(0);
 
-            await manager.DeactivateAll(_context);
+            await manager.DeactivateAll();
             count.Should().Be(0);
         }
 
@@ -40,16 +40,16 @@ namespace Khooversoft.Toolbox.Test.Actor
             int count = 0;
 
             IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_context, _ => new StringCache(y => count += y));
+            manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key = new ActorKey("cache/test");
-            ICache cache = await manager.CreateProxy<ICache>(_context, key);
+            ICache cache = await manager.CreateProxy<ICache>(key);
 
             count.Should().Be(1);
-            await manager.Deactivate<ICache>(_context, key);
+            await manager.Deactivate<ICache>(key);
             count.Should().Be(0);
 
-            await manager.DeactivateAll(_context);
+            await manager.DeactivateAll();
             count.Should().Be(0);
         }
 
@@ -59,13 +59,13 @@ namespace Khooversoft.Toolbox.Test.Actor
             int count = 0;
 
             var manager = new ActorManager();
-            manager.Register<ICache>(_context, _ => new StringCache(y => count += y));
+            manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key = new ActorKey("cache/test");
-            ICache cache = await manager.CreateProxy<ICache>(_context, key);
+            ICache cache = await manager.CreateProxy<ICache>(key);
 
             count.Should().Be(1);
-            await manager.DeactivateAll(_context);
+            await manager.DeactivateAll();
 
             count.Should().Be(0);
         }
@@ -76,23 +76,23 @@ namespace Khooversoft.Toolbox.Test.Actor
             int count = 0;
 
             ActorManager manager = new ActorManager();
-            manager.Register<ICache>(_context, _ => new StringCache(y => count += y));
+            manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key1 = new ActorKey("Cache/Test1");
-            ICache cache1 = await manager.CreateProxy<ICache>(_context, key1);
+            ICache cache1 = await manager.CreateProxy<ICache>(key1);
             count.Should().Be(1);
 
             ActorKey key2 = new ActorKey("Cache/Test2");
-            ICache cache2 = await manager.CreateProxy<ICache>(_context, key2);
+            ICache cache2 = await manager.CreateProxy<ICache>(key2);
             count.Should().Be(2);
 
-            await manager.Deactivate<ICache>(_context, key1);
+            await manager.Deactivate<ICache>(key1);
             count.Should().Be(1);
 
-            await manager.Deactivate<ICache>(_context, key2);
+            await manager.Deactivate<ICache>(key2);
             count.Should().Be(0);
 
-            await manager.DeactivateAll(_context);
+            await manager.DeactivateAll();
         }
 
         [Fact]
@@ -101,10 +101,10 @@ namespace Khooversoft.Toolbox.Test.Actor
             int count = 0;
 
             ActorManager manager = new ActorManager();
-            manager.Register<ICache>(_context, _ => new StringCache(y => count += y));
+            manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key1 = new ActorKey("Cache/Test1");
-            ICache cache1 = await manager.CreateProxy<ICache>(_context, key1);
+            ICache cache1 = await manager.CreateProxy<ICache>(key1);
             count.Should().Be(1);
 
             const string firstText = "first";
@@ -115,10 +115,10 @@ namespace Khooversoft.Toolbox.Test.Actor
             test = await cache1.IsCached(firstText);
             test.Should().BeTrue();
 
-            await manager.Deactivate<ICache>(_context, key1);
+            await manager.Deactivate<ICache>(key1);
             count.Should().Be(0);
 
-            await manager.DeactivateAll(_context);
+            await manager.DeactivateAll();
         }
 
         [Fact]
@@ -128,14 +128,14 @@ namespace Khooversoft.Toolbox.Test.Actor
 
             var manager = new ActorManager();
 
-            manager.Register<ICache>(_context, _ => new StringCache(y => count += y));
+            manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key1 = new ActorKey("Cache/Test1");
-            ICache cache1 = await manager.CreateProxy<ICache>(_context, key1);
+            ICache cache1 = await manager.CreateProxy<ICache>(key1);
             count.Should().Be(1);
 
             ActorKey key2 = new ActorKey("Cache/Test2");
-            ICache cache2 = await manager.CreateProxy<ICache>(_context, key2);
+            ICache cache2 = await manager.CreateProxy<ICache>(key2);
             count.Should().Be(2);
 
             const string firstText = "first";
@@ -149,17 +149,17 @@ namespace Khooversoft.Toolbox.Test.Actor
             bool test2 = await cache2.IsCached(secondText);
             test2.Should().BeTrue();
 
-            ICache cache1Dup = await manager.CreateProxy<ICache>(_context, key1);
+            ICache cache1Dup = await manager.CreateProxy<ICache>(key1);
             test = await cache1Dup.IsCached(firstText);
             test.Should().BeTrue();
             test = await cache1Dup.IsCached(secondText);
             test.Should().BeFalse();
 
-            await manager.Deactivate<ICache>(_context, key1);
-            await manager.Deactivate<ICache>(_context, key2);
+            await manager.Deactivate<ICache>(key1);
+            await manager.Deactivate<ICache>(key2);
             count.Should().Be(0);
 
-            await manager.DeactivateAll(_context);
+            await manager.DeactivateAll();
         }
 
         private interface ICache : IActor

@@ -12,8 +12,6 @@ namespace Khooversoft.Toolbox.Actor
     /// </summary>
     public class ActorTypeRegistration
     {
-        private readonly StringVector _tag = new StringVector(nameof(ActorTypeRegistration));
-
         public ActorTypeRegistration(Type interfaceType, Func<IWorkContext, IActor> createImplementation)
         {
             interfaceType.Verify(nameof(interfaceType)).IsNotNull();
