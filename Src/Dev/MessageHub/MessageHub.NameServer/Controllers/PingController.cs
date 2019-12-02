@@ -12,6 +12,7 @@ namespace MessageHub.NameServer.Controllers
     public class PingController : ControllerBase
     {
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public Task<IActionResult> Ping()
         {
             return Task.FromResult<IActionResult>(Ok(new { Ok = true }));

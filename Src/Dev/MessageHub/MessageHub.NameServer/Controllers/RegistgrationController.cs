@@ -16,26 +16,36 @@ namespace MessageHub.NameServer.Controllers
     public class RegistgrationController : ControllerBase
     {
         private readonly IRouteManager _routeManager;
-        private readonly ILogger<RegistgrationController> _logger;
         private readonly IWorkContext _workContext;
 
-        public RegistgrationController(IRouteManager routeManager, ILogger<RegistgrationController> logger, IWorkContext workContext)
+        public RegistgrationController(IWorkContext workContext, IRouteManager routeManager)
         {
-            _routeManager = routeManager;
-            _logger = logger;
             _workContext = workContext;
+            _routeManager = routeManager;
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Set([FromBody] RouteRegistrationRequest routeRegistrationRequest)
+        public async Task<IActionResult> Register([FromBody] RouteRegistrationRequest routeRegistrationRequest)
         {
             if (routeRegistrationRequest == null) return StatusCode(StatusCodes.Status400BadRequest);
 
             RouteRegistrationResponse response = await _routeManager.Register(_workContext, routeRegistrationRequest);
 
             return StatusCode(StatusCodes.Status201Created, response);
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Unregister([FromBody] RouteRegistrationRequest routeRegistrationRequest)
+        {
+            if (routeRegistrationRequest == null) return StatusCode(StatusCodes.Status400BadRequest);
+
+            await _routeManager.Unregister(_workContext, routeRegistrationRequest);
+
+            return StatusCode(StatusCodes.Status200OK);
         }
 
         [HttpGet]

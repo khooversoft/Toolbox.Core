@@ -19,8 +19,8 @@ namespace Khooversoft.MessageHub.Interface
             InputUri = inputUri;
         }
 
-        public string NodeId { get; set; }
+        public string NodeId { get; }
 
-        public string InputUri { get; set; }
+        public string InputUri { get; }
     }
 }

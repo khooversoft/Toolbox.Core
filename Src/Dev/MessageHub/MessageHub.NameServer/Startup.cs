@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Khooversoft.MessageHub.Interface;
 using Khooversoft.MessageHub.Management;
 using Khooversoft.Toolbox.Actor;
+using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using MessageHub.Management.Test.RouteManagement;
 using Microsoft.AspNetCore.Builder;
@@ -22,14 +24,17 @@ namespace MessageHub.NameServer
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _hostEnvironment;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _hostEnvironment = env;
         }
 
         public IConfiguration Configuration { get; }
 
-        public ILifetimeScope AutofacContainer { get; private set; }
+        public ILifetimeScope? AutofacContainer { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -46,17 +51,21 @@ namespace MessageHub.NameServer
             // Register your own things directly with Autofac, like:
             //builder.RegisterModule(new MyApplicationModule());
 
-            builder.Register(x => new WorkContextBuilder().Set(new ServiceProviderProxy(x => AutofacContainer.Resolve(x), x => AutofacContainer.ResolveOptional(x))))
+            builder.Register(x => new WorkContextBuilder().Set(new ServiceProviderProxy(x => AutofacContainer.Resolve(x), x => AutofacContainer.ResolveOptional(x))).Build())
                 .As<IWorkContext>()
                 .InstancePerLifetimeScope();
 
             builder.RegisterContainerModule(new RouteManagerContainerRegistrationModule());
 
-            builder.RegisterType<BlobRepositoryFake>().As<IBlobRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<QueueManagementFake>().As<IQueueManagement>().InstancePerLifetimeScope();
             builder.RegisterType<BlobStore>().As<IRegisterStore>().InstancePerLifetimeScope();
 
             builder.Register(x => new ActorConfigurationBuilder().Set(x.Resolve<IWorkContext>()).Build()).As<ActorConfiguration>().InstancePerLifetimeScope();
+
+            Option option = Configuration.BuildOption<Option>();
+            option.Verify(nameof(option)).IsNotNull().Value.Verify();
+
+            builder.Register(x => new BlobStoreConnection(option.BlobRepository.ContainerName, option.BlobRepository.Connection));
+            builder.Register(x => new ServiceBusConnection(option.ServiceBusConnection));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

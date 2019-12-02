@@ -18,6 +18,12 @@ namespace MessageHub.Management.Test.RouteManagement
             _blobStoreConnection = blobStoreConnection;
         }
 
+        public Task ClearAll(IWorkContext context)
+        {
+            _repository.Clear();
+            return Task.CompletedTask;
+        }
+
         public Task CreateContainer(IWorkContext context)
         {
             return Task.CompletedTask;

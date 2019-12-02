@@ -59,7 +59,7 @@ namespace Khooversoft.MessageHub.Management
             return _containerClient.DeleteIfExistsAsync(cancellationToken: context.CancellationToken);
         }
 
-        public Task Set(IWorkContext context, string path, string data)
+        public async Task Set(IWorkContext context, string path, string data)
         {
             context.Verify(nameof(context)).IsNotNull();
             path.Verify(nameof(path)).IsNotEmpty();
@@ -67,7 +67,7 @@ namespace Khooversoft.MessageHub.Management
 
             using (Stream content = new MemoryStream(Encoding.UTF8.GetBytes(data)))
             {
-                return _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
+                await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
             }
         }
 
@@ -92,7 +92,6 @@ namespace Khooversoft.MessageHub.Management
                 }
             }
         }
-
         public Task Delete(IWorkContext context, string path)
         {
             context.Verify(nameof(context)).IsNotNull();
@@ -113,6 +112,16 @@ namespace Khooversoft.MessageHub.Management
             }
 
             return list;
+        }
+
+        public async Task ClearAll(IWorkContext context)
+        {
+            var list = await List(context, "*");
+
+            foreach(var item in list)
+            {
+                await Delete(context, item);
+            }
         }
     }
 }

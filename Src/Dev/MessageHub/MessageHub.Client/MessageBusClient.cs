@@ -10,11 +10,11 @@ namespace MessageHub.Client
 {
     public class MessageBusClient
     {
-        private readonly INameServer _nameServer;
+        private readonly INameServerClient _nameServer;
         private readonly NodeRoute _nodeRoute;
         private readonly EndpointRegistration _endpointRegistration;
 
-        public MessageBusClient(INameServer nameServer, EndpointRegistration endpointRegistration)
+        public MessageBusClient(INameServerClient nameServer, EndpointRegistration endpointRegistration)
         {
             nameServer.Verify(nameof(nameServer)).IsNotNull();
             endpointRegistration.Verify(nameof(endpointRegistration)).IsNotNull();
@@ -28,7 +28,7 @@ namespace MessageHub.Client
         {
             nodeId.Verify(nameof(nodeId)).IsNotEmpty();
 
-            NodeRegistrationModel nodeRegistration = await _nodeRoute.Get(context, nodeId);
+            NodeRegistrationModel? nodeRegistration = await _nodeRoute.Get(context, nodeId);
             nodeRegistration.Verify().IsNotNull($"Node {nodeId} does not exist in the name server.");
 
             _endpointRegistration.TryGetValue(nodeRegistration.InputUri, out ResourceEndpointRegistration resourceEndpointRegistration)

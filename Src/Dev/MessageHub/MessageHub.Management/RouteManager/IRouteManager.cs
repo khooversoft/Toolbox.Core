@@ -11,7 +11,11 @@ namespace Khooversoft.MessageHub.Management
     public interface IRouteManager
     {
         Task<RouteRegistrationResponse> Register(IWorkContext context, RouteRegistrationRequest request);
+
         Task<IReadOnlyList<RouteLookupResponse>> Search(IWorkContext context, RouteLookupRequest request);
-        Task Unregister(IWorkContext context, string nodeId);
+
+        Task Unregister(IWorkContext context, RouteRegistrationRequest routeRegistrationRequest);
+
+        Task Clear(IWorkContext workContext);
     }
 }

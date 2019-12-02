@@ -21,6 +21,12 @@ namespace Khooversoft.MessageHub.Management
         {
         }
 
+        public Task ClearAll(IWorkContext context)
+        {
+            _data.Clear();
+            return Task.CompletedTask;
+        }
+
         public Task<NodeRegistrationModel?> Get(IWorkContext context, string path)
         {
             if (_data.TryGetValue(path, out NodeRegistrationModel model))

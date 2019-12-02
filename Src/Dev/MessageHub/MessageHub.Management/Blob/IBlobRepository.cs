@@ -20,5 +20,7 @@ namespace Khooversoft.MessageHub.Management
         Task<IReadOnlyList<string>> List(IWorkContext context, string search);
 
         Task Set(IWorkContext context, string path, string data);
+
+        Task ClearAll(IWorkContext context);
     }
 }

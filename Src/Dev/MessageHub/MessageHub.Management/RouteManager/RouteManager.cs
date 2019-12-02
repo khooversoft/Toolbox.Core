@@ -62,18 +62,22 @@ namespace Khooversoft.MessageHub.Management
         /// <param name="context">context</param>
         /// <param name="nodeId">node id</param>
         /// <returns>task</returns>
-        public async Task Unregister(IWorkContext context, string nodeId)
+        public async Task Unregister(IWorkContext context, RouteRegistrationRequest routeRegistrationRequest)
         {
-            nodeId.Verify(nameof(nodeId)).IsNotNull();
+            routeRegistrationRequest.Verify(nameof(routeRegistrationRequest)).IsNotNull();
+            routeRegistrationRequest.NodeId.Verify(nameof(routeRegistrationRequest.NodeId)).IsNotNull();
 
             Uri uri = new ResourcePathBuilder()
                 .SetScheme(ResourceScheme.Queue)
                 .SetServiceBusName("Default")
-                .SetEntityName(nodeId)
+                .SetEntityName(routeRegistrationRequest.NodeId!)
                 .Build();
 
-            INodeRegistrationActor subject = await _actorManager.CreateProxy<INodeRegistrationActor>(nodeId);
+            INodeRegistrationActor subject = await _actorManager.CreateProxy<INodeRegistrationActor>(routeRegistrationRequest.NodeId!);
             await subject.Remove(context);
+
+            IQueueManagementActor queueActor = await _actorManager.CreateProxy<IQueueManagementActor>(routeRegistrationRequest.NodeId!);
+            await queueActor.Remove(context);
         }
 
         /// <summary>
@@ -96,6 +100,17 @@ namespace Khooversoft.MessageHub.Management
                     InputUri = x.InputUri,
                 })
                 .ToList();
+        }
+
+        /// <summary>
+        /// Clear all stores and actors
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public async Task Clear(IWorkContext context)
+        {
+            INodeRegistrationManagementActor managementActor = await _actorManager.CreateProxy<INodeRegistrationManagementActor>("default");
+            await managementActor.ClearRegistery(context);
         }
     }
 }

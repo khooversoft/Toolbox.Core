@@ -1,7 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>7545633a-7f13-40f2-971b-a6cd8ad1ee12</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +23,7 @@
     <ProjectReference Include="..\..\..\Test\MessageHub\MessageHub.Management.Test\MessageHub.Management.Test.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Actor\Toolbox.Actor.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Autofac\Toolbox.Autofac.csproj" />
+    <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Configuration\Toolbox.Configuration.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
     <ProjectReference Include="..\MessageHub.Interface\MessageHub.Interface.csproj" />
     <ProjectReference Include="..\MessageHub.Management\MessageHub.Management.csproj" />

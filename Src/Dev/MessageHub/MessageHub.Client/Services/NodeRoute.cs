@@ -11,26 +11,29 @@ namespace MessageHub.Client
     public class NodeRoute
     {
         private readonly ConcurrentDictionary<string, CacheObject<NodeRegistrationModel>> _routes = new ConcurrentDictionary<string, CacheObject<NodeRegistrationModel>>(StringComparer.OrdinalIgnoreCase);
-        private readonly INameServer _nameServer;
+        private readonly INameServerClient _nameServer;
         private readonly TimeSpan _timeToLive;
 
-        public NodeRoute(INameServer nameServer, TimeSpan? timeToLive = null)
+        public NodeRoute(INameServerClient nameServer, TimeSpan? timeToLive = null)
         {
             _nameServer = nameServer;
             _timeToLive = timeToLive ?? TimeSpan.FromHours(1);
         }
 
-        public async Task<NodeRegistrationModel> Get(IWorkContext context, string nodeId)
+        public async Task<NodeRegistrationModel?> Get(IWorkContext context, string nodeId)
         {
             if (_routes.TryGetValue(nodeId, out CacheObject<NodeRegistrationModel> cacheModel))
             {
                 if (cacheModel.TryGetValue(out NodeRegistrationModel model)) return model;
             }
 
-            NodeRegistrationModel lookup = await _nameServer.Lookup(nodeId);
-            if (lookup != null) _routes[nodeId] = new CacheObject<NodeRegistrationModel>(_timeToLive).Set(lookup);
+            RouteLookupResponse? lookup = await _nameServer.Lookup(context, new RouteLookupRequest { SearchNodeId = nodeId });
+            if (lookup == null) return null;
 
-            return lookup;
+            NodeRegistrationModel lookupModel = lookup.ConvertTo();
+            _routes[nodeId] = new CacheObject<NodeRegistrationModel>(_timeToLive).Set(lookupModel);
+
+            return lookupModel;
         }
     }
 }

@@ -55,11 +55,18 @@ namespace Khooversoft.MessageHub.Management
 
             IReadOnlyList<string> list = await _blobRepository.List(context, search);
 
-            IReadOnlyList<NodeRegistrationModel> result = list
-                .Select(x => JsonConvert.DeserializeObject<NodeRegistrationModel>(x))
-                .ToList();
+            NodeRegistrationModel[] result = await list
+                .Select(x => Get(context, x))
+                .WhenAll();
 
             return result;
+        }
+
+        public async Task ClearAll(IWorkContext context)
+        {
+            _createContainer.Execute(context);
+
+            await _blobRepository.ClearAll(context);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace MessageHub.Management.Test.RouteManagement
 
                 const string nodeId = "Need/Customer";
 
-                RouteRegistrationRequest request = new RouteRegistrationRequest(nodeId);
+                RouteRegistrationRequest request = new RouteRegistrationRequest { NodeId = nodeId };
 
                 RouteRegistrationResponse response = await manager.Register(_workContext, request);
                 response.Should().NotBeNull();
@@ -57,7 +57,7 @@ namespace MessageHub.Management.Test.RouteManagement
                 routeLookupResponses[0].NodeId.Should().Be(nodeId);
                 routeLookupResponses[0].InputUri.Should().Be(uri.ToString());
 
-                await manager.Unregister(_workContext, nodeId);
+                await manager.Unregister(_workContext, request);
 
                 routeLookupResponses = await manager.Search(_workContext, routeLookupRequest);
                 routeLookupResponses.Should().NotBeNull();
@@ -85,7 +85,7 @@ namespace MessageHub.Management.Test.RouteManagement
                 var routeRegistrations = Enumerable.Range(0, max)
                     .Select(x => new
                     {
-                        NodeRigistration = new RouteRegistrationRequest(generateName(x)),
+                        NodeRigistration = new RouteRegistrationRequest { NodeId = generateName(x) },
                         Uri = new ResourcePathBuilder()
                             .SetScheme(ResourceScheme.Queue)
                             .SetServiceBusName("Default")
@@ -119,7 +119,7 @@ namespace MessageHub.Management.Test.RouteManagement
 
                 // Unregister
                 await routeRegistrations
-                    .Select(x => manager.Unregister(_workContext, x.NodeRigistration.NodeId!))
+                    .Select(x => manager.Unregister(_workContext, x.NodeRigistration))
                     .WhenAll();
 
                 routeLookupResponse = await manager.Search(_workContext, new RouteLookupRequest { SearchNodeId = "*" });

@@ -10,5 +10,7 @@ namespace Khooversoft.MessageHub.Management
     public interface INodeRegistrationManagementActor : IActor
     {
         Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context, string search);
+
+        Task ClearRegistery(IWorkContext context);
     }
 }

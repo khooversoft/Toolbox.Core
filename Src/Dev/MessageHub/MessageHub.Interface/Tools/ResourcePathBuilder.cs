@@ -38,9 +38,9 @@ namespace Khooversoft.MessageHub.Interface
 
         public ResourceScheme Scheme { get; set; } = ResourceScheme.None;
 
-        public string? ServiceBusName { get; set; }
+        public string ServiceBusName { get; set; } = string.Empty;
 
-        public StringVector? EntityName { get; set; }
+        public StringVector EntityName { get; set; } = StringVector.Empty;
 
         public ResourcePathBuilder SetScheme(ResourceScheme resourceScheme)
         {

@@ -23,7 +23,7 @@ namespace Khooversoft.MessageHub.Management
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new RouteRegistrationRequest(subject.NodeId);
+            return new RouteRegistrationRequest { NodeId = subject.NodeId };
         }
     }
 }

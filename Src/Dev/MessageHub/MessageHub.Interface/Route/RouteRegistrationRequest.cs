@@ -12,14 +12,9 @@ namespace Khooversoft.MessageHub.Interface
     /// </summary>
     public class RouteRegistrationRequest
     {
-        public RouteRegistrationRequest(string nodeId)
-        {
-            NodeId = nodeId;
-        }
-
         /// <summary>
         /// Node's ID
         /// </summary>
-        public string NodeId { get; set; }
+        public string? NodeId { get; set; }
     }
 }

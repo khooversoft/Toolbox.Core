@@ -17,5 +17,7 @@ namespace Khooversoft.MessageHub.Management
         Task<NodeRegistrationModel?> Get(IWorkContext context, string path);
 
         Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context, string search);
+
+        Task ClearAll(IWorkContext context);
     }
 }
