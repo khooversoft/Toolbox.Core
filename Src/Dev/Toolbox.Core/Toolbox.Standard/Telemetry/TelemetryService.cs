@@ -44,6 +44,12 @@ namespace Khooversoft.Toolbox.Standard
             return this;
         }
 
+        public TelemetryService DoAction(Action<TelemetryMessage> action, Predicate<TelemetryMessage>? predicate = null)
+        {
+            _pipeline.DoAction(action, predicate);
+            return this;
+        }
+
         public TelemetryService AddConsoleLogger(TelemetryType telemetryType, ITelemetryLogger logger)
         {
             logger.Verify(nameof(logger)).IsNotNull();

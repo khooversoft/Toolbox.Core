@@ -81,7 +81,7 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
-        /// Add dataflow block to pipeline
+        /// Add data flow block to pipeline
         /// </summary>
         /// <param name="source">block</param>
         /// <returns>this</returns>
@@ -99,7 +99,7 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
-        /// Add pipline block to pipeline
+        /// Add pipeline block to pipeline
         /// </summary>
         /// <param name="source">pipeline</param>
         /// <returns>this</returns>
