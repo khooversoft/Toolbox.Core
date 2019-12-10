@@ -8,4 +8,8 @@
     <ProjectReference Include="..\Toolbox.Standard\Toolbox.Standard.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
+
 </Project>

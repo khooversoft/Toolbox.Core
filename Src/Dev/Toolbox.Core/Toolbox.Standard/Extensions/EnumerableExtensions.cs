@@ -46,6 +46,24 @@ namespace Khooversoft.Toolbox.Standard
         /// <typeparam name="T">type</typeparam>
         /// <param name="list">list to operate on</param>
         /// <param name="action">action to execute</param>
+        public static void ForEach<T>(this IEnumerable<T> list, Action<T, int> action)
+        {
+            list.Verify(nameof(list)).IsNotNull();
+            action.Verify(nameof(action)).IsNotNull();
+
+            int index = 0;
+            foreach (var item in list)
+            {
+                action(item, index++);
+            }
+        }
+
+        /// <summary>
+        /// Execute 'action' on each item
+        /// </summary>
+        /// <typeparam name="T">type</typeparam>
+        /// <param name="list">list to operate on</param>
+        /// <param name="action">action to execute</param>
         public static async Task ForEachAsync<T>(this IEnumerable<T> list, Func<T, Task> action)
         {
             list.Verify(nameof(list)).IsNotNull();
