@@ -12,14 +12,14 @@ using Xunit;
 namespace ToolBox.Azure.Test.Blob
 {
     [Collection("QueueTests")]
-    public class BlobRegistorStoreTests : IClassFixture<Application>
+    public class BlobRegistorStoreTests : IClassFixture<ApplicationFixture>
     {
         private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey={blob-storage-test-AccountKey};EndpointSuffix=core.windows.net";
         private readonly BlobStoreConnection _blobStore;
         private readonly IWorkContext _workContext = WorkContext.Empty;
-        private readonly Application _application;
+        private readonly ApplicationFixture _application;
 
-        public BlobRegistorStoreTests(Application application)
+        public BlobRegistorStoreTests(ApplicationFixture application)
         {
             _application = application;
 

@@ -64,23 +64,28 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task Set(IWorkContext context, string path, string data)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            path.Verify(nameof(path)).IsNotEmpty();
             data.Verify(nameof(data)).IsNotEmpty();
 
-            using (Stream content = new MemoryStream(Encoding.UTF8.GetBytes(data)))
-            {
-                await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
-            }
+            using Stream content = new MemoryStream(Encoding.UTF8.GetBytes(data));
+            await Upload(context, path, content);
         }
 
-        public async Task<string?> Get(IWorkContext context, string path)
+        public async Task Upload(IWorkContext context, string path, Stream content)
         {
-            IReadOnlyList<byte> blob = await GetBlob(context, path);
+            context.Verify(nameof(context)).IsNotNull();
+            path.Verify(nameof(path)).IsNotEmpty();
+            content.Verify(nameof(content)).IsNotNull();
+
+            await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
+        }
+
+        public async Task<string> Get(IWorkContext context, string path)
+        {
+            IReadOnlyList<byte> blob = await Download(context, path);
             return Encoding.UTF8.GetString(blob.ToArray(), 0, blob.Count);
         }
 
-        public async Task<IReadOnlyList<byte>> GetBlob(IWorkContext context, string path)
+        public async Task<IReadOnlyList<byte>> Download(IWorkContext context, string path)
         {
             context.Verify(nameof(context)).IsNotNull();
             path.Verify(nameof(path)).IsNotEmpty();

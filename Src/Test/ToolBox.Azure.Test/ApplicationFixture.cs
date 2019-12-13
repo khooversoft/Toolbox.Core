@@ -6,9 +6,9 @@ using Xunit;
 
 namespace ToolBox.Azure.Test
 {
-    public class Application
+    public class ApplicationFixture
     {
-        public Application()
+        public ApplicationFixture()
         {
             IConfiguration configuration = new ConfigurationBuilder()
                 .AddUserSecrets("ToolBox.Azure.Test")
