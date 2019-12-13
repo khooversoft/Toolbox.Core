@@ -102,7 +102,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="ignoreDuplicates">true, will not add keys already set</param>
-        /// <returns></returns>
+        /// <returns>new property resolver</returns>
         public IPropertyResolver With(string key, string value, PropertyUpdate propertyUpdate)
         {
             key.Verify(nameof(key)).IsNotEmpty();

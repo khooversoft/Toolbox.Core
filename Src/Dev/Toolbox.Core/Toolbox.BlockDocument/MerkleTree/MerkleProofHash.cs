@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Toolbox.BlockDocument
+namespace Khooversoft.Toolbox.BlockDocument
 {
     public class MerkleProofHash
     {

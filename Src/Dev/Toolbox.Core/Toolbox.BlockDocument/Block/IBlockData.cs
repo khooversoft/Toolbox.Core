@@ -1,7 +1,9 @@
-﻿namespace Toolbox.BlockDocument
+﻿using System.Collections.Generic;
+
+namespace Khooversoft.Toolbox.BlockDocument
 {
     public interface IBlockData
     {
-        byte[] GetUTF8Bytes();
+        IReadOnlyList<byte> GetUTF8Bytes();
     }
 }

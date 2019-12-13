@@ -2,7 +2,7 @@
 using Autofac;
 using Khooversoft.Toolbox.Standard;
 
-namespace Toolbox.Autofac
+namespace Khooversoft.Toolbox.Autofac
 {
     public static class AutofacExtensions
     {

@@ -111,11 +111,6 @@ namespace KHooversoft.Toolbox.Graph
                 return false;
             }
 
-            if (_running != 0)
-            {
-                Thread.Sleep(TimeSpan.FromSeconds(10));
-            }
-
             timeout = timeout ?? TimeSpan.FromMilliseconds(-1);
             context.Telemetry.Verbose(context, $"OrchestratorHost: (Wait) timeout={timeout}");
             bool status = Task.WaitAll(new Task[] { RunningTask }, (int)((TimeSpan)timeout).TotalMilliseconds, context.CancellationToken);

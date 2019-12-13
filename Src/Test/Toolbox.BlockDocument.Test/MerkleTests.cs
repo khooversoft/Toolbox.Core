@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Xunit;
 using Khooversoft.Toolbox.Standard;
+using Khooversoft.Toolbox.BlockDocument;
 
 namespace Toolbox.BlockDocument.Test
 {

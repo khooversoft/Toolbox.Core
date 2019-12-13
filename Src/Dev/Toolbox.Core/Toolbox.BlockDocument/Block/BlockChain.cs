@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Toolbox.BlockDocument
+namespace Khooversoft.Toolbox.BlockDocument
 {
     public class BlockChain : IEnumerable<BlockNode>
     {
@@ -16,21 +16,23 @@ namespace Toolbox.BlockDocument
         {
             _chain = new List<BlockNode>
             {
-                new BlockNode(new BlockData<string>(DateTime.Now, "block", "begin", "{}"), 0, "*"),
+                new BlockNode(new DataBlock<string>(DateTime.Now, "block", "begin", "{}"), 0, "*"),
             };
         }
 
         public IReadOnlyList<BlockNode> Chain => _chain;
 
-        public void Add(params BlockNode[] dataBlock)
+        public void Add(params IBlockData[] dataBlocks)
         {
             lock (_lock)
             {
-                foreach (var item in dataBlock)
+                foreach (var item in dataBlocks)
                 {
+                    item.Verify().Assert(x => x.GetType() != typeof(BlockNode), "BlockNode is an invalid data block");
+
                     BlockNode latestBlock = Chain[_chain.Count - 1];
 
-                    BlockNode newBlock = new BlockNode(item, latestBlock.Index + 1, latestBlock.Hash);
+                    var newBlock = new BlockNode(item, latestBlock.Index + 1, latestBlock.Hash);
                     _chain.Add(newBlock);
                 }
             }
@@ -63,6 +65,12 @@ namespace Toolbox.BlockDocument
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _chain.GetEnumerator();
+        }
+
+        public static BlockChain operator +(BlockChain self, IBlockData blockData)
+        {
+            self.Add(blockData);
+            return self;
         }
     }
 }

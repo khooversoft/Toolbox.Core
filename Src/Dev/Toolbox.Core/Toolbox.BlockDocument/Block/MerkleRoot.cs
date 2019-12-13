@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Toolbox.BlockDocument
+namespace Khooversoft.Toolbox.BlockDocument
 {
     public class MerkleRoot
     {

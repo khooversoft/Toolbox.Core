@@ -5,20 +5,30 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Toolbox.BlockDocument
+namespace Khooversoft.Toolbox.BlockDocument
 {
-    public class BlockNode : IBlockData
+    public class BlockNode
     {
+        public BlockNode(IBlockData blockData)
+        {
+            blockData.Verify(nameof(blockData)).IsNotNull();
+
+            BlockData = blockData;
+            Hash = GetUTF8Bytes().ComputeSha256Hash();
+        }
+
         public BlockNode(IBlockData blockData, int index, string previousHash)
         {
             blockData.Verify(nameof(blockData)).IsNotNull();
+
             previousHash.Verify(nameof(previousHash)).IsNotEmpty();
 
             BlockData = blockData;
             Index = index;
             PreviousHash = previousHash;
+            Hash = GetUTF8Bytes().ComputeSha256Hash();
         }
-        
+
         public BlockNode(BlockNode blockNode)
             : this(blockNode.BlockData, blockNode.Index, blockNode.PreviousHash)
         {
@@ -37,7 +47,7 @@ namespace Toolbox.BlockDocument
             return Hash == GetUTF8Bytes().ComputeSha256Hash();
         }
 
-        public byte[] GetUTF8Bytes()
+        public IReadOnlyList<byte> GetUTF8Bytes()
         {
             return BlockData.GetUTF8Bytes()
                 .Concat(Encoding.UTF8.GetBytes($"{Index}-{PreviousHash ?? ""}"))
@@ -48,8 +58,7 @@ namespace Toolbox.BlockDocument
         {
             if (obj is BlockNode blockNode)
             {
-                return base.Equals(obj) &&
-                    Index == blockNode.Index &&
+                return Index == blockNode.Index &&
                     PreviousHash == blockNode.PreviousHash &&
                     Hash == blockNode.Hash;
             }
@@ -59,8 +68,7 @@ namespace Toolbox.BlockDocument
 
         public override int GetHashCode()
         {
-            return base.GetHashCode() ^
-                Index.GetHashCode() ^
+            return Index.GetHashCode() ^
                 PreviousHash.GetHashCode() ^
                 Hash.GetHashCode();
         }

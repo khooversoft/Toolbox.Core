@@ -62,5 +62,17 @@ namespace Khooversoft.Toolbox.Standard
 
             return (T)Convert.ChangeType(valueToConvert, targetType);
         }
+
+        /// <summary>
+        /// Safely casts the specified object to the type specified through T/>.
+        /// </summary>
+        /// <remarks>
+        /// Has been introduced to allow casting objects without breaking the fluent API.
+        /// </remarks>
+        /// <typeparam name="TTo"></typeparam>
+        public static T CastAs<T>(this object subject)
+        {
+            return subject is T ? (T)subject : default;
+        }
     }
 }
