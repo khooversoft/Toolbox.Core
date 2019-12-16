@@ -1,11 +1,8 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Newtonsoft.Json;
+using System.Linq;
+using System.Text.Json;
 
 namespace Khooversoft.Toolbox.Standard
 {
@@ -13,64 +10,23 @@ namespace Khooversoft.Toolbox.Standard
     {
         public static string ConvertToJson(this TelemetryMessage message)
         {
-            StringWriter sw = new StringWriter();
-            JsonTextWriter writer = new JsonTextWriter(sw);
-
-            writer.WriteStartObject();
-
-            writer.WritePropertyName(nameof(message.TelemetryType));
-            writer.WriteValue(message.TelemetryType.ToString());
-
-            writer.WritePropertyName(nameof(message.EventDate));
-            writer.WriteValue(message.EventDate.ToString("o"));
-
-            writer.WritePropertyName(nameof(message.WorkContext.Cv));
-            writer.WriteValue(message.WorkContext.Cv);
-
-            writer.WritePropertyName(nameof(message.WorkContext.Tag));
-            writer.WriteValue(message.WorkContext.Tag);
-
-            writer.WritePropertyName(nameof(message.EventSourceName));
-            writer.WriteValue(message.EventSourceName);
-
-            writer.WritePropertyName(nameof(message.EventName));
-            writer.WriteValue(message.EventName);
-
-            if (message.Message != null)
+            var model = new TelemetryMessageModel
             {
-                writer.WritePropertyName(nameof(message.Message));
-                writer.WriteValue(message.Message);
-            }
+                MessageId = message.MessageId,
+                EventDate = message.EventDate,
+                Cv = message.WorkContext.Cv,
+                Tag = message.WorkContext.Tag,
+                TelemetryType = message.TelemetryType,
+                EventSourceName = message.EventSourceName,
+                EventName = message.EventName,
+                Message = message.Message,
+                Duration = message.Duration,
+                Value = message.Value,
+                Dimensions = message.EventDimensions.ToDictionary(x => x.Key, x => x.Value),
+                Exception = message.Exception,
+            };
 
-            if (message.Duration != null)
-            {
-                writer.WritePropertyName(nameof(message.Duration));
-                writer.WriteValue(message.Duration);
-            }
-
-            if (message.Value != null)
-            {
-                writer.WritePropertyName(nameof(message.Value));
-                writer.WriteValue(message.Value);
-            }
-
-            if (message.Exception != null)
-            {
-                writer.WritePropertyName(nameof(message.Exception));
-                writer.WriteValue(message.Exception.ToString());
-            }
-
-            if (message.EventDimensions != null)
-            {
-                writer.WritePropertyName("Dimensions");
-                writer.WriteStartObject();
-                message.EventDimensions.ForEach(x => { writer.WritePropertyName(x.Key); writer.WriteValue(x.Value); });
-                writer.WriteEndObject();
-            }
-
-            writer.WriteEndObject();
-
-            return sw.ToString();
+            return JsonSerializer.Serialize(model);
         }
 
         public static TelemetryMessage? ConvertJsonToTelemetryMessage(this string jsonMessage)
@@ -80,7 +36,7 @@ namespace Khooversoft.Toolbox.Standard
                 return null;
             }
 
-            var md = JsonConvert.DeserializeObject<MessageDeserialize>(jsonMessage);
+            var md = JsonSerializer.Deserialize<TelemetryMessageModel>(jsonMessage);
             md.Verify(nameof(md)).IsNotNull();
 
             IWorkContext context = new WorkContextBuilder()

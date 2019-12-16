@@ -1,5 +1,5 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using FluentAssertions;
 using Khooversoft.Toolbox.Standard;
@@ -75,20 +75,25 @@ namespace Toolbox.Standard.Test.Tools
         {
             var list = new List<List<int>>();
 
-            var bb = new BatchBlock<int>(10);
-            var ab = new ActionBlock<int[]>(x => list.Add(new List<int>(x)));
-            bb.LinkTo(ab);
+            var option = new DataflowLinkOptions
+            {
+                PropagateCompletion = true,
+            };
+
+            var batchBlock = new BatchBlock<int>(10);
+            var actionBlock = new ActionBlock<int[]>(x => list.Add(new List<int>(x)));
+            batchBlock.LinkTo(actionBlock, option);
 
             var p = new PipelineManager<IWorkContext, int>
             {
-                new Pipeline<IWorkContext, int>() + ((c, x) => { bb.Post(x); return true; }),
+                new Pipeline<IWorkContext, int>() + ((c, x) => { batchBlock.Post(x); return true; }),
             };
 
             Enumerable.Range(0, 100)
                 .ForEach(x => p.Post(null!, x));
 
-            bb.Complete();
-            Task.WaitAll(bb.Completion);
+            batchBlock.Complete();
+            Task.WaitAll(batchBlock.Completion, actionBlock.Completion);
 
             list.Count.Should().Be(10);
             list.All(x => x.Count == 10).Should().BeTrue();

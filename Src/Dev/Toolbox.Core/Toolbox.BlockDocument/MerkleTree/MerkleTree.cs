@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,54 +9,51 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.BlockDocument
 {
-    public class MerkleTree
+    public sealed class MerkleTree
     {
-        protected List<MerkleNode> _nodes;
-        protected List<MerkleNode> _leaves;
-        
+        private readonly List<MerkleNode> _nodes = new List<MerkleNode>();
+        private readonly List<MerkleNode> _leaves = new List<MerkleNode>();
+        private readonly object _lock = new object();
 
         public MerkleTree()
         {
-            _nodes = new List<MerkleNode>();
-            _leaves = new List<MerkleNode>();
         }
 
-        public MerkleNode RootNode { get; protected set; }
+        public MerkleNode? RootNode { get; private set; }
 
-        public MerkleNode AppendLeaf(MerkleNode node)
+        public MerkleTree Append(params MerkleNode[] nodes)
         {
-            _nodes.Add(node);
-            _leaves.Add(node);
+            lock (_lock)
+            {
+                nodes.ForEach(x =>
+                {
+                    _nodes.Add(x);
+                    _leaves.Add(x);
+                });
 
-            return node;
+                return this;
+            }
         }
 
-        public void AppendLeaves(MerkleNode[] nodes)
+        public MerkleTree Append(params MerkleHash[] nodes)
         {
-            nodes.ForEach(x => AppendLeaf(x));
-        }
+            lock (_lock)
+            {
+                nodes.ForEach(x =>
+                {
+                    var node = new MerkleNode(x);
+                    _nodes.Add(node);
+                    _leaves.Add(node);
+                });
 
-        public MerkleNode AppendLeaf(MerkleHash hash)
-        {
-            var node = CreateNode(hash);
-            _nodes.Add(node);
-            _leaves.Add(node);
-
-            return node;
-        }
-
-        public List<MerkleNode> AppendLeaves(MerkleHash[] hashes)
-        {
-            List<MerkleNode> nodes = new List<MerkleNode>();
-            hashes.ForEach(h => nodes.Add(AppendLeaf(h)));
-
-            return nodes;
+                return this;
+            }
         }
 
         public MerkleHash AddTree(MerkleTree tree)
         {
             _leaves.Verify(nameof(_leaves)).Assert(x => x.Count > 0, "Cannot add to a tree with no leaves.");
-            tree._leaves.ForEach(l => AppendLeaf(l));
+            tree._leaves.ForEach(x => Append(x));
 
             return BuildTree();
         }
@@ -71,7 +71,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             if ((_leaves.Count & 1) == 1)
             {
                 var lastLeaf = _leaves.Last();
-                var l = AppendLeaf(lastLeaf.Hash);
+                var l = Append(lastLeaf.Hash);
                 // l.Text = lastLeaf.Text;
             }
         }
@@ -82,19 +82,12 @@ namespace Khooversoft.Toolbox.BlockDocument
         public MerkleHash BuildTree()
         {
             // We do not call FixOddNumberLeaves because we want the ability to append 
-            // leaves and add additional trees without creating unecessary wasted space in the tree.
+            // leaves and add additional trees without creating unnecessary wasted space in the tree.
             _leaves.Verify(nameof(_leaves)).Assert(x => x.Count > 0, "Cannot build a tree with no leaves.");
             BuildTree(_leaves);
 
-            return RootNode.Hash;
+            return RootNode!.Hash;
         }
-
-        // Why would we need this?
-        //public void RegisterRoot(MerkleNode node)
-        //{
-        //    Contract(() => node.Parent == null, "Node is not a root node.");
-        //    rootNode = node;
-        //}
 
         /// <summary>
         /// Returns the audit proof hashes to reconstruct the root hash.
@@ -118,7 +111,7 @@ namespace Khooversoft.Toolbox.BlockDocument
         }
 
         /// <summary>
-        /// Verifies ordering and consistency of the first n leaves, such that we reach the expected subroot.
+        /// Verifies ordering and consistency of the first n leaves, such that we reach the expected sub-root.
         /// This verifies that the prior data has not been changed and that leaf order has been preserved.
         /// m is the number of leaves for which to do a consistency check.
         /// </summary>
@@ -136,11 +129,11 @@ namespace Khooversoft.Toolbox.BlockDocument
             // Traverse up the tree until we get to the node specified by idx.
             while (idx > 0)
             {
-                node = node.Parent;
+                node = node.Parent!;
                 --idx;
             }
 
-            int k = node.Leaves().Count();
+            int k = node!.Leaves().Count();
             hashNodes.Add(new MerkleProofHash(node.Hash, MerkleProofHash.Branch.OldRoot));
 
             if (m == k)
@@ -155,7 +148,7 @@ namespace Khooversoft.Toolbox.BlockDocument
                 // if m - k < # of SN's leaves, set SN to SN's left child node and repeat Rule 2.
 
                 // sibling node:
-                MerkleNode sn = node.Parent.RightNode;
+                MerkleNode sn = node.Parent!.RightNode!;
                 bool traverseTree = true;
 
                 while (traverseTree)
@@ -172,12 +165,12 @@ namespace Khooversoft.Toolbox.BlockDocument
                     if (m - k > sncount)
                     {
                         hashNodes.Add(new MerkleProofHash(sn.Hash, MerkleProofHash.Branch.OldRoot));
-                        sn = sn.Parent.RightNode;
+                        sn = sn.Parent!.RightNode!;
                         k += sncount;
                     }
                     else // (m - k < sncount)
                     {
-                        sn = sn.LeftNode;
+                        sn = sn.LeftNode!;
                     }
                 }
             }
@@ -260,7 +253,7 @@ namespace Khooversoft.Toolbox.BlockDocument
                 hash = rhash = MerkleTree.ComputeHash(lhash, proof[hidx].Hash);
                 hidx -= 2;
 
-                // foreach (var nextHashNode in proof.Skip(1))
+                // for each (var nextHashNode in proof.Skip(1))
                 while (hidx >= 0)
                 {
                     lhash = proof[hidx].Hash;
@@ -282,7 +275,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             return new MerkleHash(left.Value.Concat(right.Value).ToArray());
         }
 
-        protected void BuildAuditTrail(List<MerkleProofHash> auditTrail, MerkleNode parent, MerkleNode child)
+        private void BuildAuditTrail(List<MerkleProofHash> auditTrail, MerkleNode? parent, MerkleNode child)
         {
             if (parent != null)
             {
@@ -297,11 +290,11 @@ namespace Khooversoft.Toolbox.BlockDocument
                     auditTrail.Add(new MerkleProofHash(nextChild.Hash, direction));
                 }
 
-                BuildAuditTrail(auditTrail, child.Parent.Parent, child.Parent);
+                BuildAuditTrail(auditTrail, child.Parent!.Parent, child.Parent);
             }
         }
 
-        protected MerkleNode FindLeaf(MerkleHash leafHash)
+        private MerkleNode FindLeaf(MerkleHash leafHash)
         {
             // TODO: We can improve the search for the leaf hash by maintaining a sorted list of leaf hashes.
             // We use First because a tree with an odd number of leaves will duplicate the last leaf
@@ -313,7 +306,7 @@ namespace Khooversoft.Toolbox.BlockDocument
         /// Reduce the current list of n nodes to n/2 parents.
         /// </summary>
         /// <param name="nodes"></param>
-        protected void BuildTree(List<MerkleNode> nodes)
+        private void BuildTree(List<MerkleNode> nodes)
         {
             nodes.Verify(nameof(nodes)).Assert(x => x.Count > 0, "node list not expected to be empty.");
 
@@ -327,27 +320,15 @@ namespace Khooversoft.Toolbox.BlockDocument
 
                 for (int i = 0; i < nodes.Count; i += 2)
                 {
-                    MerkleNode right = (i + 1 < nodes.Count) ? nodes[i + 1] : null;
+                    MerkleNode? right = (i + 1 < nodes.Count) ? nodes[i + 1] : null;
+
                     // Constructing the MerkleNode resolves the right node being null.
-                    MerkleNode parent = CreateNode(nodes[i], right);
+                    MerkleNode parent = new MerkleNode(nodes[i], right!);
                     parents.Add(parent);
                 }
 
                 BuildTree(parents);
             }
-        }
-
-        // Override in derived class to extend the behavior.
-        // Alternatively, we could implement a factory pattern.
-
-        protected virtual MerkleNode CreateNode(MerkleHash hash)
-        {
-            return new MerkleNode(hash);
-        }
-
-        protected virtual MerkleNode CreateNode(MerkleNode left, MerkleNode right)
-        {
-            return new MerkleNode(left, right);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,13 +19,20 @@ namespace Khooversoft.Toolbox.BlockDocument
         {
             _chain = new List<BlockNode>
             {
-                new BlockNode(new DataBlock<string>(DateTime.Now, "block", "begin", "{}"), 0, "*"),
+                new BlockNode(new DataBlock<HeaderBlock>("genesis", "0", new HeaderBlock("genesis"))),
             };
+        }
+
+        public BlockChain(IEnumerable<BlockNode> blockNodes)
+        {
+            blockNodes.Verify(nameof(blockNodes)).IsNotNull();
+
+            _chain = blockNodes.ToList();
         }
 
         public IReadOnlyList<BlockNode> Chain => _chain;
 
-        public void Add(params IBlockData[] dataBlocks)
+        public void Add(params IDataBlock[] dataBlocks)
         {
             lock (_lock)
             {
@@ -67,7 +77,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             return _chain.GetEnumerator();
         }
 
-        public static BlockChain operator +(BlockChain self, IBlockData blockData)
+        public static BlockChain operator +(BlockChain self, IDataBlock blockData)
         {
             self.Add(blockData);
             return self;

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
-    internal class MessageDeserialize
+    internal class TelemetryMessageModel
     {
         public Guid MessageId { get; set; }
 
@@ -30,5 +30,7 @@ namespace Khooversoft.Toolbox.Standard
         public double? Value { get; set; }
 
         public IReadOnlyDictionary<string, object>? Dimensions { get; set; }
+
+        public Exception? Exception { get; set; }
     }
 }

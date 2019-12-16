@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Khooversoft.Toolbox.Standard
@@ -142,7 +145,7 @@ namespace Khooversoft.Toolbox.Standard
         {
             value.Verify(nameof(value)).Assert(x => !required || x != null, "Value is required but null");
 
-            string jsonString = JsonConvert.SerializeObject(value);
+            string jsonString = JsonSerializer.Serialize(value);
             Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
             return this;
         }

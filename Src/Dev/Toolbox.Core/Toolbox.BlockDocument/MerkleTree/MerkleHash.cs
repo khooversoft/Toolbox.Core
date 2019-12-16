@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,25 +30,25 @@ namespace Khooversoft.Toolbox.BlockDocument
         {
         }
 
-        public byte[] Value { get; }
+        public IReadOnlyList<byte> Value { get; }
 
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return BitConverter.ToString(Value.ToArray()).Replace("-", "");
+        }
+
         public override bool Equals(object obj)
         {
             obj.Verify(nameof(obj))
                 .IsNotNull()
-                .Assert(x => x is MerkleHash, "rvalue is not a MerkleHash");
+                .Assert(x => x is MerkleHash, "r-value is not a MerkleHash");
 
             return Equals((MerkleHash)obj);
-        }
-
-        public override string ToString()
-        {
-            return BitConverter.ToString(Value).Replace("-", "");
         }
 
         public bool Equals(byte[] hash)

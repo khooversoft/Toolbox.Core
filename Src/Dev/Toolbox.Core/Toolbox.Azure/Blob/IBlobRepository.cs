@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +17,7 @@ namespace Khooversoft.Toolbox.Azure
 
         Task DeleteContainer(IWorkContext context);
 
-        Task<string?> Get(IWorkContext context, string path);
+        Task<string> Get(IWorkContext context, string path);
 
         Task<IReadOnlyList<string>> List(IWorkContext context, string search);
 

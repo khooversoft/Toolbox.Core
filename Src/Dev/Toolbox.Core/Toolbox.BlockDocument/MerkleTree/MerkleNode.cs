@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,21 +10,11 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.BlockDocument
 {
-    public class MerkleNode : IEnumerable<MerkleNode>
+    public sealed class MerkleNode : IEnumerable<MerkleNode>
     {
         public MerkleNode()
         {
         }
-
-        public MerkleHash Hash { get; protected set; }
-
-        public MerkleNode LeftNode { get; protected set; }
-
-        public MerkleNode RightNode { get; protected set; }
-
-        public MerkleNode Parent { get; protected set; }
-
-        public bool IsLeaf { get { return LeftNode == null && RightNode == null; } }
 
         /// <summary>
         /// Constructor for a base node (leaf), representing the lowest level of the tree.
@@ -31,10 +24,20 @@ namespace Khooversoft.Toolbox.BlockDocument
             Hash = hash;
         }
 
+        public MerkleHash Hash { get; private set; }
+
+        public MerkleNode? LeftNode { get; private set; }
+
+        public MerkleNode? RightNode { get; private set; }
+
+        public MerkleNode? Parent { get; private set; }
+
+        public bool IsLeaf { get { return LeftNode == null && RightNode == null; } }
+
         /// <summary>                
         /// Constructor for a parent node.
         /// </summary>
-        public MerkleNode(MerkleNode left, MerkleNode right = null)
+        public MerkleNode(MerkleNode left, MerkleNode? right = null)
         {
             LeftNode = left;
             RightNode = right;
@@ -44,54 +47,10 @@ namespace Khooversoft.Toolbox.BlockDocument
             ComputeHash();
         }
 
-        public override string ToString()
-        {
-            return Hash.ToString();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<MerkleNode> GetEnumerator()
-        {
-            foreach (var n in Iterate(this)) yield return n;
-        }
-
-        /// <summary>
-        /// Bottom-up/left-right iteration of the tree.
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        protected IEnumerable<MerkleNode> Iterate(MerkleNode node)
-        {
-            if (node.LeftNode != null)
-            {
-                foreach (var n in Iterate(node.LeftNode)) yield return n;
-            }
-
-            if (node.RightNode != null)
-            {
-                foreach (var n in Iterate(node.RightNode)) yield return n;
-            }
-
-            yield return node;
-        }
-
         public MerkleHash ComputeHash(byte[] buffer)
         {
             Hash = new MerkleHash(buffer);
-
             return Hash;
-        }
-
-        /// <summary>
-        /// Return the leaves (not all children, just leaves) under this node
-        /// </summary>
-        public IEnumerable<MerkleNode> Leaves()
-        {
-            return this.Where(n => n.LeftNode == null && n.RightNode == null);
         }
 
         public void SetLeftNode(MerkleNode node)
@@ -104,6 +63,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             LeftNode.Parent = this;
             ComputeHash();
         }
+
 
         public void SetRightNode(MerkleNode node)
         {
@@ -143,13 +103,18 @@ namespace Khooversoft.Toolbox.BlockDocument
 
             if (RightNode == null)
             {
-                return Hash.Equals(LeftNode.Hash);
+                return Hash.Equals(LeftNode!.Hash);
             }
 
             LeftNode.Verify(nameof(LeftNode)).Assert(x => x != null, "Left branch must be a node if right branch is a node.");
-            MerkleHash leftRightHash = new MerkleHash(LeftNode.Hash, RightNode.Hash);
+            MerkleHash leftRightHash = new MerkleHash(LeftNode!.Hash, RightNode.Hash);
 
             return Hash.Equals(leftRightHash);
+        }
+
+        public override string ToString()
+        {
+            return Hash.ToString();
         }
 
         /// <summary>
@@ -160,7 +125,45 @@ namespace Khooversoft.Toolbox.BlockDocument
             return Hash.Equals(node.Hash);
         }
 
-        protected void ComputeHash()
+        /// <summary>
+        /// Return the leaves (not all children, just leaves) under this node
+        /// </summary>
+        public IEnumerable<MerkleNode> Leaves()
+        {
+            return this.Where(n => n.LeftNode == null && n.RightNode == null);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public IEnumerator<MerkleNode> GetEnumerator()
+        {
+            foreach (var n in Iterate(this)) yield return n;
+        }
+
+        /// <summary>
+        /// Bottom-up/left-right iteration of the tree.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        private IEnumerable<MerkleNode> Iterate(MerkleNode node)
+        {
+            if (node.LeftNode != null)
+            {
+                foreach (var n in Iterate(node.LeftNode)) yield return n;
+            }
+
+            if (node.RightNode != null)
+            {
+                foreach (var n in Iterate(node.RightNode)) yield return n;
+            }
+
+            yield return node;
+        }
+
+        private void ComputeHash()
         {
             // Repeat the left node if the right node doesn't exist.
             // This process breaks the case of doing a consistency check on 3 leaves when there are only 3 leaves in the tree.
@@ -171,9 +174,9 @@ namespace Khooversoft.Toolbox.BlockDocument
             // This process does not break the edge case described above.
             // We're implementing this version because the consistency check unit tests pass when we don't simulate
             // a right-hand node.
-            Hash = RightNode == null ?
-                LeftNode.Hash : //MerkleHash.Create(LeftNode.Hash.Value.Concat(LeftNode.Hash.Value).ToArray()) : 
-                new MerkleHash(LeftNode.Hash.Value.Concat(RightNode.Hash.Value).ToArray());
+
+            Hash = RightNode == null ? LeftNode!.Hash : new MerkleHash(LeftNode!.Hash.Value.Concat(RightNode.Hash.Value).ToArray());
+
             Parent?.ComputeHash();      // Recurse, because out hash has changed.
         }
     }

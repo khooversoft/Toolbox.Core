@@ -53,7 +53,7 @@ namespace Khooversoft.Toolbox.Standard
             Exception = message.Exception;
         }
 
-        internal TelemetryMessage(MessageDeserialize messageDeserialize, IWorkContext context)
+        internal TelemetryMessage(TelemetryMessageModel messageDeserialize, IWorkContext context)
         {
             messageDeserialize = messageDeserialize ?? throw new ArgumentNullException(nameof(messageDeserialize));
             context = context ?? throw new ArgumentNullException(nameof(context));

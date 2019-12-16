@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using FluentAssertions;
 using Khooversoft.Toolbox.Standard;
 using Khooversoft.Toolbox.Actor;
 using System.Threading.Tasks;

@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +10,10 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.BlockDocument
 {
-    public class DataBlock<T> : IBlockData
+    public class DataBlock<T> : IDataBlock
+        where T : IBlockType
     {
-        public DataBlock(string blockType, string blockId, T data)
+        public DataBlock(string blockType, string blockId, T data, IEnumerable<KeyValuePair<string, string>>? properties = null)
         {
             blockType.Verify(nameof(blockType)).IsNotEmpty();
             blockId.Verify(nameof(blockId)).IsNotEmpty();
@@ -19,18 +23,13 @@ namespace Khooversoft.Toolbox.BlockDocument
             BlockType = blockType;
             BlockId = blockId;
             Data = data;
+            Properties = properties?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, string>();
         }
 
-        public DataBlock(DateTime timeStamp, string blockType, string blockId, T data)
+        public DataBlock(DateTime timeStamp, string blockType, string blockId, T data, IEnumerable<KeyValuePair<string, string>>? properties = null)
+            : this(blockType, blockId, data, properties)
         {
-            blockType.Verify(nameof(blockType)).IsNotEmpty();
-            blockId.Verify(nameof(blockId)).IsNotEmpty();
-            data.Verify(nameof(data)).IsNotNull();
-
             TimeStamp = timeStamp;
-            BlockType = blockType;
-            BlockId = blockId;
-            Data = data;
         }
 
         public DataBlock(DataBlock<T> dataBlock)
@@ -41,6 +40,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             BlockType = dataBlock.BlockType;
             BlockId = dataBlock.BlockId;
             Data = dataBlock.Data;
+            Properties = dataBlock.Properties.ToDictionary(x => x.Key, x => x.Value);
         }
 
         public DateTime TimeStamp { get; }
@@ -51,19 +51,12 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public T Data { get; }
 
-        public IReadOnlyList<byte> GetUTF8Bytes()
+        public IReadOnlyDictionary<string, string> Properties { get; set; }
+
+        public IReadOnlyList<byte> GetBytesForHash()
         {
-            var append = Data switch
-            {
-                string str => Encoding.UTF8.GetBytes(str),
-
-                IBlockData dataBlock => dataBlock.GetUTF8Bytes(),
-
-                _ => throw new InvalidOperationException($"Data {Data.GetType().Name} is not a string or implements IBlockData"),
-            };
-
             return Encoding.UTF8.GetBytes($"{TimeStamp}-{BlockType}-{BlockId}-")
-                .Concat(append)
+                .Concat(Data.GetBytesForHash())
                 .ToArray();
         }
 

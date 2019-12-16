@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +9,7 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.BlockDocument
 {
-    public class BlockBlob : IBlockData
+    public class BlockBlob : IBlockType
     {
         public BlockBlob(string name, string contentType, string author, IReadOnlyList<byte> content)
         {
@@ -21,8 +24,6 @@ namespace Khooversoft.Toolbox.BlockDocument
             Name = name;
             ContentType = contentType;
             Author = author;
-            Content = content;
-
             Content = new List<byte>(content);
         }
 
@@ -34,9 +35,11 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public IReadOnlyList<byte> Content { get; }
 
-        public IReadOnlyList<byte> GetUTF8Bytes()
+        public IReadOnlyList<byte> GetBytesForHash()
         {
-            return Content.ToArray();
+            return Encoding.UTF8.GetBytes($"{Name}-{ContentType}={Author}")
+                .Concat(Content)
+                .ToArray();
         }
     }
 }

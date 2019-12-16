@@ -1,4 +1,7 @@
-﻿using Azure;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Azure;
 using FluentAssertions;
 using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.Standard;

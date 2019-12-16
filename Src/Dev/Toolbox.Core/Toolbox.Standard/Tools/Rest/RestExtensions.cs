@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Khooversoft.Toolbox.Standard
@@ -51,7 +52,7 @@ namespace Khooversoft.Toolbox.Standard
                     return new RestResponse<T>(message, (T)(object)json);
                 }
 
-                return new RestResponse<T>(message, JsonConvert.DeserializeObject<T>(json));
+                return new RestResponse<T>(message, JsonSerializer.Deserialize<T>(json));
             }
             catch (Exception ex)
             {

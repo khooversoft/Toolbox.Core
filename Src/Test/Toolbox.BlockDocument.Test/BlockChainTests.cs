@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using FluentAssertions;
 using Khooversoft.Toolbox.BlockDocument;
 using System;
 using System.Collections.Generic;
@@ -16,7 +19,7 @@ namespace Toolbox.BlockDocument.Test
             var now = DateTime.Now;
             var blockChain = new BlockChain();
 
-            var block1 = new DataBlock<string>(now, "blockTypeV1", "blockIdV1", "dataV1");
+            var block1 = new DataBlock<TextBlock>(now, "blockTypeV1", "blockIdV1", new TextBlock("name", "type", "author", "dataV1"));
             blockChain.Add(block1);
 
             blockChain.IsValid().Should().BeTrue();
@@ -28,10 +31,10 @@ namespace Toolbox.BlockDocument.Test
             var now = DateTime.Now;
             var blockChain = new BlockChain();
 
-            var block1 = new DataBlock<string>(now, "blockTypeV1", "blockIdV1", "dataV1");
+            var block1 = new DataBlock<TextBlock>(now, "blockTypeV1", "blockIdV1", new TextBlock("name", "type", "author", "dataV1"));
             blockChain.Add(block1);
 
-            var block2 = new DataBlock<string>(now, "blockTypeV2", "blockIdV2", "dataV2");
+            var block2 = new DataBlock<TextBlock>(now, "blockTypeV2", "blockIdV2", new TextBlock("name", "type", "author", "dataV2"));
             blockChain.Add(block2);
 
             blockChain.IsValid().Should().BeTrue();
@@ -44,8 +47,8 @@ namespace Toolbox.BlockDocument.Test
             const int max = 10;
             var blockChain = new BlockChain();
 
-            List<DataBlock<string>> list = Enumerable.Range(0, max)
-                .Select(x => new DataBlock<string>(now, $"blockTypeV{x}", $"blockIdV{x}", $"dataV{x}"))
+            List<DataBlock<TextBlock>> list = Enumerable.Range(0, max)
+                .Select(x => new DataBlock<TextBlock>(now, $"blockTypeV{x}", $"blockIdV{x}", new TextBlock("name", "type", "author", $"dataV{x}")))
                 .ToList();
 
             blockChain.Add(list.ToArray());
@@ -71,8 +74,8 @@ namespace Toolbox.BlockDocument.Test
                 .All(x => x.x.Index == x.i)
                 .Should().BeTrue();
 
-            blockChain.Chain[0].BlockData.As<DataBlock<string>>().BlockType.Should().Be("block");
-            blockChain.Chain[0].BlockData.As<DataBlock<string>>().BlockId.Should().Be("begin");
+            blockChain.Chain[0].BlockData.As<DataBlock<HeaderBlock>>().BlockType.Should().Be("genesis");
+            blockChain.Chain[0].BlockData.As<DataBlock<HeaderBlock>>().BlockId.Should().Be("0");
 
             blockChain.Chain[1].BlockData.As<DataBlock<HeaderBlock>>().BlockType.Should().Be("header");
             blockChain.Chain[1].BlockData.As<DataBlock<HeaderBlock>>().BlockId.Should().Be("header_1");
@@ -83,7 +86,6 @@ namespace Toolbox.BlockDocument.Test
             blockChain.Chain[3].BlockData.As<DataBlock<TrxBlock>>().BlockType.Should().Be("ContractLedger");
             blockChain.Chain[3].BlockData.As<DataBlock<TrxBlock>>().BlockId.Should().Be("Pmt");
         }
-
 
         [Fact]
         public void GivenSetBlockType_WhenChainCreated_ShouldSerialize()
@@ -105,8 +107,8 @@ namespace Toolbox.BlockDocument.Test
                 .All(x => x.x.Index == x.i)
                 .Should().BeTrue();
 
-            blockChain.Chain[0].BlockData.As<DataBlock<string>>().BlockType.Should().Be("block");
-            blockChain.Chain[0].BlockData.As<DataBlock<string>>().BlockId.Should().Be("begin");
+            blockChain.Chain[0].BlockData.As<DataBlock<HeaderBlock>>().BlockType.Should().Be("genesis");
+            blockChain.Chain[0].BlockData.As<DataBlock<HeaderBlock>>().BlockId.Should().Be("0");
 
             blockChain.Chain[1].BlockData.As<DataBlock<HeaderBlock>>().BlockType.Should().Be("header");
             blockChain.Chain[1].BlockData.As<DataBlock<HeaderBlock>>().BlockId.Should().Be("header_1");

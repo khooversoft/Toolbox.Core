@@ -1,3 +1,6 @@
+// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -81,10 +84,10 @@ namespace Toolbox.BlockDocument.Test
         public void CreateBalancedTreeTest()
         {
             MerkleTree tree = new MerkleTree();
-            tree.AppendLeaf(new MerkleHash("abc"));
-            tree.AppendLeaf(new MerkleHash("def"));
-            tree.AppendLeaf(new MerkleHash("123"));
-            tree.AppendLeaf(new MerkleHash("456"));
+            tree.Append(new MerkleHash("abc"));
+            tree.Append(new MerkleHash("def"));
+            tree.Append(new MerkleHash("123"));
+            tree.Append(new MerkleHash("456"));
             tree.BuildTree();
             tree.RootNode.Should().NotBeNull();
         }
@@ -93,9 +96,9 @@ namespace Toolbox.BlockDocument.Test
         public void CreateUnbalancedTreeTest()
         {
             MerkleTree tree = new MerkleTree();
-            tree.AppendLeaf(new MerkleHash("abc"));
-            tree.AppendLeaf(new MerkleHash("def"));
-            tree.AppendLeaf(new MerkleHash("123"));
+            tree.Append(new MerkleHash("abc"));
+            tree.Append(new MerkleHash("def"));
+            tree.Append(new MerkleHash("123"));
             tree.BuildTree();
             tree.RootNode.Should().NotBeNull();
         }
@@ -112,7 +115,7 @@ namespace Toolbox.BlockDocument.Test
             MerkleHash l2 = new MerkleHash("def");
             MerkleHash l3 = new MerkleHash("123");
             MerkleHash l4 = new MerkleHash("456");
-            tree.AppendLeaves(new MerkleHash[] { l1, l2, l3, l4 });
+            tree.Append(new MerkleHash[] { l1, l2, l3, l4 });
             MerkleHash rootHash = tree.BuildTree();
 
             List<MerkleProofHash> auditTrail = tree.AuditProof(l1);
@@ -135,7 +138,7 @@ namespace Toolbox.BlockDocument.Test
             MerkleHash l1 = new MerkleHash("abc");
             MerkleHash l2 = new MerkleHash("def");
             MerkleHash l3 = new MerkleHash("123");
-            tree.AppendLeaves(new MerkleHash[] { l1, l2, l3 });
+            tree.Append(new MerkleHash[] { l1, l2, l3 });
             MerkleHash rootHash = tree.BuildTree();
             tree.AddTree(new MerkleTree());
             MerkleHash rootHashAfterFix = tree.BuildTree();
@@ -149,7 +152,7 @@ namespace Toolbox.BlockDocument.Test
             MerkleHash l1 = new MerkleHash("abc");
             MerkleHash l2 = new MerkleHash("def");
             MerkleHash l3 = new MerkleHash("123");
-            tree.AppendLeaves(new MerkleHash[] { l1, l2, l3 });
+            tree.Append(new MerkleHash[] { l1, l2, l3 });
             MerkleHash rootHash = tree.BuildTree();
             tree.FixOddNumberLeaves();
             MerkleHash rootHashAfterFix = tree.BuildTree();
@@ -163,7 +166,7 @@ namespace Toolbox.BlockDocument.Test
             MerkleHash l1 = new MerkleHash("abc");
             MerkleHash l2 = new MerkleHash("def");
             MerkleHash l3 = new MerkleHash("123");
-            tree.AppendLeaves(new MerkleHash[] { l1, l2, l3 });
+            tree.Append(new MerkleHash[] { l1, l2, l3 });
             MerkleHash rootHash = tree.BuildTree();
 
             MerkleTree tree2 = new MerkleTree();
@@ -171,7 +174,7 @@ namespace Toolbox.BlockDocument.Test
             MerkleHash l6 = new MerkleHash("xyzzy");
             MerkleHash l7 = new MerkleHash("fizbin");
             MerkleHash l8 = new MerkleHash("foobar");
-            tree2.AppendLeaves(new MerkleHash[] { l5, l6, l7, l8 });
+            tree2.Append(new MerkleHash[] { l5, l6, l7, l8 });
             MerkleHash tree2RootHash = tree2.BuildTree();
             MerkleHash rootHashAfterAddTree = tree.AddTree(tree2);
 
@@ -184,7 +187,7 @@ namespace Toolbox.BlockDocument.Test
         {
             // Start with a tree with 2 leaves:
             MerkleTree tree = new MerkleTree();
-            var startingNodes = tree.AppendLeaves(new MerkleHash[]
+            var startingNodes = tree.Append(new MerkleHash[]
                 {
                     new MerkleHash("1"),
                     new MerkleHash("2"),
@@ -200,7 +203,7 @@ namespace Toolbox.BlockDocument.Test
             // for all the previous leaves.
             for (int i = 2; i < 100; i++)
             {
-                tree.AppendLeaf(new MerkleHash(i.ToString())); //.Text=i.ToString();
+                tree.Append(new MerkleHash(i.ToString())); //.Text=i.ToString();
                 tree.BuildTree();
 
                 // After adding a leaf, verify that all the old root hashes exist.
@@ -234,7 +237,7 @@ namespace Toolbox.BlockDocument.Test
                 });
 
                 // Then we add this root hash as the next old root hash to check.
-                oldRoots.Add(tree.RootNode.Hash);
+                oldRoots.Add(tree.RootNode!.Hash);
             }
         }
 

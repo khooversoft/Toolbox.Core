@@ -1,7 +1,6 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
-
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -81,6 +80,8 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task<string> Get(IWorkContext context, string path)
         {
+            path.Verify(nameof(path)).IsNotEmpty();
+
             IReadOnlyList<byte> blob = await Download(context, path);
             return Encoding.UTF8.GetString(blob.ToArray(), 0, blob.Count);
         }

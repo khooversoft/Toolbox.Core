@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +12,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 {
     public class BlockNode
     {
-        public BlockNode(IBlockData blockData)
+        public BlockNode(IDataBlock blockData)
         {
             blockData.Verify(nameof(blockData)).IsNotNull();
 
@@ -17,11 +20,9 @@ namespace Khooversoft.Toolbox.BlockDocument
             Hash = GetUTF8Bytes().ComputeSha256Hash();
         }
 
-        public BlockNode(IBlockData blockData, int index, string previousHash)
+        public BlockNode(IDataBlock blockData, int index, string? previousHash)
         {
             blockData.Verify(nameof(blockData)).IsNotNull();
-
-            previousHash.Verify(nameof(previousHash)).IsNotEmpty();
 
             BlockData = blockData;
             Index = index;
@@ -30,15 +31,15 @@ namespace Khooversoft.Toolbox.BlockDocument
         }
 
         public BlockNode(BlockNode blockNode)
-            : this(blockNode.BlockData, blockNode.Index, blockNode.PreviousHash)
+            : this(blockNode.BlockData, blockNode.Index, blockNode.PreviousHash!)
         {
         }
 
-        public IBlockData BlockData { get; }
+        public IDataBlock BlockData { get; }
 
         public int Index { get; }
 
-        public string PreviousHash { get; }
+        public string? PreviousHash { get; }
 
         public string Hash { get; }
 
@@ -49,7 +50,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public IReadOnlyList<byte> GetUTF8Bytes()
         {
-            return BlockData.GetUTF8Bytes()
+            return BlockData.GetBytesForHash()
                 .Concat(Encoding.UTF8.GetBytes($"{Index}-{PreviousHash ?? ""}"))
                 .ToArray();
         }
@@ -69,7 +70,7 @@ namespace Khooversoft.Toolbox.BlockDocument
         public override int GetHashCode()
         {
             return Index.GetHashCode() ^
-                PreviousHash.GetHashCode() ^
+                PreviousHash?.GetHashCode() ?? 0 ^
                 Hash.GetHashCode();
         }
 
