@@ -1,4 +1,7 @@
-﻿using Khooversoft.Toolbox.Security;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Khooversoft.Toolbox.Security;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;

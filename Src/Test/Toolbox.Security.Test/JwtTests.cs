@@ -1,3 +1,6 @@
+// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
 using FluentAssertions;
 using Khooversoft.Toolbox.Security;
 using Khooversoft.Toolbox.Standard;
@@ -19,6 +22,7 @@ namespace Toolbox.Security.Test
         private static readonly LocalCertificate _vaultData =
             new LocalCertificate(StoreLocation.LocalMachine, StoreName.My, "388A397D47ACD9C9D75E06A4FFEE016CB7EFF0CB", true);
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public void JwtSecurityTokenBuilderTest()
         {
@@ -48,6 +52,7 @@ namespace Toolbox.Security.Test
             tokenDetails.JwtSecurityToken.Claims.Any(x => x.Type == emailText && x.Value == emailId).Should().BeTrue();
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public void JwtSecurityTokenAudienceTest()
         {
@@ -72,6 +77,7 @@ namespace Toolbox.Security.Test
             tokenDetails.JwtSecurityToken.Header.Kid.Should().Be(_jwtVaultTest.LocalCertificateKey.Thumbprint);
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public void JwtSecurityTokenIssuerTest()
         {
@@ -96,6 +102,7 @@ namespace Toolbox.Security.Test
             tokenDetails.JwtSecurityToken.Header.Kid.Should().Be(_jwtVaultTest.LocalCertificateKey.Thumbprint);
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public void JwtSecurityFailureTest()
         {
@@ -131,6 +138,7 @@ namespace Toolbox.Security.Test
             tokenDetails.JwtSecurityToken.Header.Kid.Should().Be(_jwtVaultTest.LocalCertificateKey.Thumbprint);
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public void JwtSecuritySignatureFailureTest()
         {
