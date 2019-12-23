@@ -7,11 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Khooversoft.Toolbox.BlockDocument
+namespace Khooversoft.Toolbox.Security
 {
     public sealed class MerkleTree
     {
-        private readonly List<MerkleNode> _nodes = new List<MerkleNode>();
         private readonly List<MerkleNode> _leaves = new List<MerkleNode>();
         private readonly object _lock = new object();
 
@@ -25,12 +24,7 @@ namespace Khooversoft.Toolbox.BlockDocument
         {
             lock (_lock)
             {
-                nodes.ForEach(x =>
-                {
-                    _nodes.Add(x);
-                    _leaves.Add(x);
-                });
-
+                nodes.ForEach(x => _leaves.Add(x));
                 return this;
             }
         }
@@ -42,7 +36,20 @@ namespace Khooversoft.Toolbox.BlockDocument
                 nodes.ForEach(x =>
                 {
                     var node = new MerkleNode(x);
-                    _nodes.Add(node);
+                    _leaves.Add(node);
+                });
+
+                return this;
+            }
+        }
+
+        public MerkleTree Append(params string[] hashes)
+        {
+            lock (_lock)
+            {
+                hashes.ForEach(x =>
+                {
+                    var node = new MerkleNode(new MerkleHash(x));
                     _leaves.Add(node);
                 });
 

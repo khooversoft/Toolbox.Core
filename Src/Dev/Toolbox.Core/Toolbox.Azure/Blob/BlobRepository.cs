@@ -69,6 +69,16 @@ namespace Khooversoft.Toolbox.Azure
             await Upload(context, path, content);
         }
 
+        public async Task Upload(IWorkContext context, string path, IEnumerable<byte> content)
+        {
+            context.Verify(nameof(context)).IsNotNull();
+            path.Verify(nameof(path)).IsNotEmpty();
+            content.Verify(nameof(content)).IsNotNull();
+
+            using var memoryBuffer = new MemoryStream(content.ToArray());
+            await _containerClient.UploadBlobAsync(path, memoryBuffer, context.CancellationToken);
+        }
+
         public async Task Upload(IWorkContext context, string path, Stream content)
         {
             context.Verify(nameof(context)).IsNotNull();

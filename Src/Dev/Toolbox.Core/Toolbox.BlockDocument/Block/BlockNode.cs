@@ -1,6 +1,7 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
+using Khooversoft.Toolbox.Security;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             blockData.Verify(nameof(blockData)).IsNotNull();
 
             BlockData = blockData;
-            Hash = GetUTF8Bytes().ComputeSha256Hash();
+            Digest = GetDigest();
         }
 
         public BlockNode(IDataBlock blockData, int index, string? previousHash)
@@ -27,7 +28,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             BlockData = blockData;
             Index = index;
             PreviousHash = previousHash;
-            Hash = GetUTF8Bytes().ComputeSha256Hash();
+            Digest = GetDigest();
         }
 
         public BlockNode(BlockNode blockNode)
@@ -41,18 +42,22 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public string? PreviousHash { get; }
 
-        public string Hash { get; }
+        public string Digest { get; }
 
         public bool IsValid()
         {
-            return Hash == GetUTF8Bytes().ComputeSha256Hash();
+            return Digest == GetDigest();
         }
 
-        public IReadOnlyList<byte> GetUTF8Bytes()
+        public string GetDigest()
         {
-            return BlockData.GetBytesForHash()
-                .Concat(Encoding.UTF8.GetBytes($"{Index}-{PreviousHash ?? ""}"))
-                .ToArray();
+            var hashes = new string[]
+            {
+                $"{Index}-{PreviousHash ?? ""}".ToBytes().ToSHA256Hash(),
+                BlockData.GetDigest(),
+            };
+
+            return hashes.ToMerkleHash();
         }
 
         public override bool Equals(object obj)
@@ -61,7 +66,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             {
                 return Index == blockNode.Index &&
                     PreviousHash == blockNode.PreviousHash &&
-                    Hash == blockNode.Hash;
+                    Digest == blockNode.Digest;
             }
 
             return false;
@@ -71,7 +76,7 @@ namespace Khooversoft.Toolbox.BlockDocument
         {
             return Index.GetHashCode() ^
                 PreviousHash?.GetHashCode() ?? 0 ^
-                Hash.GetHashCode();
+                Digest.GetHashCode();
         }
 
         public static bool operator ==(BlockNode v1, BlockNode v2) => v1.Equals(v2);

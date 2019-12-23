@@ -9,6 +9,6 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public string? TransactionType { get; set; }
 
-        public double Value { get; set; }
+        public long Value { get; set; }
     }
 }

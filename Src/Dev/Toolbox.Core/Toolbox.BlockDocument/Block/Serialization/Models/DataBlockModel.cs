@@ -10,7 +10,7 @@ namespace Khooversoft.Toolbox.BlockDocument
     public class DataBlockModel<T> : IDataBlockModel
         where T : IDataBlockModelType
     {
-        public DateTime TimeStamp { get; set; }
+        public long TimeStamp { get; set; }
 
         public string? BlockType { get; set; }
 
@@ -19,5 +19,9 @@ namespace Khooversoft.Toolbox.BlockDocument
         public T Data { get; set; } = default!;
 
         public IReadOnlyDictionary<string, string>? Properties { get; set; }
+
+        public string? Digest { get; set; }
+
+        public string? JwtSignature { get; set; }
     }
 }

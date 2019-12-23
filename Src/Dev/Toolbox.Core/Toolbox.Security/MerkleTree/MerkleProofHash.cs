@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Khooversoft.Toolbox.BlockDocument
+namespace Khooversoft.Toolbox.Security
 {
     public class MerkleProofHash
     {

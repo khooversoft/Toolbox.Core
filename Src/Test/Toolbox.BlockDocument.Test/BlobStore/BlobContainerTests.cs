@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Toolbox.BlockDocument.Test.BlobStore
+namespace Toolbox.BlockDocument.Test.BlobStoreTest
 {
     public class BlobContainerTests : IClassFixture<ApplicationFixture>
     {
@@ -45,11 +45,11 @@ namespace Toolbox.BlockDocument.Test.BlobStore
             var blockChain = new BlockChain()
             {
                 new DataBlock<HeaderBlock>("header", "header_1", new HeaderBlock("Master Contract")),
-                new DataBlock<BlockBlob>("contract", "contract_1", new BlockBlob("contract.docx", "docx", "me", Encoding.UTF8.GetBytes("this is a contract between two people"))),
+                new DataBlock<BlobBlock>("contract", "contract_1", new BlobBlock("contract.docx", "docx", "me", Encoding.UTF8.GetBytes("this is a contract between two people"))),
                 new DataBlock<TrxBlock>("ContractLedger", "Pmt", new TrxBlock("1", "cr", 100)),
             };
 
-            blockChain.Chain.Count.Should().Be(4);
+            blockChain.Blocks.Count.Should().Be(4);
             blockChain.IsValid().Should().BeTrue();
             string blockChainHash = blockChain.ToMerkleTree().BuildTree().ToString();
 
@@ -76,7 +76,75 @@ namespace Toolbox.BlockDocument.Test.BlobStore
             reader.Close();
 
             BlockChain result = readJson.ToBlockChain();
-            blockChain.IsValid().Should().BeTrue();
+            result.IsValid().Should().BeTrue();
+            string resultChainHash = result.ToMerkleTree().BuildTree().ToString();
+
+            blockChainHash.Should().Be(resultChainHash);
+
+            await container.Delete(_workContext, _blobPath);
+        }
+
+        [Fact]
+        public async Task GivenBlockChain_WhenContainerIsBlobAndBuilder_ShouldRoundTrip()
+        {
+            const string _blobPath = "Test.sa";
+
+            var container = new BlobRepository(_blobStore);
+
+            await container.CreateContainer(_workContext);
+
+            var blockChain = new BlockChain()
+            {
+                new DataBlock<HeaderBlock>("header", "header_1", new HeaderBlock("Master Contract")),
+                new DataBlock<BlobBlock>("contract", "contract_1", new BlobBlock("contract.docx", "docx", "me", Encoding.UTF8.GetBytes("this is a contract between two people"))),
+                new DataBlock<TrxBlock>("ContractLedger", "Pmt", new TrxBlock("1", "cr", 100)),
+            };
+
+            blockChain.Blocks.Count.Should().Be(4);
+            string blockChainHash = blockChain.ToMerkleTree().BuildTree().ToString();
+
+            using (var zipStream = blockChain.ToZipContainer(_workContext))
+            {
+                await container.Delete(_workContext, _blobPath);
+                await container.Upload(_workContext, _blobPath, zipStream);
+            }
+
+            IReadOnlyList<byte> readBlob = await container.Download(_workContext, _blobPath);
+            using var readMemoryBuffer = new MemoryStream(readBlob.ToArray());
+
+            BlockChain result = readMemoryBuffer.ToBlockChain(_workContext);
+            result.IsValid().Should().BeTrue();
+            string resultChainHash = result.ToMerkleTree().BuildTree().ToString();
+
+            blockChainHash.Should().Be(resultChainHash);
+
+            await container.Delete(_workContext, _blobPath);
+        }
+
+        [Fact]
+        public async Task GivenBlockChain_WhenUsingBuilder_ShouldValidate()
+        {
+            const string _blobPath = "Test.sa";
+
+            var container = new BlobRepository(_blobStore);
+
+            await container.CreateContainer(_workContext);
+
+            var blockChain = new BlockChain()
+            {
+                new DataBlock<HeaderBlock>("header", "header_1", new HeaderBlock("Master Contract")),
+                new DataBlock<BlobBlock>("contract", "contract_1", new BlobBlock("contract.docx", "docx", "me", Encoding.UTF8.GetBytes("this is a contract between two people"))),
+                new DataBlock<TrxBlock>("ContractLedger", "Pmt", new TrxBlock("1", "cr", 100)),
+            };
+
+            blockChain.Blocks.Count.Should().Be(4);
+
+            string blockChainHash = blockChain.ToMerkleTree().BuildTree().ToString();
+
+            using var zipStream = blockChain.ToZipContainer(_workContext);
+
+            BlockChain result = zipStream.ToBlockChain(_workContext);
+            result.IsValid().Should().BeTrue();
             string resultChainHash = result.ToMerkleTree().BuildTree().ToString();
 
             blockChainHash.Should().Be(resultChainHash);

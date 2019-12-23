@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Khooversoft.Toolbox.BlockDocument
+namespace Khooversoft.Toolbox.Security
 {
     public sealed class MerkleNode : IEnumerable<MerkleNode>
     {
@@ -63,7 +63,6 @@ namespace Khooversoft.Toolbox.BlockDocument
             LeftNode.Parent = this;
             ComputeHash();
         }
-
 
         public void SetRightNode(MerkleNode node)
         {

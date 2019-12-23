@@ -9,6 +9,6 @@ namespace Khooversoft.Toolbox.BlockDocument
 {
     public interface IBlockType
     {
-        IReadOnlyList<byte> GetBytesForHash();
+        string GetDigest();
     }
 }

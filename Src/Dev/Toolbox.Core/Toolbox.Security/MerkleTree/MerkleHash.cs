@@ -8,7 +8,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Khooversoft.Toolbox.BlockDocument
+namespace Khooversoft.Toolbox.Security
 {
     public struct MerkleHash
     {
@@ -39,7 +39,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public override string ToString()
         {
-            return BitConverter.ToString(Value.ToArray()).Replace("-", "");
+            return Convert.ToBase64String(Value.ToArray());
         }
 
         public override bool Equals(object obj)

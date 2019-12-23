@@ -61,7 +61,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             var memoryStream = new MemoryStream();
             Read(context, zipPath, memoryStream);
             memoryStream.Seek(0, SeekOrigin.Begin);
-            return Encoding.UTF8.GetString(memoryStream.GetBuffer());
+            return Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length);
         }
 
         public ZipContainerReader Read(IWorkContext context, string zipPath, Stream targetStream)

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
+using Khooversoft.Toolbox.Security;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
@@ -18,10 +19,12 @@ namespace Khooversoft.Toolbox.BlockDocument
             author.Verify(nameof(author)).IsNotEmpty();
             content.Verify(nameof(content)).IsNotEmpty();
 
-            Name = name;
-            ContentType = contentType;
-            Author = author;
-            Content = content;
+            Name = name.Trim();
+            ContentType = contentType.Trim();
+            Author = author.Trim();
+            Content = content.Trim();
+
+            Digest = GetDigest();
         }
 
         public string Name { get; }
@@ -32,10 +35,11 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public string Content { get; }
 
-        public IReadOnlyList<byte> GetBytesForHash()
-        {
-            return Encoding.UTF8.GetBytes($"{Name}-{ContentType}-{Author}-{Content}");
-        }
+        public string Digest { get; }
+
+        public string GetDigest() => $"{Name}-{ContentType}-{Author}-{Content}"
+                .ToBytes()
+                .ToSHA256Hash();
 
         public override bool Equals(object obj)
         {
@@ -44,7 +48,8 @@ namespace Khooversoft.Toolbox.BlockDocument
                 return Name == textBlock.Name &&
                     ContentType == textBlock.ContentType &&
                     Author == textBlock.Author &&
-                    Content == textBlock.Content;
+                    Content == textBlock.Content &&
+                    Digest == textBlock.Digest;
             }
 
             return false;
@@ -55,7 +60,8 @@ namespace Khooversoft.Toolbox.BlockDocument
             return Name.GetHashCode() ^
                 ContentType.GetHashCode() ^
                 Author.GetHashCode() ^
-                Content.GetHashCode();
+                Content.GetHashCode() ^
+                Digest.GetHashCode();
         }
 
         public static bool operator ==(TextBlock v1, TextBlock v2) =>v1.Equals(v2);

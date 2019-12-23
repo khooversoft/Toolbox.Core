@@ -19,10 +19,10 @@ namespace Khooversoft.Toolbox.BlockDocument
             {
                 Index = subject.Index,
                 PreviousHash = subject.PreviousHash,
-                Hash = subject.Hash,
+                Hash = subject.Digest,
                 Header = subject.BlockData switch { DataBlock<HeaderBlock> headerBlock => headerBlock.ConvertTo<HeaderBlock, HeaderBlockModel>(), _ => null },
                 Trx = subject.BlockData switch { DataBlock<TrxBlock> headerBlock => headerBlock.ConvertTo<TrxBlock, TrxBlockModel>(), _ => null },
-                Blob = subject.BlockData switch { DataBlock<BlockBlob> headerBlock => headerBlock.ConvertTo<BlockBlob, BlockBlobModel>(), _ => null },
+                Blob = subject.BlockData switch { DataBlock<BlobBlock> headerBlock => headerBlock.ConvertTo<BlobBlock, BlockBlobModel>(), _ => null },
                 Text = subject.BlockData switch { DataBlock<TextBlock> headerBlock => headerBlock.ConvertTo<TextBlock, TextBlockModel>(), _ => null },
             };
         }
@@ -35,7 +35,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
             if (subject.Header != null) dataBlockList.Add(subject.Header.ConvertTo<HeaderBlockModel, HeaderBlock>());
             if (subject.Trx != null) dataBlockList.Add(subject.Trx.ConvertTo<TrxBlockModel, TrxBlock>());
-            if (subject.Blob != null) dataBlockList.Add(subject.Blob.ConvertTo<BlockBlobModel, BlockBlob>());
+            if (subject.Blob != null) dataBlockList.Add(subject.Blob.ConvertTo<BlockBlobModel, BlobBlock>());
             if (subject.Text != null) dataBlockList.Add(subject.Text.ConvertTo<TextBlockModel, TextBlock>());
 
             dataBlockList.Count.Verify().Assert<int, InvalidOperationException>(x => x == 1, $"{nameof(BlockChainNodeModel)} has zero or more then 1 block type specified");
@@ -89,7 +89,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             IDataBlockModelType model = subject.Data switch
             {
                 TextBlock textBlock => textBlock.ConvertTo(),
-                BlockBlob blockBob => blockBob.ConvertTo(),
+                BlobBlock blockBob => blockBob.ConvertTo(),
                 HeaderBlock headerBlock => headerBlock.ConvertTo(),
                 TrxBlock trxBlock => trxBlock.ConvertTo(),
 
@@ -103,6 +103,8 @@ namespace Khooversoft.Toolbox.BlockDocument
                 BlockId = subject.BlockId,
                 Data = (TTarget)model,
                 Properties = subject.Properties.ToDictionary(x => x.Key, x => x.Value),
+                Digest = subject.Digest,
+                JwtSignature = subject.JwtSignature,
             };
         }
 
@@ -122,7 +124,7 @@ namespace Khooversoft.Toolbox.BlockDocument
                 _ => throw new InvalidOperationException($"Unknown type {subject.Data.GetType().Name}"),
             };
 
-            return new DataBlock<TTarget>(subject.TimeStamp, subject.BlockType!, subject.BlockId!, (TTarget)block, subject.Properties);
+            return new DataBlock<TTarget>((UnixDate)subject.TimeStamp, subject.BlockType!, subject.BlockId!, (TTarget)block, subject.Properties, subject.Digest, subject.JwtSignature);
         }
 
         // ========================================================================================
@@ -133,7 +135,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
             return new HeaderBlockModel
             {
-                CreatedDate = subject.CreatedDate,
+                TimeStamp = subject.TimeStamp,
                 Description = subject.Description,
             };
         }
@@ -142,12 +144,12 @@ namespace Khooversoft.Toolbox.BlockDocument
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new HeaderBlock(subject.CreatedDate, subject.Description!);
+            return new HeaderBlock((UnixDate)subject.TimeStamp, subject.Description!);
         }
 
         // ========================================================================================
         // Blob block
-        public static BlockBlobModel ConvertTo(this BlockBlob subject)
+        public static BlockBlobModel ConvertTo(this BlobBlock subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
@@ -160,11 +162,11 @@ namespace Khooversoft.Toolbox.BlockDocument
             };
         }
 
-        public static BlockBlob ConvertTo(this BlockBlobModel subject)
+        public static BlobBlock ConvertTo(this BlockBlobModel subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new BlockBlob(subject.Name!, subject.ContentType!, subject.Author!, subject.Content!);
+            return new BlobBlock(subject.Name!, subject.ContentType!, subject.Author!, subject.Content!);
         }
 
         // ========================================================================================
@@ -185,7 +187,7 @@ namespace Khooversoft.Toolbox.BlockDocument
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new TrxBlock(subject.ReferenceId!, subject.TransactionType!, subject.Value);
+            return new TrxBlock(subject.ReferenceId!, subject.TransactionType!, (MaskDecimal4)subject.Value);
         }
 
 

@@ -74,5 +74,17 @@ namespace Khooversoft.Toolbox.Standard
         {
             return subject is T ? (T)subject : default;
         }
+
+        /// <summary>
+        /// Convert string to UTF8 bytes
+        /// </summary>
+        /// <param name="subject">string to convert</param>
+        /// <returns>array of bytes</returns>
+        public static IReadOnlyList<byte> ToBytes(this string subject)
+        {
+            if (subject == null) return Enumerable.Empty<byte>().ToList();
+
+            return Encoding.UTF8.GetBytes(subject);
+        }
     }
 }

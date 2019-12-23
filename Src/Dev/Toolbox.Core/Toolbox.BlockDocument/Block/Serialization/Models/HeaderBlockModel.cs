@@ -7,7 +7,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 {
     public class HeaderBlockModel : IDataBlockModelType
     {
-        public DateTime CreatedDate { get; set; }
+        public long TimeStamp { get; set; }
 
         public string? Description { get; set; }
     }

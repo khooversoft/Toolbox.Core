@@ -7,6 +7,12 @@ namespace Khooversoft.Toolbox.BlockDocument
 {
     public interface IDataBlock
     {
-        IReadOnlyList<byte> GetBytesForHash();
+        string GetDigest();
+
+        public string Digest { get; }
+
+        public string? JwtSignature { get; }
+
+        void Validate();
     }
 }

@@ -48,7 +48,7 @@ namespace Toolbox.BlockDocument.Test
             string json = blockChain.ToJson();
 
             BlockChain result = json.ToBlockChain();
-            result.Chain.Count.Should().Be(blockChain.Chain.Count);
+            result.Blocks.Count.Should().Be(blockChain.Blocks.Count);
             blockChain.IsValid().Should().BeTrue();
             string resultChainHash = result.ToMerkleTree().BuildTree().ToString();
 
@@ -72,7 +72,7 @@ namespace Toolbox.BlockDocument.Test
 
             BlockChain result = json.ToBlockChain();
             blockChain.IsValid().Should().BeTrue();
-            result.Chain.Count.Should().Be(blockChain.Chain.Count);
+            result.Blocks.Count.Should().Be(blockChain.Blocks.Count);
             string resultChainHash = result.ToMerkleTree().BuildTree().ToString();
 
             blockChainHash.Should().Be(resultChainHash);
@@ -109,11 +109,11 @@ namespace Toolbox.BlockDocument.Test
             var blockChain = new BlockChain()
             {
                 new DataBlock<HeaderBlock>("header", "header_1", new HeaderBlock("Master Contract")),
-                new DataBlock<BlockBlob>("contract", "contract_1", new BlockBlob("contract.docx", "docx", "me", Encoding.UTF8.GetBytes("this is a contract between two people"))),
+                new DataBlock<BlobBlock>("contract", "contract_1", new BlobBlock("contract.docx", "docx", "me", Encoding.UTF8.GetBytes("this is a contract between two people"))),
                 new DataBlock<TrxBlock>("ContractLedger", "Pmt", new TrxBlock("1", "cr", 100)),
             };
 
-            blockChain.Chain.Count.Should().Be(4);
+            blockChain.Blocks.Count.Should().Be(4);
             blockChain.IsValid().Should().BeTrue();
             string blockChainHash = blockChain.ToMerkleTree().BuildTree().ToString();
 
@@ -132,11 +132,11 @@ namespace Toolbox.BlockDocument.Test
             var blockChain = new BlockChain()
             {
                 new DataBlock<HeaderBlock>("header", "header_1", new HeaderBlock("Master Contract")),
-                new DataBlock<BlockBlob>("contract", "contract_1", new BlockBlob("contract.docx", "docx", "me", Encoding.UTF8.GetBytes("this is a contract between two people"))),
+                new DataBlock<BlobBlock>("contract", "contract_1", new BlobBlock("contract.docx", "docx", "me", Encoding.UTF8.GetBytes("this is a contract between two people"))),
                 new DataBlock<TrxBlock>("ContractLedger", "Pmt", new TrxBlock("1", "cr", 100)),
             };
 
-            blockChain.Chain.Count.Should().Be(4);
+            blockChain.Blocks.Count.Should().Be(4);
             blockChain.IsValid().Should().BeTrue();
             string blockChainHash = blockChain.ToMerkleTree().BuildTree().ToString();
 

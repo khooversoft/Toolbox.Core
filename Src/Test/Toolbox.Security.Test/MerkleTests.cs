@@ -2,14 +2,14 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using FluentAssertions;
+using Khooversoft.Toolbox.Security;
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
-using Khooversoft.Toolbox.Standard;
-using Khooversoft.Toolbox.BlockDocument;
 
-namespace Toolbox.BlockDocument.Test
+namespace Toolbox.Security.Test
 {
     public class MerkleTests
     {

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
+using Khooversoft.Toolbox.Security;
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +15,7 @@ namespace Khooversoft.Toolbox.BlockDocument
         public static MerkleTree ToMerkleTree(this BlockChain blockChain)
         {
             return new MerkleTree()
-                .Append(blockChain.Select(x => new MerkleHash(x.Hash))
-                .ToArray());
+                .Append(blockChain.Select(x => x.Digest).ToArray());
         }
     }
 }
