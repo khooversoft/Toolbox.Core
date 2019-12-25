@@ -76,6 +76,24 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
+        /// Execute 'action' on each item
+        /// </summary>
+        /// <typeparam name="T">type</typeparam>
+        /// <param name="list">list to operate on</param>
+        /// <param name="action">function to execute, index is passed</param>
+        public static async Task ForEachAsync<T>(this IEnumerable<T> list, Func<T, int, Task> action)
+        {
+            list.Verify(nameof(list)).IsNotNull();
+            action.Verify(nameof(action)).IsNotNull();
+
+            int index = 0;
+            foreach (var item in list)
+            {
+                await action(item, index++);
+            }
+        }
+
+        /// <summary>
         /// Convert enumerable to stack
         /// </summary>
         /// <typeparam name="T">type</typeparam>

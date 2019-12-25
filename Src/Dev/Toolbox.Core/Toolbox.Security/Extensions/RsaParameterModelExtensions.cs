@@ -2,14 +2,13 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox.Standard;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 
 namespace Khooversoft.Toolbox.Security
 {
@@ -51,14 +50,14 @@ namespace Khooversoft.Toolbox.Security
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return JsonSerializer.Serialize(subject);
+            return JsonConvert.SerializeObject(subject);
         }
 
         public static RsaParameterModel ToRasParameterModel(this string json)
         {
             json.Verify(nameof(json)).IsNotEmpty();
 
-            return JsonSerializer.Deserialize<RsaParameterModel>(json);
+            return JsonConvert.DeserializeObject<RsaParameterModel>(json);
         }
 
         public static string ToBinaryString(this RSAParameters subject)

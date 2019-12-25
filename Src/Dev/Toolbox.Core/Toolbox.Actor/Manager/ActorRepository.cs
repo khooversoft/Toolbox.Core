@@ -150,8 +150,15 @@ namespace Khooversoft.Toolbox.Actor
                 if (!_actorCache.TryRemove(key, out registration)) return null;
             }
 
-            await registration.Instance.Deactivate(context).ConfigureAwait(false);
-            registration.Instance.Dispose();
+            try
+            {
+                await registration.Instance.Deactivate(context).ConfigureAwait(false);
+            }
+            finally
+            {
+                registration.Instance.Dispose();
+            }
+
             return registration;
         }
 

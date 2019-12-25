@@ -1,8 +1,8 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
+using Newtonsoft.Json;
 using System.Linq;
-using System.Text.Json;
 
 namespace Khooversoft.Toolbox.Standard
 {
@@ -26,7 +26,9 @@ namespace Khooversoft.Toolbox.Standard
                 Exception = message.Exception,
             };
 
-            return JsonSerializer.Serialize(model);
+            return JsonConvert.SerializeObject(model);
+
+            //return JsonSerializer.Serialize(model);
         }
 
         public static TelemetryMessage? ConvertJsonToTelemetryMessage(this string jsonMessage)
@@ -36,7 +38,8 @@ namespace Khooversoft.Toolbox.Standard
                 return null;
             }
 
-            var md = JsonSerializer.Deserialize<TelemetryMessageModel>(jsonMessage);
+            //var md = JsonSerializer.Deserialize<TelemetryMessageModel>(jsonMessage);
+            var md = JsonConvert.DeserializeObject<TelemetryMessageModel>(jsonMessage);
             md.Verify(nameof(md)).IsNotNull();
 
             IWorkContext context = new WorkContextBuilder()

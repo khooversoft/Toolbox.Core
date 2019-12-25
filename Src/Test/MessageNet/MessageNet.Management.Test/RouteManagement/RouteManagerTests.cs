@@ -68,7 +68,7 @@ namespace MessageHub.Management.Test.RouteManagement
         [Fact]
         public async Task GivenThreeNode_WhenRegisterAndUnregistered_ShouldPass()
         {
-            const int max = 10;
+            const int max = 1;
             IContainer rootContainer = CreateContainer();
 
             using (ILifetimeScope container = rootContainer.BeginLifetimeScope())

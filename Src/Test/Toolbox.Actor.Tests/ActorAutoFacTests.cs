@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Autofac;
 
-namespace Khooversoft.Toolbox.Test.Actor
+namespace Toolbox.Actor.Tests
 {
     [Trait("Category", "Actor")]
     public class ActorAutoFacTests

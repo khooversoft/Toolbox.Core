@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
-    <ProjectReference Include="..\MessageHub.Interface\MessageHub.Interface.csproj" />
+    <ProjectReference Include="..\MessageNet.Interface\MessageNet.Interface.csproj" />
   </ItemGroup>
 
 </Project>

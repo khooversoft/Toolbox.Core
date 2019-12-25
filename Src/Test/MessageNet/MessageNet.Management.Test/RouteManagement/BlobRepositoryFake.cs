@@ -53,7 +53,7 @@ namespace MessageHub.Management.Test.RouteManagement
 
             var result = _repository
                 .Where(x => searchTest.Test(x.Key))
-                .Select(x => x.Value)
+                .Select(x => x.Key)
                 .ToList();
 
             return Task.FromResult<IReadOnlyList<string>>(result);

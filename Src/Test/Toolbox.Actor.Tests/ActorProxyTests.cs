@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Khooversoft.Toolbox.Test.Actor
+namespace Toolbox.Actor.Tests
 {
     [Trait("Category", "Actor")]
     public class ActorProxyTests

@@ -57,6 +57,7 @@ namespace Khooversoft.MessageHub.Management
 
             NodeRegistrationModel[] result = await list
                 .Select(x => Get(context, x))
+                .Where(x => x != null)
                 .WhenAll();
 
             return result;

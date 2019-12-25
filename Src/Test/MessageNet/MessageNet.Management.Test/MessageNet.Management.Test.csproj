@@ -2,15 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-
-    <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Autofac" Version="4.9.4" />
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
@@ -24,8 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Dev\MessageHub\MessageHub.Client\MessageHub.Client.csproj" />
-    <ProjectReference Include="..\..\..\Dev\MessageHub\MessageHub.NameServer\MessageHub.NameServer.csproj" />
+    <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.Management\MessageNet.Management.csproj" />
     <ProjectReference Include="..\..\..\Dev\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
   </ItemGroup>
 

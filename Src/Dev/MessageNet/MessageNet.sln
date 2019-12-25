@@ -11,27 +11,27 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Standard", "..\Tool
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Configuration", "..\Toolbox.Core\Toolbox.Configuration\Toolbox.Configuration.csproj", "{0075129F-353F-421C-81AB-6596F014F2C7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventHubPerformanceTest", "..\..\Test\MessageHub\EventHubPerformanceTest\EventHubPerformanceTest.csproj", "{23B84730-7E43-4DF5-8595-E2CCDBC6A456}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventHubPerformanceTest", "..\..\Test\MessageNet\EventHubPerformanceTest\EventHubPerformanceTest.csproj", "{23B84730-7E43-4DF5-8595-E2CCDBC6A456}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceBusPerformanceTest", "..\..\Test\MessageHub\ServiceBusPerformanceTest\ServiceBusPerformanceTest.csproj", "{AB3C25C9-5062-4922-BE7A-36579B35AC8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceBusPerformanceTest", "..\..\Test\MessageNet\ServiceBusPerformanceTest\ServiceBusPerformanceTest.csproj", "{AB3C25C9-5062-4922-BE7A-36579B35AC8F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.Management", "MessageHub.Management\MessageHub.Management.csproj", "{F19341C6-C2E2-4858-B919-142AA5DC6C1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Management", "MessageNet.Management\MessageNet.Management.csproj", "{F19341C6-C2E2-4858-B919-142AA5DC6C1B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{CA15BE8F-60FA-4A83-A96E-DA70CDB75C6B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Actor", "..\Toolbox.Core\Toolbox.Actor\Toolbox.Actor.csproj", "{BBEA57F6-A357-4322-8DFF-42578E14538F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.Interface", "MessageHub.Interface\MessageHub.Interface.csproj", "{B5358CC6-77E7-41AC-B9E5-2368A4189A89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Interface", "MessageNet.Interface\MessageNet.Interface.csproj", "{B5358CC6-77E7-41AC-B9E5-2368A4189A89}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.Client", "MessageHub.Client\MessageHub.Client.csproj", "{32622E33-9269-4086-8ABC-B142D66F9ACD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Client", "MessageNet.Client\MessageNet.Client.csproj", "{32622E33-9269-4086-8ABC-B142D66F9ACD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.NameServer", "MessageHub.NameServer\MessageHub.NameServer.csproj", "{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.NameServer", "MessageNet.NameServer\MessageNet.NameServer.csproj", "{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Autofac", "..\Toolbox.Core\Toolbox.Autofac\Toolbox.Autofac.csproj", "{462260A1-E3D3-49D7-98C7-3F2F04A3570B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageHub.Management.Test", "..\..\Test\MessageHub\MessageHub.Management.Test\MessageHub.Management.Test.csproj", "{BA38F83D-A16F-474A-AFC8-C173DB1C20C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Management.Test", "..\..\Test\MessageNet\MessageNet.Management.Test\MessageNet.Management.Test.csproj", "{BA38F83D-A16F-474A-AFC8-C173DB1C20C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.NameServer.Test", "..\..\Test\MessageHub\MessageHub.NameServer.Test\MessageHub.NameServer.Test.csproj", "{28436DA8-A52F-4591-9811-ECB7FBE4B7FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageNet.NameServer.Test", "..\..\Test\MessageNet\MessageNet.NameServer.Test\MessageNet.NameServer.Test.csproj", "{28436DA8-A52F-4591-9811-ECB7FBE4B7FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

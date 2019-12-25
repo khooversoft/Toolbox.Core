@@ -9,24 +9,24 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Test\MessageHub\MessageHub.Management.Test\MessageHub.Management.Test.csproj" />
+    <ProjectReference Include="..\..\..\Test\MessageNet\MessageNet.Management.Test\MessageNet.Management.Test.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Actor\Toolbox.Actor.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Autofac\Toolbox.Autofac.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Configuration\Toolbox.Configuration.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
-    <ProjectReference Include="..\MessageHub.Interface\MessageHub.Interface.csproj" />
-    <ProjectReference Include="..\MessageHub.Management\MessageHub.Management.csproj" />
+    <ProjectReference Include="..\MessageNet.Interface\MessageNet.Interface.csproj" />
+    <ProjectReference Include="..\MessageNet.Management\MessageNet.Management.csproj" />
   </ItemGroup>
 
 </Project>

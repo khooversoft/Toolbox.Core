@@ -8,8 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using System.Linq;
 
-namespace Khooversoft.Toolbox.Test.Actor
+namespace Toolbox.Actor.Tests
 {
     [Trait("Category", "Actor")]
     public class ActorTests
@@ -30,7 +31,7 @@ namespace Khooversoft.Toolbox.Test.Actor
             cache.GetActorManager().Should().Be(manager);
 
             count.Should().Be(1);
-            await manager.Deactivate<ICache>(key);
+            (await manager.Deactivate<ICache>(key)).Should().BeTrue();
             count.Should().Be(0);
 
             await manager.DeactivateAll();
@@ -38,7 +39,53 @@ namespace Khooversoft.Toolbox.Test.Actor
         }
 
         [Fact]
-        public async Task ActorSimpleTest()
+        public async Task GivenActor_WhenMultipleCreated_KeyAndManagerShouldBeSet()
+        {
+            int count = 0;
+
+            IActorManager manager = new ActorManager();
+            manager.Register<ICache>(_ => new StringCache(y => count += y));
+
+            const int max = 10;
+            var keyList = new List<ActorKey>();
+
+            await Enumerable.Range(0, max)
+                .ForEachAsync(async (x, index) =>
+                {
+                    ActorKey key = new ActorKey($"cache/test_{index}");
+                    keyList.Add(key);
+
+                    ICache cache = await manager.CreateProxy<ICache>(key);
+                    cache.GetActorKey().Should().Be(key);
+                    cache.GetActorManager().Should().Be(manager);
+                });
+
+            count.Should().Be(max);
+
+            await keyList
+                .ForEachAsync(async x =>
+                {
+                    ICache cache = await manager.CreateProxy<ICache>(x);
+                    cache.GetActorKey().Should().Be(x);
+                    cache.GetActorManager().Should().Be(manager);
+                });
+
+            count.Should().Be(max);
+
+            await keyList
+                .ForEachAsync(async x =>
+                {
+                    (await manager.Deactivate<ICache>(x)).Should().BeTrue();
+                });
+
+            count.Should().Be(0);
+
+            await manager.DeactivateAll();
+            count.Should().Be(0);
+        }
+
+        [Fact]
+        public async Task GivenActor_WhenCreatedDeactivated_CountsShouldFollowLifecycle()
         {
             int count = 0;
 
@@ -49,7 +96,7 @@ namespace Khooversoft.Toolbox.Test.Actor
             ICache cache = await manager.CreateProxy<ICache>(key);
 
             count.Should().Be(1);
-            await manager.Deactivate<ICache>(key);
+            (await manager.Deactivate<ICache>(key)).Should().BeTrue();
             count.Should().Be(0);
 
             await manager.DeactivateAll();
@@ -57,7 +104,7 @@ namespace Khooversoft.Toolbox.Test.Actor
         }
 
         [Fact]
-        public async Task ActorDeactivateAllTest()
+        public async Task GivenActor_WhenDeactivatedAll_ActorCountShouldBeZero()
         {
             int count = 0;
 
@@ -89,10 +136,10 @@ namespace Khooversoft.Toolbox.Test.Actor
             ICache cache2 = await manager.CreateProxy<ICache>(key2);
             count.Should().Be(2);
 
-            await manager.Deactivate<ICache>(key1);
+            (await manager.Deactivate<ICache>(key1)).Should().BeTrue();
             count.Should().Be(1);
 
-            await manager.Deactivate<ICache>(key2);
+            (await manager.Deactivate<ICache>(key2)).Should().BeTrue();
             count.Should().Be(0);
 
             await manager.DeactivateAll();
@@ -118,7 +165,7 @@ namespace Khooversoft.Toolbox.Test.Actor
             test = await cache1.IsCached(firstText);
             test.Should().BeTrue();
 
-            await manager.Deactivate<ICache>(key1);
+            (await manager.Deactivate<ICache>(key1)).Should().BeTrue(); ;
             count.Should().Be(0);
 
             await manager.DeactivateAll();
@@ -158,8 +205,8 @@ namespace Khooversoft.Toolbox.Test.Actor
             test = await cache1Dup.IsCached(secondText);
             test.Should().BeFalse();
 
-            await manager.Deactivate<ICache>(key1);
-            await manager.Deactivate<ICache>(key2);
+            (await manager.Deactivate<ICache>(key1)).Should().BeTrue();
+            (await manager.Deactivate<ICache>(key2)).Should().BeTrue();
             count.Should().Be(0);
 
             await manager.DeactivateAll();

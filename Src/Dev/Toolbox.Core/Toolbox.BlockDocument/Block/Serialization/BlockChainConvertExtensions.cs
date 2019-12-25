@@ -2,11 +2,9 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox.Standard;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
 
 namespace Khooversoft.Toolbox.BlockDocument
 {
@@ -30,14 +28,14 @@ namespace Khooversoft.Toolbox.BlockDocument
                 Blocks = list,
             };
 
-            return JsonSerializer.Serialize(blockChainModel);
+            return JsonConvert.SerializeObject(blockChainModel);
         }
 
         public static BlockChain ToBlockChain(this string json)
         {
             json.Verify(nameof(json)).IsNotEmpty();
 
-            var blockChainModel = JsonSerializer.Deserialize<BlockChainModel>(json);
+            var blockChainModel = JsonConvert.DeserializeObject<BlockChainModel>(json);
             blockChainModel.Blocks.Verify(nameof(blockChainModel.Blocks)).IsNotNull();
 
             var list = new List<BlockNode>();
