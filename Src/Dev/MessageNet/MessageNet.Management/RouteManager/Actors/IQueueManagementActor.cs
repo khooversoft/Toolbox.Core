@@ -2,11 +2,11 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Threading.Tasks;
-using Khooversoft.MessageHub.Interface;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Standard;
 
-namespace Khooversoft.MessageHub.Management
+namespace Khooversoft.MessageNet.Management
 {
     public interface IQueueManagementActor : IActor
     {

@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using FluentAssertions;
-using Khooversoft.MessageHub.Interface;
-using Khooversoft.MessageHub.Management;
+using Khooversoft.MessageNet.Interface;
+using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Standard;
 using System;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace MessageHub.Management.Test.RouteManagement
+namespace MessageNet.Management.Test.RouteManagement
 {
     public class RouteManagerTests
     {

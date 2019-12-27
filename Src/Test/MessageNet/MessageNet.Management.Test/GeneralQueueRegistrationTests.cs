@@ -2,20 +2,21 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using FluentAssertions;
-using Khooversoft.MessageHub.Interface;
-using Khooversoft.MessageHub.Management;
+using Khooversoft.MessageNet.Interface;
+using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace MessageHub.Management.Test
+namespace MessageNet.Management.Test
 {
     [Collection("QueueTests")]
-    public class GeneralQueueRegistrationTests
+    public class GeneralQueueRegistrationTests : IClassFixture<ApplicationFixture>
     {
-        private readonly ServiceBusConnection _serviceBusConnection = new ServiceBusConnection("Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=COdoxUj4S71bFrClrJTbNY1IGSpPnVxERyTLFEOz58Q=;TransportType=Amqp");
+        private const string _connectionString = "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={messagehub.accesskey};TransportType=Amqp";
+        private readonly ServiceBusConnection _serviceBusConnection;
         private readonly IWorkContext _workContext = WorkContext.Empty;
         private readonly QueueManagement _queueManagement;
 
@@ -24,8 +25,11 @@ namespace MessageHub.Management.Test
             QueueName = "Unit2_TestQueue2",
         };
 
-        public GeneralQueueRegistrationTests()
+        public GeneralQueueRegistrationTests(ApplicationFixture application)
         {
+            string? connectionString = _connectionString.Resolve(application.PropertyResolver);
+
+            _serviceBusConnection = new ServiceBusConnection(connectionString!);
             _queueManagement = new QueueManagement(_serviceBusConnection);
         }
 

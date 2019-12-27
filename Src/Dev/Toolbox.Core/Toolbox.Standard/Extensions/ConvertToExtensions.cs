@@ -86,5 +86,17 @@ namespace Khooversoft.Toolbox.Standard
 
             return Encoding.UTF8.GetBytes(subject);
         }
+
+        /// <summary>
+        /// Convert string to UTF8 bytes
+        /// </summary>
+        /// <param name="subject">string to convert</param>
+        /// <returns>array of bytes</returns>
+        public static byte[] ToByteArray(this string subject)
+        {
+            if (subject == null) return new byte[0];
+
+            return Encoding.UTF8.GetBytes(subject);
+        }
     }
 }

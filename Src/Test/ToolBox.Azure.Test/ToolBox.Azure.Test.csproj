@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>ToolBox.Azure.Test</UserSecretsId>
+    <Nullable>enabled</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

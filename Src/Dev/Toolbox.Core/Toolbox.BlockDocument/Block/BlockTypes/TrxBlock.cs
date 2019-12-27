@@ -29,6 +29,8 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public MaskDecimal4 Value { get; }
 
+        // TODO: Need properties
+
         public string Digest { get; }
 
         public string GetDigest() => $"{ReferenceId}-{TransactionType}-{Value}"

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Khooversoft.MessageHub.Interface
+namespace Khooversoft.MessageNet.Interface
 {
     /// <summary>
     /// Node registration response to a request

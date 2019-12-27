@@ -1,4 +1,4 @@
-﻿using Khooversoft.MessageHub.Interface;
+﻿using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Concurrent;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MessageHub.Client
+namespace Khooversoft.MessageNet.Client
 {
     public class NodeRoute
     {

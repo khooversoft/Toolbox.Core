@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Khooversoft.MessageHub.Management;
+using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Standard;
 
-namespace MessageHub.Management.Test.RouteManagement
+namespace MessageNet.Management.Test.RouteManagement
 {
     public class BlobRepositoryFake : IBlobRepository
     {

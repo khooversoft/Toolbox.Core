@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Khooversoft.MessageHub.Interface;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 
-namespace MessageHub.Client
+namespace Khooversoft.MessageNet.Client
 {
     public interface INameServerClient
     {

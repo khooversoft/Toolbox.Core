@@ -1,7 +1,7 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Khooversoft.MessageHub.Interface;
-using Khooversoft.MessageHub.Management;
+using Khooversoft.MessageNet.Interface;
+using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Configuration;

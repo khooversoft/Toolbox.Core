@@ -10,9 +10,9 @@ using System.Linq;
 using Khooversoft.Toolbox.Standard;
 using Newtonsoft.Json;
 using Khooversoft.Toolbox.Actor;
-using Khooversoft.MessageHub.Interface;
+using Khooversoft.MessageNet.Interface;
 
-namespace Khooversoft.MessageHub.Management
+namespace Khooversoft.MessageNet.Management
 {
     public class BlobStore : IRegisterStore
     {

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Khooversoft.MessageHub.Interface;
-using Khooversoft.MessageHub.Management;
+using Khooversoft.MessageNet.Interface;
+using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

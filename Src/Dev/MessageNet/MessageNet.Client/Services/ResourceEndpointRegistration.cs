@@ -1,10 +1,10 @@
-﻿using Khooversoft.MessageHub.Interface;
+﻿using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MessageHub.Client
+namespace Khooversoft.MessageNet.Client
 {
     public class ResourceEndpointRegistration
     {
@@ -20,9 +20,9 @@ namespace MessageHub.Client
 
         public ResourceScheme Scheme { get; }
 
-        public string ServiceBusNamespace { get; set; }
+        public string ServiceBusNamespace { get; }
 
-        public string ConnectionString { get; set; }
+        public string ConnectionString { get; }
 
         public string Key => Scheme.ToString() + ":" + ServiceBusNamespace;
 

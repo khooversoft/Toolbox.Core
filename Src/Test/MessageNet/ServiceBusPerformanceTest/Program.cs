@@ -10,7 +10,7 @@ using System.Threading;
 using Autofac;
 using System.Collections.Generic;
 using System.Linq;
-using Khooversoft.MessageHub.Interface;
+using Khooversoft.MessageNet.Interface;
 
 namespace ServiceBusPerformanceTest
 {
@@ -91,7 +91,7 @@ namespace ServiceBusPerformanceTest
                     Console.WriteLine("Canceling...");
                 };
 
-                Console.WriteLine("Hit Ctrl C to quite");
+                Console.WriteLine("Hit Ctrl C to quit");
                 Console.WriteLine();
 
                 await Task.WhenAll(runningTasks);

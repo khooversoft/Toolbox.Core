@@ -18,5 +18,6 @@ namespace Khooversoft.Toolbox.Standard
         void Complete();
         Task<bool> Send(T value);
         bool Post(T value);
+        Task CompleteAndWait();
     }
 }

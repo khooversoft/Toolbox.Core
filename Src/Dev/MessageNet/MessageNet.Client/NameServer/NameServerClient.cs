@@ -4,12 +4,12 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Khooversoft.MessageHub.Interface;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace MessageHub.Client
+namespace Khooversoft.MessageNet.Client
 {
     public class NameServerClient : INameServerClient
     {

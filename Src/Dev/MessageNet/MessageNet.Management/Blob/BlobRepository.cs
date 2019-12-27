@@ -10,7 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Khooversoft.MessageHub.Management
+namespace Khooversoft.MessageNet.Management
 {
     public class BlobRepository : IBlobRepository
     {

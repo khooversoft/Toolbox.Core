@@ -63,24 +63,6 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
-        /// Get completion task
-        /// </summary>
-        public Task Completion
-        {
-            get
-            {
-                _blockList.Count.Verify().Assert(x => x > 0, _assertText);
-
-                var tasks = _blockList.OfType<IDataflowBlock>()
-                    .Select(x => x.Completion)
-                    .Concat(_register.Select(x => x.Completion))
-                    .ToArray();
-
-                return Task.WhenAll(tasks);
-            }
-        }
-
-        /// <summary>
         /// Add data flow block to pipeline
         /// </summary>
         /// <param name="source">block</param>
@@ -123,8 +105,35 @@ namespace Khooversoft.Toolbox.Standard
             lock (_lock)
             {
                 Root.Complete();
-                _register.ForEach(x => x.Complete());
+                //_register.ForEach(x => x.Complete());
             }
+        }
+
+        /// <summary>
+        /// Get completion task
+        /// </summary>
+        public Task Completion
+        {
+            get
+            {
+                _blockList.Count.Verify().Assert(x => x > 0, _assertText);
+
+                var tasks = _blockList.OfType<IDataflowBlock>()
+                    .Select(x => x.Completion)
+                    //.Concat(_register.Select(x => x.Completion))
+                    .ToArray();
+
+                return Task.WhenAll(tasks);
+            }
+        }
+
+        public async Task CompleteAndWait()
+        {
+            Root.Complete();
+            await _blockList.OfType<IDataflowBlock>().Select(x => x.Completion).WhenAll();
+
+            _register.ForEach(x => x.Complete());
+            await _register.Select(x => x.Completion).WhenAll();
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Khooversoft.Toolbox.Standard;
-using MessageHub.Client;
+using Khooversoft.MessageNet.Client;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;

@@ -31,6 +31,7 @@ namespace ToolBox.Azure.Test.Blob
             _blobStore = new BlobStoreConnection("blob-storage-test", connectionString);
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public async Task WhenContainer_CreateIfItDoesNotExist_ShouldPass()
         {
@@ -39,6 +40,7 @@ namespace ToolBox.Azure.Test.Blob
             await subject.CreateContainer(_workContext);
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public async Task GivenFileDoesNotExist_WhenGet_ShouldThrow()
         {
@@ -55,6 +57,7 @@ namespace ToolBox.Azure.Test.Blob
             await act.Should().ThrowAsync<RequestFailedException>();
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public async Task WhenContainer_FullLiveCycle_ShouldPass()
         {
@@ -85,6 +88,7 @@ namespace ToolBox.Azure.Test.Blob
             filePaths.Count.Should().Be(0);
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public async Task WhenContainer_FullLiveCycleForFiles_ShouldPass()
         {

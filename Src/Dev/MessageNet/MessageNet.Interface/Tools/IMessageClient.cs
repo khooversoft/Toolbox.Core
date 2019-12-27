@@ -4,7 +4,7 @@
 using System.Threading.Tasks;
 using Khooversoft.Toolbox.Standard;
 
-namespace Khooversoft.MessageHub.Interface
+namespace Khooversoft.MessageNet.Interface
 {
     public interface IMessageClient
     {

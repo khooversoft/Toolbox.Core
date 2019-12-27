@@ -1,20 +1,14 @@
 ﻿using Autofac.Extensions.DependencyInjection;
-using Khooversoft.MessageHub.Interface;
-using Khooversoft.MessageHub.Management;
-using Khooversoft.Toolbox.Standard;
-using MessageHub.Client;
-using MessageHub.Management.Test.RouteManagement;
+using Khooversoft.MessageNet.Management;
+using Khooversoft.MessageNet.Client;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace MessageHub.NameServer.Test
 {

@@ -152,6 +152,67 @@ namespace Toolbox.Standard.Test.Tools
         }
 
         [Fact]
+        public void GivenSimplePipeline_WhenPost_ShouldProcessMessage()
+        {
+            const int postValue = 100;
+
+            var s1 = new List<int>();
+            var s1Pipeline = new PipelineBlock<int>().DoAction(x => s1.Add(x));
+
+            s1Pipeline.Post(postValue);
+            s1Pipeline.Complete();
+            s1Pipeline.Completion.Wait();
+
+            s1.Count.Should().Be(1);
+            s1[0].Should().Be(postValue);
+        }
+
+        [Fact]
+        public void GivenRegisteredPipeline_WhenPost_ShouldProcessAllMessage()
+        {
+            const int postValue = 100;
+
+            var s1 = new List<int>();
+            var s1Pipeline = new PipelineBlock<int>().DoAction(x => s1.Add(x));
+
+            var job = new PipelineBlock<int>()
+                .Register(s1Pipeline)
+                .DoAction(x => s1Pipeline.Post(x));
+
+            job.Post(postValue);
+
+            job.Complete();
+            job.Completion.Wait();
+
+            s1Pipeline.Complete();
+            s1Pipeline.Completion.Wait();
+
+            s1.Count.Should().Be(1);
+            s1[0].Should().Be(postValue);
+        }
+
+
+        [Fact]
+        public void GivenRegisteredPipeline_WhenCompleteAndWait_ShouldProcessAllMessage()
+        {
+            const int postValue = 100;
+
+            var s1 = new List<int>();
+            var s1Pipeline = new PipelineBlock<int>().DoAction(x => s1.Add(x));
+
+            var job = new PipelineBlock<int>()
+                .Register(s1Pipeline)
+                .DoAction(x => s1Pipeline.Post(x));
+
+            job.Post(postValue);
+
+            job.CompleteAndWait().Wait();
+
+            s1.Count.Should().Be(1);
+            s1[0].Should().Be(postValue);
+        }
+
+        [Fact]
         public void GivenBuffer_ApplyTransformAndTwoSubpiplines_ShouldPass()
         {
             const int max = 1000;
@@ -178,11 +239,12 @@ namespace Toolbox.Standard.Test.Tools
             Enumerable.Range(0, max)
                 .ForEach(async x => await jobs.Send(x));
 
-            jobs.Complete();
-            jobs.Completion.Wait();
+            jobs.CompleteAndWait().Wait();
 
             list.Count.Should().Be(max);
             list2.Count.Should().Be(max);
+            s1.Count.Should().Be(max);
+            s2.Count.Should().Be(max);
 
             list
                 .Select((x, i) => new { x, i })

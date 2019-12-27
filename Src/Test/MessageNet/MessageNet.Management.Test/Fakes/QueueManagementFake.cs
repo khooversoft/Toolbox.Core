@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Khooversoft.MessageHub.Interface;
-using Khooversoft.MessageHub.Management;
+using Khooversoft.MessageNet.Interface;
+using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Standard;
 
-namespace MessageHub.Management.Test.RouteManagement
+namespace MessageNet.Management.Test.RouteManagement
 {
     public class QueueManagementFake : IQueueManagement
     {

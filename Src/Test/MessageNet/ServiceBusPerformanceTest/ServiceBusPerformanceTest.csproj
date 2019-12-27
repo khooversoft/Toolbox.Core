@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.Client\MessageNet.Client.csproj" />
     <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.Interface\MessageNet.Interface.csproj" />
     <ProjectReference Include="..\..\..\Dev\Toolbox.Core\Toolbox.Configuration\Toolbox.Configuration.csproj" />
     <ProjectReference Include="..\..\..\Dev\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />

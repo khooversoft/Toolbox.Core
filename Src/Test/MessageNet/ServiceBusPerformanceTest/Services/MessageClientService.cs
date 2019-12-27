@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Khooversoft.MessageHub.Interface;
+using Khooversoft.MessageNet.Interface;
+using Khooversoft.MessageNet.Client;
 
 namespace ServiceBusPerformanceTest
 {

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Khooversoft.MessageHub.Management
+namespace Khooversoft.MessageNet.Management
 {
     public class BlobStoreConnection
     {

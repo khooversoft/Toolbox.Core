@@ -1,30 +1,26 @@
-﻿// Copyright (c) KhooverSoft. All rights reserved.
-// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
-
+﻿using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
-using Khooversoft.Toolbox.Standard;
-using Microsoft.Azure.ServiceBus.Core;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace ServiceBusPerformanceTest
+namespace Khooversoft.MessageNet.Client
 {
-    internal class MessageProcessor : IMessageProcessor, IDisposable
+    public class MessageProcessor : IMessageProcessor, IDisposable
     {
-        private readonly IOption _option;
         private Func<Message, Task>? _receiver;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
         private MessageReceiver _messageReceiver;
 
-        public MessageProcessor(IOption option)
+        public MessageProcessor(string connectionString, string queueName)
         {
-            option.Verify(nameof(option)).IsNotNull();
+            connectionString.Verify(nameof(connectionString)).IsNotEmpty();
+            queueName.Verify(nameof(queueName)).IsNotEmpty();
 
-            _option = option;
-            _messageReceiver = new MessageReceiver(_option.ServiceBusConnectionString, _option.QueueName, ReceiveMode.PeekLock);
+            _messageReceiver = new MessageReceiver(connectionString, queueName, ReceiveMode.PeekLock);
         }
 
         public Task Register(IWorkContext context, Func<Message, Task> receiver)
@@ -57,7 +53,6 @@ namespace ServiceBusPerformanceTest
             };
 
             _messageReceiver.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
-
             return doneReceiving.Task;
         }
 
@@ -122,6 +117,5 @@ namespace ServiceBusPerformanceTest
 
             return Task.CompletedTask;
         }
-
     }
 }

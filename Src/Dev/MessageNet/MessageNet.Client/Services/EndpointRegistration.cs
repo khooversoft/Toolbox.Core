@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MessageHub.Client
+namespace Khooversoft.MessageNet.Client
 {
     public class EndpointRegistration
     {
@@ -14,10 +14,8 @@ namespace MessageHub.Client
         {
         }
 
-        public EndpointRegistration Add(IEnumerable<ResourceEndpointRegistration> resourceEndpointRegistrations)
+        public EndpointRegistration Add(params ResourceEndpointRegistration[] resourceEndpointRegistrations)
         {
-            resourceEndpointRegistrations.Verify(nameof(resourceEndpointRegistrations)).IsNotNull();
-
             foreach(var item in resourceEndpointRegistrations)
             {
                 _registry[item.Key] = item;

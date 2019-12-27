@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Khooversoft.MessageHub.Management
+namespace Khooversoft.MessageNet.Management
 {
     /// <summary>
     /// Verify queue existence and/or remove it.

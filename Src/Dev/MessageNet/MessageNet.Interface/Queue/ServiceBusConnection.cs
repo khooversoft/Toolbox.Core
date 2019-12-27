@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Khooversoft.MessageHub.Interface
+namespace Khooversoft.MessageNet.Interface
 {
     public class ServiceBusConnection
     {

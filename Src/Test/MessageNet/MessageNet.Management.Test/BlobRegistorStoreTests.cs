@@ -3,7 +3,7 @@
 
 using Azure;
 using FluentAssertions;
-using Khooversoft.MessageHub.Management;
+using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
@@ -12,13 +12,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace MessageHub.Management.Test
+namespace MessageNet.Management.Test
 {
     [Collection("QueueTests")]
-    public class BlobRegistorStoreTests
+    public class BlobRegistorStoreTests : IClassFixture<ApplicationFixture>
     {
-        private readonly BlobStoreConnection _blobStore = new BlobStoreConnection("blob-storage-test", "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey=YyoPvCOTP0tdyRSB5QT5WkIjCkXAFg9c3NgIZj5a+IDwdUGpSZvpziFGZfthD0nofpVWBxKe8kWFTCS/hB9X8A==;EndpointSuffix=core.windows.net");
+        private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey={blob.storage.connection};EndpointSuffix=core.windows.net";
+        private readonly BlobStoreConnection _blobStore;
         private readonly IWorkContext _workContext = WorkContext.Empty;
+
+        public BlobRegistorStoreTests(ApplicationFixture application)
+        {
+            string? connectionString = _connectionString.Resolve(application.PropertyResolver);
+
+            _blobStore = new BlobStoreConnection("blob-storage-test", connectionString!);
+        }
 
         [Fact]
         public async Task WhenContainer_CreateIfItDoesNotExist_ShouldPass()

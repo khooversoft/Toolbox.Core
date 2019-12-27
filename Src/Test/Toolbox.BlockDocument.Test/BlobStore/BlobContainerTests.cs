@@ -32,6 +32,7 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
             _blobStore = new BlobStoreConnection("blob-storage-test", connectionString!);
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public async Task GivenBlockChain_WhenContainerIsBlob_ShouldRoundTrip()
         {
@@ -84,6 +85,7 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
             await container.Delete(_workContext, _blobPath);
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public async Task GivenBlockChain_WhenContainerIsBlobAndBuilder_ShouldRoundTrip()
         {
@@ -121,6 +123,7 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
             await container.Delete(_workContext, _blobPath);
         }
 
+        [Trait("Category", "LocalOnly")]
         [Fact]
         public async Task GivenBlockChain_WhenUsingBuilder_ShouldValidate()
         {

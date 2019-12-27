@@ -3,14 +3,14 @@
 
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Standard;
-using Khooversoft.MessageHub.Management;
+using Khooversoft.MessageNet.Management;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Khooversoft.MessageHub.Interface;
+using Khooversoft.MessageNet.Interface;
 
-namespace Khooversoft.MessageHub.Management
+namespace Khooversoft.MessageNet.Management
 {
     public class NodeRegistrationManagementActor : ActorBase, INodeRegistrationManagementActor
     {
