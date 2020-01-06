@@ -11,6 +11,7 @@ using Autofac;
 using System.Collections.Generic;
 using System.Linq;
 using Khooversoft.MessageNet.Interface;
+using Khooversoft.MessageNet.Client;
 
 namespace ServiceBusPerformanceTest
 {

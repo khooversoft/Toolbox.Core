@@ -13,12 +13,18 @@ namespace Khooversoft.Toolbox.Standard
     public class TelemetryService : ITelemetryService, IDisposable
     {
         private IPipelineBlock<TelemetryMessage> _pipeline;
-        private Func<TelemetryMessage, TelemetryMessage> _transform = x => x;
 
         public TelemetryService()
         {
             _pipeline = new PipelineBlock<TelemetryMessage>()
-                .Select(_transform)
+                .Broadcast();
+        }
+        public TelemetryService(Func<TelemetryMessage, TelemetryMessage> transform)
+        {
+            transform.Verify(nameof(transform)).IsNotNull();
+
+            _pipeline = new PipelineBlock<TelemetryMessage>()
+                .Select(transform)
                 .Broadcast();
         }
 
@@ -36,14 +42,6 @@ namespace Khooversoft.Toolbox.Standard
             _pipeline.Post(message);
         }
 
-        public TelemetryService SetTransform(Func<TelemetryMessage, TelemetryMessage> transform)
-        {
-            transform.Verify(nameof(transform)).IsNotNull();
-
-            _transform = transform;
-            return this;
-        }
-
         public TelemetryService DoAction(Action<TelemetryMessage> action, Predicate<TelemetryMessage>? predicate = null)
         {
             _pipeline.DoAction(action, predicate);
@@ -55,7 +53,6 @@ namespace Khooversoft.Toolbox.Standard
             logger.Verify(nameof(logger)).IsNotNull();
 
             _pipeline.DoAction(x => logger.Write(x), x => x.TelemetryType.IsReplay() || x.TelemetryType.FilterLevel(telemetryType));
-
             return this;
         }
 
@@ -64,7 +61,6 @@ namespace Khooversoft.Toolbox.Standard
             logger.Verify(nameof(logger)).IsNotNull();
 
             _pipeline.DoAction(x => logger.Write(x), x => !x.TelemetryType.IsReplay() && !x.TelemetryType.IsMetric());
-
             return this;
         }
 
@@ -73,7 +69,6 @@ namespace Khooversoft.Toolbox.Standard
             logger.Verify(nameof(logger)).IsNotNull();
 
             _pipeline.DoAction(x => logger.Write(x), x => !x.TelemetryType.IsReplay() && x.TelemetryType.IsEvent() && !x.TelemetryType.IsVerbose());
-
             return this;
         }
 

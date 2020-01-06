@@ -13,7 +13,7 @@ namespace Khooversoft.MessageNet.Client
     /// <summary>
     /// Primary client interface to the Message Net.
     /// </summary>
-    public class MessageNetClient
+    public class MessageNetClient : IMessageNetClient
     {
         private readonly string _nodeId;
         private readonly NodeRoute _nodeRoute;
@@ -60,6 +60,12 @@ namespace Khooversoft.MessageNet.Client
             return new MessageClient(resourceEndpointRegistration.ConnectionString, queueName);
         }
 
+        /// <summary>
+        /// Register a receiver to receive messages
+        /// </summary>
+        /// <param name="context">context</param>
+        /// <param name="receiver">function to call</param>
+        /// <returns>task</returns>
         public async Task RegisterReceiver(IWorkContext context, Func<Message, Task> receiver)
         {
             _messageProcessor.Verify().Assert(x => x == null, "Message process has already been started");

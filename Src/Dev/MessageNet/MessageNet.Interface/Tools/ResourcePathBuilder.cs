@@ -8,6 +8,9 @@ using System.Text;
 
 namespace Khooversoft.MessageNet.Interface
 {
+    /// <summary>
+    /// Resource path builder for queue, topic, event
+    /// </summary>
     public class ResourcePathBuilder
     {
         public ResourcePathBuilder()

@@ -1,15 +1,12 @@
 ﻿using Autofac;
-using Khooversoft.MessageNet.Client;
-using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SmartBlockServer
+namespace MicroserviceHost
 {
     class Program
     {
@@ -50,7 +47,7 @@ namespace SmartBlockServer
             if (option.Help)
             {
                 option.FormatHelp()
-                    .ForEach(x => Console.WriteLine(x));
+                    .ForEach(x => Console.WriteLine(option.SecretManager.Mask(x)));
 
                 return _ok;
             }
@@ -71,23 +68,23 @@ namespace SmartBlockServer
                     .FormatSettings()
                     .ForEach(x => context.Telemetry.Info(context, x));
 
-                Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
+                Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
                 {
                     e.Cancel = true;
                     cancellationTokenSource.Cancel();
-
                     Console.WriteLine("Canceling...");
                 };
 
                 Console.WriteLine("Hit Ctrl C to quit");
                 Console.WriteLine();
 
+                IExecutionContext executionContext = new ExecutionContext();
+
                 await new IAction[]
                 {
-                    container.Resolve<RegisterRoute>(),
-                    //container.Resolve<ReceiveMessages>(),
+                    container.Resolve<LoadAssemblyAction>(),
                 }
-                .ForEachAsync(x => x.Run(context));
+                .ForEachAsync(x => x.Run(context, executionContext));
 
                 return _ok;
             }
@@ -99,12 +96,7 @@ namespace SmartBlockServer
 
             builder.RegisterInstance(option).As<IOption>();
 
-            builder.RegisterType<RegisterRoute>().InstancePerLifetimeScope();
-            //builder.RegisterType<ReceiveMessages>().InstancePerLifetimeScope();
-
-            var endpointRegistration = new ResourceEndpointRegistration(ResourceScheme.Queue, "SmartAgreement", option.ServiceBusConnection);
-
-            builder.Register(x => new MessageNetClient(option.NodeId, new Uri(option.NameServerUri), endpointRegistration)).InstancePerLifetimeScope();
+            builder.RegisterType<LoadAssemblyAction>().InstancePerLifetimeScope();
 
             BuildTelemetry(option, builder);
 
@@ -117,10 +109,10 @@ namespace SmartBlockServer
         {
             builder.Register(x => new ConsoleEventLogger()).As<ConsoleEventLogger>().InstancePerLifetimeScope();
 
-            string logType = "Server";
+            string logType = "ServerHost";
             builder.Register(x => new FileEventLogger(option.LoggingFolder!, logType)).As<FileEventLogger>().InstancePerLifetimeScope();
 
-            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryService()
+            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryService(x => new TelemetryMessage(x, option.SecretManager))
                     .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
                     .AddFileLogger(x.Resolve<FileEventLogger>());
 

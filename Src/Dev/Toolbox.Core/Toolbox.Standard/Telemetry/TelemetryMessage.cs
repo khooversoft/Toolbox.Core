@@ -36,7 +36,7 @@ namespace Khooversoft.Toolbox.Standard
             EventDimensions = new EventDimensions(eventDimensions?.Select(x => x) ?? Standard.EventDimensions.Empty) + context.Dimensions;
         }
 
-        public TelemetryMessage(TelemetryMessage message)
+        public TelemetryMessage(TelemetryMessage message, ITelemetrySecretManager? telemetrySecretManager = null)
         {
             message = message ?? throw new ArgumentNullException(nameof(message));
 
@@ -46,7 +46,7 @@ namespace Khooversoft.Toolbox.Standard
             TelemetryType = message.TelemetryType;
             EventSourceName = message.EventSourceName;
             EventName = message.EventName;
-            Message = message.Message;
+            Message = telemetrySecretManager?.Mask(message.Message) ?? message.Message;
             Duration = message.Duration;
             Value = message.Value;
             EventDimensions = new EventDimensions(message.EventDimensions.Select(x => x));

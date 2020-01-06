@@ -1,0 +1,7 @@
+﻿{
+  "Run": true,
+  "NodeId": "Backend/Customer",
+  "NameServerUri": "http://localhost:5000",
+  "AssemblyPath": "D:\\Sources\\Toolbox.Core\\Src\\Test\\Microservice.Core\\CustomerInfo.MicroService\\bin\\Debug\\netstandard2.1\\CustomerInfo.MicroService.dll",
+  "ServiceBusConnection": "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={SharedAccessKey};TransportType=Amqp"
+}

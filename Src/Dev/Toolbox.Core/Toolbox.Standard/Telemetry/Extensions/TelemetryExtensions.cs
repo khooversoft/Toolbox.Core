@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
@@ -32,6 +33,15 @@ namespace Khooversoft.Toolbox.Standard
             dimensions.Verify(nameof(dimensions)).IsNotNull();
 
             return dimensions.ToKeyValues().ToEventDimensions();
+        }
+
+        public static ITelemetrySecretManager BuildSecretManager(this object optionClass)
+        {
+            optionClass.Verify(nameof(optionClass)).IsNotNull();
+
+            IReadOnlyList<KeyValuePair<string, object>> properties = optionClass.ToKeyValuesForAttribute<TelemetrySecretAttribute>();
+
+            return new TelemetrySecretManager().Add(properties.Select(x => x.Value.ToString()).ToArray());
         }
     }
 }
