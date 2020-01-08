@@ -193,6 +193,44 @@ namespace Toolbox.Standard.Test.Tools
                 .Should().BeTrue();
         }
 
+        [Fact]
+        public void GivenPropertyName_WhenSet_ReturnCorrectName()
+        {
+            var option = new TestOptionName
+            {
+                Name = "Name1",
+                Value = 3,
+                OptionalValue = 10
+            };
+
+            IPropertyResolver resolver = option.BuildResolver();
+
+            List<KeyValuePair<string, string>> testValues = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>(nameof(TestOptionName.Name), "Name1"),
+                new KeyValuePair<string, string>(nameof(TestOptionName.Value), "3"),
+                new KeyValuePair<string, string>("optional.value", "10"),
+            };
+
+            resolver.SourceProperties.Count.Should().Be(testValues.Count);
+            resolver.SourceProperties
+                .Zip(testValues, (o, i) => new { o, i })
+                .All(x => x.o.Key == x.i.Key && x.o.Value == x.i.Value)
+                .Should().BeTrue();
+        }
+
+        public class TestOptionName
+        {
+            [PropertyResolver]
+            public string? Name { get; set; }
+
+            [PropertyResolver]
+            public int Value { get; set; }
+
+            [PropertyResolver("optional.value")]
+            public int? OptionalValue { get; set; }
+        }
+
         private enum SectionType
         {
             Private,

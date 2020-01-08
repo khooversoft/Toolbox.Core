@@ -40,7 +40,7 @@ namespace Toolbox.Standard.Test.Extensions
 
             IReadOnlyDictionary<string, object> properties = testClass
                 .SerializeToKeyValue()
-                .ToDictionary(x => x.Key, x => x.Value);
+                .ToDictionary(x => x.Path, x => x.Value);
 
             properties.Should().NotBeNull();
             properties.Count.Should().Be(7);
@@ -83,7 +83,7 @@ namespace Toolbox.Standard.Test.Extensions
 
             IReadOnlyDictionary<string, object> properties = testClass
                 .SerializeToKeyValue()
-                .ToDictionary(x => x.Key, x => x.Value);
+                .ToDictionary(x => x.Path, x => x.Value);
 
             properties.Should().NotBeNull();
             properties.Count.Should().Be(11);

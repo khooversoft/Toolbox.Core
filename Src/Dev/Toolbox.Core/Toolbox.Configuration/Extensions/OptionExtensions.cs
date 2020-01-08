@@ -83,14 +83,14 @@ namespace Khooversoft.Toolbox.Configuration
         {
             option.Verify(nameof(option)).IsNotNull();
 
-            IReadOnlyList<KeyValuePair<string, object>> properties = option.SerializeToKeyValue(x => x.GetCustomAttribute<OptionAttribute>() != null)
-                .OrderBy(x => x.Key)
+            IReadOnlyList<PropertyPathValue> properties = option.SerializeToKeyValue(x => x.GetCustomAttribute<OptionAttribute>() != null)
+                .OrderBy(x => x.Path)
                 .ToList();
 
-            string fmt = $"{{0,-{properties.Max(x => x.Key.Length)}}} : {{1}}";
+            string fmt = $"{{0,-{properties.Max(x => x.Path.Length)}}} : {{1}}";
 
             return properties
-                .Select(x => string.Format(fmt, x.Key, x.Value))
+                .Select(x => string.Format(fmt, x.Path, x.Value))
                 .ToList();
         }
 

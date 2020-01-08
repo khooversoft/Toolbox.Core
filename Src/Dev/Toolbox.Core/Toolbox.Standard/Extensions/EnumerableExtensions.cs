@@ -109,9 +109,8 @@ namespace Khooversoft.Toolbox.Standard
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tasks"></param>
-        /// <returns></returns>
+        /// <param name="tasks">task to join</param>
+        /// <returns>task</returns>
         public static Task WhenAll(this IEnumerable<Task> tasks)
         {
             tasks.Verify(nameof(tasks)).IsNotNull();
@@ -122,14 +121,23 @@ namespace Khooversoft.Toolbox.Standard
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tasks"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">type</typeparam>
+        /// <param name="tasks">task to join</param>
+        /// <returns>array of types</returns>
         public static Task<T[]> WhenAll<T>(this IEnumerable<Task<T>> tasks)
         {
             tasks.Verify(nameof(tasks)).IsNotNull();
 
             return Task.WhenAll(tasks);
+        }
+
+        /// <summary>
+        /// Wait all
+        /// </summary>
+        /// <param name="tasks">task to wait on</param>
+        public static void WaitAll(this IEnumerable<Task> tasks)
+        {
+            Task.WaitAll(tasks.ToArray());
         }
     }
 }

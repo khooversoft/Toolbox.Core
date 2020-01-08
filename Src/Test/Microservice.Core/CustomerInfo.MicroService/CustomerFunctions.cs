@@ -17,7 +17,7 @@ namespace CustomerInfo.MicroService
             _messageNetClient = messageNetClient;
         }
 
-        [Function("CustomerAddress", "queue://{host.id}/{function.name}")]
+        [Function("CustomerAddress", "queue://{node.id}/{function.name}")]
         public Task GetCustomerAddress(IWorkContext context, RouteMessage<CustomerInfoRequest> request)
         {
             return Task.CompletedTask;

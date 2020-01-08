@@ -21,7 +21,7 @@ namespace MicroserviceHost
         public bool UnRegister { get; set; }
 
         [Option("Node ID for Message Net")]
-        [PropertyResolver]
+        [PropertyResolver("node.id")]
         public string NodeId { get; set; } = string.Empty;
 
         [Option("Service Bus connection string")]

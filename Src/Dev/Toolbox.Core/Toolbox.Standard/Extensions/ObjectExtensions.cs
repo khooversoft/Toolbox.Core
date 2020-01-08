@@ -126,7 +126,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <typeparam name="T"></typeparam>
         /// <param name="Value"></param>
         /// <returns>list of path and values</returns>
-        public static IReadOnlyList<KeyValuePair<string, object>> SerializeToKeyValue<T>(this T value, Func<PropertyInfo, bool>? filter = null)
+        public static IReadOnlyList<PropertyPathValue> SerializeToKeyValue<T>(this T value, Func<PropertyInfo, bool>? filter = null)
             where T : class
         {
             return new SerializeToKeyValue<T>().ToKeyValue(value, filter);
@@ -138,7 +138,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <typeparam name="T">attribute type</typeparam>
         /// <param name="classToScan">class to scan</param>
         /// <returns>list of property path and values</returns>
-        public static IReadOnlyList<KeyValuePair<string, object>> ToKeyValuesForAttribute<T>(this object classToScan)
+        public static IReadOnlyList<PropertyPathValue> ToKeyValuesForAttribute<T>(this object classToScan)
             where T : Attribute
         {
             return classToScan.SerializeToKeyValue(x => x.GetCustomAttributes<T>().Count() > 0);

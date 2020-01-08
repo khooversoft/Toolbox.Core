@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\MessageNet\MessageNet.Client\MessageNet.Client.csproj" />
     <ProjectReference Include="..\..\MessageNet\MessageNet.Interface\MessageNet.Interface.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Actor\Toolbox.Actor.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Autofac\Toolbox.Autofac.csproj" />

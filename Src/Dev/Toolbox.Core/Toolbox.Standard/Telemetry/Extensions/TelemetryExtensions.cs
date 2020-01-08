@@ -39,7 +39,7 @@ namespace Khooversoft.Toolbox.Standard
         {
             optionClass.Verify(nameof(optionClass)).IsNotNull();
 
-            IReadOnlyList<KeyValuePair<string, object>> properties = optionClass.ToKeyValuesForAttribute<TelemetrySecretAttribute>();
+            IReadOnlyList<PropertyPathValue> properties = optionClass.ToKeyValuesForAttribute<TelemetrySecretAttribute>();
 
             return new TelemetrySecretManager().Add(properties.Select(x => x.Value.ToString()).ToArray());
         }

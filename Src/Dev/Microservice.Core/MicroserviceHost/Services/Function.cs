@@ -1,4 +1,5 @@
 ﻿using Khooversoft.MessageNet.Interface;
+using Khooversoft.Toolbox.Standard;
 using Microservice.Interface;
 using System;
 using System.Reflection;
@@ -13,12 +14,20 @@ namespace MicroserviceHost
             FunctionAttribute = functionAttribute;
         }
 
-        public string FunctionName => FunctionAttribute.Name;
+        public string Name => FunctionAttribute.Name;
 
         public MethodInfo Method { get; private set; }
 
         public FunctionAttribute FunctionAttribute { get; private set; }
 
         public IMessageNetClient? MessageNetClient { get; private set; }
+
+        public void SetMessageNetClient(IMessageNetClient messageNetClient)
+        {
+            MessageNetClient = messageNetClient
+                .Verify(nameof(messageNetClient))
+                .IsNotNull()
+                .Value;
+        }
     }
 }

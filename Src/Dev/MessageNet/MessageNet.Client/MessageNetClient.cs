@@ -53,7 +53,8 @@ namespace Khooversoft.MessageNet.Client
             nodeRegistration.Verify().IsNotNull($"Node {nodeId} does not exist in the name server.");
 
             _endpointRegistration.TryGetValue(nodeRegistration!.InputUri, out ResourceEndpointRegistration resourceEndpointRegistration)
-                .Verify().Assert($"No resource endpoint registration found for {nodeRegistration.InputUri}");
+                .Verify()
+                .Assert($"No resource endpoint registration found for {nodeRegistration.InputUri}");
 
             string queueName = new ResourcePathBuilder(nodeRegistration.InputUri).EntityName;
 
@@ -77,7 +78,8 @@ namespace Khooversoft.MessageNet.Client
             response.InputQueueUri!.Verify().IsNotEmpty("Name server's response did not include input queue uri");
 
             _endpointRegistration.TryGetValue(response.InputQueueUri!, out ResourceEndpointRegistration resourceEndpointRegistration)
-                .Verify().Assert($"No resource endpoint registration found for {response.InputQueueUri}");
+                .Verify()
+                .Assert($"No resource endpoint registration found for {response.InputQueueUri}");
 
             var builder = new ResourcePathBuilder(response.InputQueueUri!);
 

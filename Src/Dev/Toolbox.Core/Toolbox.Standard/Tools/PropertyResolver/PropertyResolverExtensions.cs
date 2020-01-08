@@ -17,15 +17,15 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="self">string to resolve</param>
         /// <param name="resolver">resolver</param>
         /// <returns>resolved string</returns>
-        public static string? Resolve(this string? self, IPropertyResolver resolver)
+        public static string Resolve(this string self, IPropertyResolver resolver)
         {
             if (self.IsEmpty())
             {
-                return self;
+                return self ?? string.Empty;
             }
 
             resolver.Verify(nameof(resolver)).IsNotNull();
-            return resolver.Resolve(self!);
+            return resolver.Resolve(self);
         }
 
         /// <summary>
@@ -73,10 +73,21 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="classToScan">class to scan for PropertyResolveAttribute</param>
         /// <param name="properties">Additional properties (has precedent)</param>
         /// <returns>property resolver</returns>
-        public static IPropertyResolver BuildResolver(this object classToScan, params IEnumerable<KeyValuePair<string, string>>[] properties)
+        public static IPropertyResolver BuildResolver<T>(this T classToScan, params IEnumerable<KeyValuePair<string, string>>[] properties)
+             where T : class
         {
             var classProperties = classToScan.ToKeyValuesForAttribute<PropertyResolverAttribute>()
-                .Select(x => new KeyValuePair<string, string>(x.Key, x.Value?.ToString()!));
+                .Select(x => {
+                    PropertyResolverAttribute attr = x.PropertyInfo.GetCustomAttribute<PropertyResolverAttribute>();
+                    if (attr == null || attr.PropertyName.IsEmpty()) return x;
+
+                    string path = x.Path.Split("/")[0..^1]
+                        .Concat(attr.PropertyName.ToEnumerable())
+                        .Do(x => string.Join("/", x));
+
+                    return new PropertyPathValue(path, x.Value, x.PropertyInfo);
+                })
+                .Select(x => new KeyValuePair<string, string>(x.Path, x.Value?.ToString()!));
 
             var result = properties
                 .SelectMany(x => x)

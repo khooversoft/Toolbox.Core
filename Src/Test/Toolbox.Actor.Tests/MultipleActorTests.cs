@@ -72,7 +72,7 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache(y => count += y));
             manager.Register<ICache2>(_ => new StringCache2(y => count2 += y));
 
-            await Enumerable.Range(0, max)
+            Enumerable.Range(0, max)
                 .Select((x, i) => new Task[]
                 {
                     Task.Run(async () => {
@@ -89,12 +89,12 @@ namespace Toolbox.Actor.Tests
                     }),
                 })
                 .SelectMany(x => x)
-                .WhenAll();
+                .WaitAll();
 
             count.Should().Be(max);
             count2.Should().Be(max);
 
-            await Enumerable.Range(0, max)
+            Enumerable.Range(0, max)
                 .Select((x, i) => new Task[]
                 {
                     Task.Run(async () => {
@@ -107,7 +107,7 @@ namespace Toolbox.Actor.Tests
                     }),
                 })
                 .SelectMany(x => x)
-                .WhenAll();
+                .WaitAll();
 
             count.Should().Be(0);
             count2.Should().Be(0);
@@ -128,25 +128,25 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache(y => count += y));
             manager.Register<ICache2>(_ => new StringCache2(y => count2 += y));
 
-            await Enumerable.Range(0, max)
+            Enumerable.Range(0, max)
                 .Select((x, i) => new Task[]
                 {
-                    Task.Run(() => {
+                    Task.Run(async () => {
                         ActorKey key = new ActorKey($"cache/test/{i}");
-                        return manager.CreateProxy<ICache>(key);
+                        await manager.CreateProxy<ICache>(key);
                     }),
-                    Task.Run(() => {
+                    Task.Run(async () => {
                         ActorKey key2 = new ActorKey($"cache/test/{i+100}");
-                        return manager.CreateProxy<ICache2>(key2);
+                        await manager.CreateProxy<ICache2>(key2);
                     }),
                 })
                 .SelectMany(x => x)
-                .WhenAll();
+                .WaitAll();
 
             count.Should().Be(max);
             count2.Should().Be(max);
 
-            await Enumerable.Range(0, max)
+            Enumerable.Range(0, max)
                 .Select((x, i) => new Task[]
                 {
                     Task.Run(async () => {
@@ -159,7 +159,7 @@ namespace Toolbox.Actor.Tests
                     }),
                 })
                 .SelectMany(x => x)
-                .WhenAll();
+                .WaitAll();
 
             count.Should().Be(0);
             count2.Should().Be(0);

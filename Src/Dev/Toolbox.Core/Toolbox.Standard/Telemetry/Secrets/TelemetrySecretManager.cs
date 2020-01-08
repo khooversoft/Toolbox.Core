@@ -45,7 +45,7 @@ namespace Khooversoft.Toolbox.Standard
 
             try
             {
-                if (_secrets.Count == 0 || value.IsEmpty() || !_secrets.Any(x => value.IndexOf(x) >= 0))
+                if (_secrets.Count == 0 || value.IsEmpty() || !_secrets.Any(x => value!.IndexOf(x) >= 0))
                 {
                     return value;
                 }

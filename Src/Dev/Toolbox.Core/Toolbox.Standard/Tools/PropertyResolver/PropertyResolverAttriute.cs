@@ -13,6 +13,14 @@ namespace Khooversoft.Toolbox.Standard
         // This is a positional argument
         public PropertyResolverAttribute()
         {
+            PropertyName = null;
         }
+
+        public PropertyResolverAttribute(string propertyName)
+        {
+            PropertyName = propertyName;
+        }
+
+        public string? PropertyName { get; }
     }
 }

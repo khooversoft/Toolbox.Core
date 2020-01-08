@@ -24,13 +24,19 @@ namespace Khooversoft.Toolbox.Standard
         {
         }
 
-        public IReadOnlyList<KeyValuePair<string, object>> ToKeyValue(T subject, Func<PropertyInfo, bool>? filter = null)
+        /// <summary>
+        /// Return property path + value
+        /// </summary>
+        /// <param name="subject">object to scan</param>
+        /// <param name="filter">filter for properties</param>
+        /// <returns>list of property path values</returns>
+        public IReadOnlyList<PropertyPathValue> ToKeyValue(T subject, Func<PropertyInfo, bool>? filter = null)
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
             _stack.Clear();
             _stack.Push(new PropertyPath(subject!, null));
-            var propertyList = new List<KeyValuePair<string, object>>();
+            var propertyList = new List<PropertyPathValue>();
             filter ??= (x => true);
 
             while (_stack.Count > 0)
@@ -44,7 +50,7 @@ namespace Khooversoft.Toolbox.Standard
                 // Get value type and string
                 classProperties
                     .Where(x => x.PropertyType.IsValueType || x.PropertyType == typeof(string))
-                    .ForEach(x => propertyList.Add(new KeyValuePair<string, object>(_createPath(current.Path, x.Name), x.GetValue(current.Instance, null))));
+                    .ForEach(x => propertyList.Add(new PropertyPathValue(_createPath(current.Path, x.Name), x.GetValue(current.Instance, null), x)));
 
                 // Get class references
                 classProperties
@@ -70,7 +76,7 @@ namespace Khooversoft.Toolbox.Standard
                         Type type = item.GetType();
                         if (type == typeof(string) || type.IsValueType)
                         {
-                            propertyList.Add(new KeyValuePair<string, object>(_createPath(current.Path, $"{collectionItem.PropertyInfo.Name}:{index}"), item));
+                            propertyList.Add(new PropertyPathValue(_createPath(current.Path, $"{collectionItem.PropertyInfo.Name}:{index}"), item, collectionItem.PropertyInfo));
                             continue;
                         }
 

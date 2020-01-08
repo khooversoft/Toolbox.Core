@@ -16,7 +16,7 @@ namespace Toolbox.Standard.Test.Tools
     public class SerializeToKeyValueTests
     {
         [Fact]
-        public void GivenClassData_WhenDeserialize_Passes()
+        public void GivenClassData_WhenSerialize_Passes()
         {
             var data = new Main
             {
@@ -25,7 +25,7 @@ namespace Toolbox.Standard.Test.Tools
                 ClassType = ClassType.Thrid,
             };
 
-            IReadOnlyDictionary<string, object> subject = data.SerializeToKeyValue().ToDictionary(x => x.Key, x => x.Value);
+            IReadOnlyDictionary<string, object> subject = data.SerializeToKeyValue().ToDictionary(x => x.Path, x => x.Value);
             subject.Should().NotBeNull();
             subject.Count.Should().Be(3);
 
@@ -35,7 +35,7 @@ namespace Toolbox.Standard.Test.Tools
         }
 
         [Fact]
-        public void GivenClassWithSubClassData_WhenDeserialize_Passes()
+        public void GivenClassWithSubClassData_WhenSerialize_Passes()
         {
             var data = new Main
             {
@@ -67,7 +67,7 @@ namespace Toolbox.Standard.Test.Tools
                 }
             };
 
-            IReadOnlyDictionary<string, object> subject = data.SerializeToKeyValue().ToDictionary(x => x.Key, x => x.Value);
+            IReadOnlyDictionary<string, object> subject = data.SerializeToKeyValue().ToDictionary(x => x.Path, x => x.Value);
             subject.Should().NotBeNull();
             subject.Count.Should().Be(12);
 
@@ -129,7 +129,7 @@ namespace Toolbox.Standard.Test.Tools
                 }
             };
 
-            IReadOnlyDictionary<string, object> subject = data.SerializeToKeyValue().ToDictionary(x => x.Key, x => x.Value);
+            IReadOnlyDictionary<string, object> subject = data.SerializeToKeyValue().ToDictionary(x => x.Path, x => x.Value);
             subject.Should().NotBeNull();
             subject.Count.Should().Be(17);
 
