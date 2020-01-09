@@ -1,4 +1,5 @@
 ﻿using Khooversoft.MessageNet.Client;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
@@ -21,11 +22,12 @@ namespace MicroserviceHost.Actions
             context.Verify(nameof(context)).IsNotNull();
             executionContext.Verify(nameof(executionContext)).IsNotNull();
 
-            var functions = new List<Function>();
+            var functions = executionContext.Functions
+                .Select(x => MessageNetFactory(x))
+                .ToList();
 
-            executionContext.Functions
-                .Select(x => MessageNetFactory(x));
-
+            executionContext.SetFunctions(functions);
+            return Task.CompletedTask;
         }
 
         private Function MessageNetFactory(Function function)
@@ -36,7 +38,8 @@ namespace MicroserviceHost.Actions
                 .IsNotEmpty($"Function: {function.Name} {function.FunctionAttribute.InputUri} is required")
                 .Value;
 
-            return function.SetMessageNetClient(new MessageNetClient(nodeId, _option.NameServerUri, ))
+            function.SetMessageNetClient(new MessageNetClient(nodeId, new Uri(_option.NameServerUri), x => _option.ServiceBusConnection));
+            return function;
         }
     }
 }

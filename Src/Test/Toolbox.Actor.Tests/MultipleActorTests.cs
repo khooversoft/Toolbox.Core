@@ -8,11 +8,19 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Toolbox.Actor.Tests
 {
     public class MultipleActorTests
     {
+        private readonly ITestOutputHelper _output;
+
+        public MultipleActorTests(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public async Task Given2Actors_WhenCreatedAndDeleted_ShouldPass()
         {
@@ -21,8 +29,8 @@ namespace Toolbox.Actor.Tests
             const int max = 10;
 
             IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
-            manager.Register<ICache2>(_ => new StringCache2(y => count2 += y));
+            manager.Register<ICache>(_ => new StringCache(y => CountControl(ref count, y)));
+            manager.Register<ICache2>(_ => new StringCache2(y => CountControl(ref count2, y)));
 
             await Enumerable.Range(0, max)
                 .Select(async x =>
@@ -67,106 +75,115 @@ namespace Toolbox.Actor.Tests
             int count = 0;
             int count2 = 0;
             const int max = 10;
+            const int maxLoop = 10;
 
             IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
-            manager.Register<ICache2>(_ => new StringCache2(y => count2 += y));
+            manager.Register<ICache>(_ => new StringCache(y => CountControl(ref count, y)));
+            manager.Register<ICache2>(_ => new StringCache2(y => CountControl(ref count2, y)));
 
-            Enumerable.Range(0, max)
-                .Select((x, i) => new Task[]
-                {
-                    Task.Run(async () => {
-                        ActorKey key = new ActorKey($"cache/test/{i}");
-                        ICache cache = await manager.CreateProxy<ICache>(key);
-                        cache.GetActorKey().Should().Be(key);
-                        cache.GetActorManager().Should().Be(manager);
-                    }),
-                    Task.Run(async () => {
-                        ActorKey key2 = new ActorKey($"cache/test/{i}");
-                        ICache2 cache2 = await manager.CreateProxy<ICache2>(key2);
-                        cache2.GetActorKey().Should().Be(key2);
-                        cache2.GetActorManager().Should().Be(manager);
-                    }),
-                })
-                .SelectMany(x => x)
-                .WaitAll();
+            for (int loop = 0; loop < maxLoop; loop++)
+            {
+                _output.WriteLine($"Loop: {loop}");
 
-            count.Should().Be(max);
-            count2.Should().Be(max);
+                await Enumerable.Range(0, max)
+                    .Select(x => new Task[]
+                    {
+                        Task.Run(async () => {
+                            ActorKey key = new ActorKey($"cache/test/{x}");
+                            ICache cache = await manager.CreateProxy<ICache>(key);
+                            cache.GetActorKey().Should().Be(key);
+                            cache.GetActorManager().Should().Be(manager);
+                        }),
+                        Task.Run(async () => {
+                            ActorKey key2 = new ActorKey($"cache/test/{x}");
+                            ICache2 cache2 = await manager.CreateProxy<ICache2>(key2);
+                            cache2.GetActorKey().Should().Be(key2);
+                            cache2.GetActorManager().Should().Be(manager);
+                        }),
+                    })
+                    .SelectMany(x => x)
+                    .WhenAll();
 
-            Enumerable.Range(0, max)
-                .Select((x, i) => new Task[]
-                {
-                    Task.Run(async () => {
-                        ActorKey key = new ActorKey($"cache/test/{i}");
-                        (await manager.Deactivate<ICache>(key)).Should().BeTrue();
-                    }),
-                    Task.Run(async () => {
-                        ActorKey key2 = new ActorKey($"cache/test/{i}");
-                        (await manager.Deactivate<ICache2>(key2)).Should().BeTrue();
-                    }),
-                })
-                .SelectMany(x => x)
-                .WaitAll();
+                count.Should().Be(max);
+                count2.Should().Be(max);
 
-            count.Should().Be(0);
-            count2.Should().Be(0);
-            
-            await manager.DeactivateAll();
-            count.Should().Be(0);
-            count2.Should().Be(0);
+                await Enumerable.Range(0, max)
+                    .Select(x => new Task<bool>[]
+                    {
+                        Task.Run(async () => await manager.Deactivate<ICache>(new ActorKey($"cache/test/{x}"))),
+                        Task.Run(async () => await manager.Deactivate<ICache2>(new ActorKey($"cache/test/{x}"))),
+                    })
+                    .SelectMany(x => x)
+                    .WhenAll();
+
+                count.Should().Be(0);
+                count2.Should().Be(0);
+
+                await manager.DeactivateAll();
+                count.Should().Be(0);
+                count2.Should().Be(0);
+            }
         }
+
 
         [Fact]
         public async Task Given2Actors_WhenCreatedAndDeletedDifferentKeyRange_ShouldPass()
         {
             int count = 0;
             int count2 = 0;
-            const int max = 10;
+            const int max = 1000;
+            const int maxLoop = 10;
 
             IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
-            manager.Register<ICache2>(_ => new StringCache2(y => count2 += y));
+            manager.Register<ICache>(_ => new StringCache(y => CountControl(ref count, y)));
+            manager.Register<ICache2>(_ => new StringCache2(y => CountControl(ref count2, y)));
 
-            Enumerable.Range(0, max)
-                .Select((x, i) => new Task[]
-                {
-                    Task.Run(async () => {
-                        ActorKey key = new ActorKey($"cache/test/{i}");
-                        await manager.CreateProxy<ICache>(key);
-                    }),
-                    Task.Run(async () => {
-                        ActorKey key2 = new ActorKey($"cache/test/{i+100}");
-                        await manager.CreateProxy<ICache2>(key2);
-                    }),
-                })
-                .SelectMany(x => x)
-                .WaitAll();
+            for (int loop = 0; loop < maxLoop; loop++)
+            {
+                _output.WriteLine($"Loop: {loop}");
 
-            count.Should().Be(max);
-            count2.Should().Be(max);
+                await Enumerable.Range(0, max)
+                    .Select((x, i) => new Task[]
+                    {
+                        Task.Run(async () => await manager.CreateProxy<ICache>(new ActorKey($"cache/test/{i}"))),
+                        Task.Run(async () => await manager.CreateProxy<ICache2>(new ActorKey($"cache/test/{i+100}"))),
+                    })
+                    .SelectMany(x => x)
+                    .WhenAll();
 
-            Enumerable.Range(0, max)
-                .Select((x, i) => new Task[]
-                {
-                    Task.Run(async () => {
-                        ActorKey key = new ActorKey($"cache/test/{i}");
-                        (await manager.Deactivate<ICache>(key)).Should().BeTrue();
-                    }),
-                    Task.Run(async () => {
-                        ActorKey key2 = new ActorKey($"cache/test/{i+100}");
-                        (await manager.Deactivate<ICache2>(key2)).Should().BeTrue();
-                    }),
-                })
-                .SelectMany(x => x)
-                .WaitAll();
+                count.Should().Be(max);
+                count2.Should().Be(max);
 
-            count.Should().Be(0);
-            count2.Should().Be(0);
+                var results = await Enumerable.Range(0, max)
+                    .Select((x, i) => new Task<bool>[]
+                    {
+                        Task.Run(async () => await manager.Deactivate<ICache>(new ActorKey($"cache/test/{i}"))),
+                        Task.Run(async () => await manager.Deactivate<ICache2>(new ActorKey($"cache/test/{i+100}"))),
+                    })
+                    .SelectMany(x => x)
+                    .WhenAll();
 
-            await manager.DeactivateAll();
-            count.Should().Be(0);
-            count2.Should().Be(0);
+                results.All(x => x == true).Should().BeTrue();
+
+                count.Should().Be(0);
+                count2.Should().Be(0);
+
+                await manager.DeactivateAll();
+                count.Should().Be(0);
+                count2.Should().Be(0);
+            }
+        }
+
+        private void CountControl(ref int subject, int value)
+        {
+            if (value > 0)
+            {
+                Interlocked.Increment(ref subject);
+            }
+            else
+            {
+                Interlocked.Decrement(ref subject);
+            }
         }
 
         private interface ICache : IActor

@@ -17,14 +17,15 @@ namespace Khooversoft.MessageNet.Client
     {
         private readonly string _nodeId;
         private readonly NodeRoute _nodeRoute;
-        private readonly EndpointRegistration _endpointRegistration;
         private readonly NameServerClient _nameServerClient;
-        private MessageProcessor? _messageProcessor;
+        private readonly Func<string, string> _getConnectionString;
+        private MessageQueueReceiveProcessor? _messageProcessor;
 
-        public MessageNetClient(string nodeId, Uri nameServerUri, params ResourceEndpointRegistration[] resourceEndpointRegistrations)
+        public MessageNetClient(string nodeId, Uri nameServerUri, Func<string, string> getConnectionString)
         {
             nodeId.Verify(nameof(nodeId)).IsNotEmpty();
             nameServerUri.Verify(nameof(nameServerUri)).IsNotNull();
+            getConnectionString.Verify(nameof(getConnectionString)).IsNotNull();
 
             var httpClient = new HttpClient()
             {
@@ -34,7 +35,7 @@ namespace Khooversoft.MessageNet.Client
             _nodeId = nodeId;
             _nameServerClient = new NameServerClient(httpClient);
             _nodeRoute = new NodeRoute(_nameServerClient);
-            _endpointRegistration = new EndpointRegistration().Add(resourceEndpointRegistrations);
+            _getConnectionString = getConnectionString;
         }
 
         /// <summary>
@@ -52,13 +53,10 @@ namespace Khooversoft.MessageNet.Client
             NodeRegistrationModel? nodeRegistration = await _nodeRoute.Get(context, nodeId);
             nodeRegistration.Verify().IsNotNull($"Node {nodeId} does not exist in the name server.");
 
-            _endpointRegistration.TryGetValue(nodeRegistration!.InputUri, out ResourceEndpointRegistration resourceEndpointRegistration)
-                .Verify()
-                .Assert($"No resource endpoint registration found for {nodeRegistration.InputUri}");
+            string connectionString = _getConnectionString(nodeId);
+            string queueName = new ResourcePathBuilder(nodeRegistration!.InputUri).EntityName;
 
-            string queueName = new ResourcePathBuilder(nodeRegistration.InputUri).EntityName;
-
-            return new MessageClient(resourceEndpointRegistration.ConnectionString, queueName);
+            return new MessageQueueSendClient(connectionString, queueName);
         }
 
         /// <summary>
@@ -77,13 +75,10 @@ namespace Khooversoft.MessageNet.Client
             response.Verify().IsNotNull($"Registration failed with name server");
             response.InputQueueUri!.Verify().IsNotEmpty("Name server's response did not include input queue uri");
 
-            _endpointRegistration.TryGetValue(response.InputQueueUri!, out ResourceEndpointRegistration resourceEndpointRegistration)
-                .Verify()
-                .Assert($"No resource endpoint registration found for {response.InputQueueUri}");
-
+            string connectionString = _getConnectionString(response.InputQueueUri!);
             var builder = new ResourcePathBuilder(response.InputQueueUri!);
 
-            _messageProcessor = new MessageProcessor(resourceEndpointRegistration.ConnectionString, builder.EntityName);
+            _messageProcessor = new MessageQueueReceiveProcessor(connectionString, builder.EntityName);
             await _messageProcessor.Register(context, receiver);
         }
     }

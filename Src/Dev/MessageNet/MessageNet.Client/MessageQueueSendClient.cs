@@ -15,13 +15,13 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Client
 {
-    public class MessageClient : IMessageClient, IDisposable
+    public class MessageQueueSendClient : IMessageClient, IDisposable
     {
         private MessageSender _messageSender;
         private readonly string _connectionString;
         private readonly string _queueName;
 
-        public MessageClient(string connectionString, string queueName)
+        public MessageQueueSendClient(string connectionString, string queueName)
         {
             connectionString.Verify(nameof(connectionString)).IsNotEmpty();
             queueName.Verify(nameof(queueName)).IsNotEmpty();

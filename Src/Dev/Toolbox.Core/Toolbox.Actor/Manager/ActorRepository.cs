@@ -62,7 +62,7 @@ namespace Khooversoft.Toolbox.Actor
 
             lock (_lock)
             {
-                list = new List<IActorRegistration>(_actorCache.Values);
+                list = new List<IActorRegistration>(_actorCache.GetValues());
                 _actorCache.Clear();
             }
 

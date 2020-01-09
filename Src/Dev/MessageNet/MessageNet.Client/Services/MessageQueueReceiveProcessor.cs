@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Client
 {
-    public class MessageProcessor : IMessageProcessor, IDisposable
+    public class MessageQueueReceiveProcessor : IMessageProcessor, IDisposable
     {
         private Func<Message, Task>? _receiver;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
         private MessageReceiver _messageReceiver;
 
-        public MessageProcessor(string connectionString, string queueName)
+        public MessageQueueReceiveProcessor(string connectionString, string queueName)
         {
             connectionString.Verify(nameof(connectionString)).IsNotEmpty();
             queueName.Verify(nameof(queueName)).IsNotEmpty();

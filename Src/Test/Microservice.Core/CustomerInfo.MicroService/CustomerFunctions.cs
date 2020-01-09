@@ -10,13 +10,6 @@ namespace CustomerInfo.MicroService
 {
     public class CustomerFunctions
     {
-        private readonly IMessageNetClient _messageNetClient;
-
-        public CustomerFunctions(IMessageNetClient messageNetClient)
-        {
-            _messageNetClient = messageNetClient;
-        }
-
         [Function("CustomerAddress", "queue://{node.id}/{function.name}")]
         public Task GetCustomerAddress(IWorkContext context, RouteMessage<CustomerInfoRequest> request)
         {

@@ -75,18 +75,11 @@ namespace Khooversoft.Toolbox.Standard
         /// <summary>
         /// Return values in LRU cache (least used to most used)
         /// </summary>
-        public IEnumerable<T> Values
+        public IEnumerable<T> GetValues()
         {
-            get
+            lock (_lock)
             {
-                List<T> list;
-
-                lock (_lock)
-                {
-                    list = _lruList.Select(x => x.Value).ToList();
-                }
-
-                return list;
+                return _lruList.Select(x => x.Value).ToList();
             }
         }
 
@@ -157,8 +150,7 @@ namespace Khooversoft.Toolbox.Standard
             value = default!;
             lock (_lock)
             {
-                LinkedListNode<CacheItem> node;
-                if (_cacheMap.TryGetValue(key, out node))
+                if (_cacheMap.TryGetValue(key, out LinkedListNode<CacheItem> node))
                 {
                     value = node.Value.Value;
 
