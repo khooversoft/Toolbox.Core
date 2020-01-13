@@ -2,10 +2,8 @@
 
 namespace MicroserviceHost
 {
-    internal interface IExecutionContext
+    public interface IExecutionContext
     {
-        IReadOnlyList<Function> Functions { get; }
-
-        void SetFunctions(IEnumerable<Function> functions);
+        IReadOnlyList<FunctionConfiguration> FunctionConfigurations { get; }
     }
 }

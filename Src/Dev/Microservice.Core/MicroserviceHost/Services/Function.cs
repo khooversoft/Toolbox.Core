@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace MicroserviceHost
 {
-    internal class Function
+    public class Function
     {
         public Function(MethodInfo method, FunctionAttribute functionAttribute, Type messageType)
         {
@@ -21,20 +21,23 @@ namespace MicroserviceHost
 
         public string Name => FunctionAttribute.Name;
 
-        public MethodInfo MethodInfo { get; private set; }
+        public MethodInfo MethodInfo { get; }
 
-        public FunctionAttribute FunctionAttribute { get; private set; }
+        public FunctionAttribute FunctionAttribute { get; }
 
         public Type MessageType { get; }
 
         public IMessageNetClient? MessageNetClient { get; private set; }
 
-        public void SetMessageNetClient(IMessageNetClient messageNetClient)
+        public string? NodeId { get; private set; }
+
+        public void SetMessageNetClient(IMessageNetClient messageNetClient, string nodeId)
         {
-            MessageNetClient = messageNetClient
-                .Verify(nameof(messageNetClient))
-                .IsNotNull()
-                .Value;
+            messageNetClient.Verify(nameof(messageNetClient)).IsNotNull();
+            nodeId.Verify(nameof(nodeId)).IsNotEmpty();
+
+            MessageNetClient = messageNetClient;
+            NodeId = nodeId;
         }
     }
 }

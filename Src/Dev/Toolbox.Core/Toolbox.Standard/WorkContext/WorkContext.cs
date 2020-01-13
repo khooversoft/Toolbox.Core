@@ -49,14 +49,14 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="container">container</param>
         /// <param name="properties">properties (optional)</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <param name="eventLog"></param>
+        /// <param name="telemetry"></param>
         /// <param name="dimensions"></param>
         public WorkContext(
             CorrelationVector cv,
             StringVector tag,
             IServiceProvider? container,
             CancellationToken? cancellationToken = null,
-            ITelemetry? eventLog = null,
+            ITelemetry? telemetry = null,
             IEventDimensions? dimensions = null
             )
         {
@@ -67,7 +67,7 @@ namespace Khooversoft.Toolbox.Standard
             Tag = tag;
             Container = container;
             CancellationToken = cancellationToken ?? CancellationToken.None;
-            Telemetry = eventLog ?? new TelemetryLogNull();
+            Telemetry = telemetry ?? new TelemetryLogNull();
             Dimensions = dimensions != null ? new EventDimensions(dimensions) : new EventDimensions();
         }
 

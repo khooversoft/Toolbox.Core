@@ -11,16 +11,16 @@ namespace Microservice.Interface
         public FunctionAttribute(string name, string inputUri)
         {
             Name = name;
-            InputUri = inputUri;
+            NodeId = inputUri;
         }
 
         public string Name { get; }
 
-        public string InputUri { get; }
+        public string NodeId { get; }
 
         public override string ToString()
         {
-            return Name + ":" + InputUri;
+            return Name + ":" + NodeId;
         }
     }
 }

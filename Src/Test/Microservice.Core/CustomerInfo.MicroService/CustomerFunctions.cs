@@ -10,9 +10,23 @@ namespace CustomerInfo.MicroService
 {
     public class CustomerFunctions
     {
-        [Function("CustomerAddress", "queue://{node.id}/{function.name}")]
-        public Task GetCustomerAddress(IWorkContext context, RouteMessage<CustomerInfoRequest> request)
+        private readonly ITestContext _testContext;
+
+        public CustomerFunctions(ITestContext testContext)
         {
+            testContext.Verify(nameof(testContext)).IsNotNull();
+
+            _testContext = testContext;
+        }
+
+        [Function("CustomerAddress", "queue://{node.id}/{function.name}")]
+        public Task GetCustomerAddress(IWorkContext context, string /*RouteMessage<CustomerInfoRequest>*/ request)
+        {
+            context.Verify(nameof(context)).IsNotNull();
+            request.Verify(nameof(request)).IsNotNull();
+
+            _testContext.AddMessageAsString(request);
+
             return Task.CompletedTask;
         }
     }

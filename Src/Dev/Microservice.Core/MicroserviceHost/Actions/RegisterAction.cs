@@ -22,24 +22,27 @@ namespace MicroserviceHost.Actions
             context.Verify(nameof(context)).IsNotNull();
             executionContext.Verify(nameof(executionContext)).IsNotNull();
 
-            var functions = executionContext.Functions
-                .Select(x => MessageNetFactory(x))
-                .ToList();
+            //var functionConfigurations = executionContext.Functions
+            //    .Select(x => MessageNetFactory(x))
+            //    .ToList();
 
-            executionContext.SetFunctions(functions);
+            //executionContext.SetFunctionConfigurations(functionConfigurations);
             return Task.CompletedTask;
         }
 
-        private Function MessageNetFactory(Function function)
+        private FunctionConfiguration MessageNetFactory(Function function)
         {
-            string nodeId = function.FunctionAttribute.InputUri
+            string nodeId = function.FunctionAttribute.NodeId
                 .Resolve(_option.Properties)
-                .Verify(nameof(function.FunctionAttribute.InputUri))
-                .IsNotEmpty($"Function: {function.Name} {function.FunctionAttribute.InputUri} is required")
+                .Verify(nameof(function.FunctionAttribute.NodeId))
+                .IsNotEmpty($"Function: {function.Name} {function.FunctionAttribute.NodeId} is required")
+                .Assert(x => x.GetPropertyNames()?.Count == 0, $"Unresolved properties for {function.FunctionAttribute.NodeId}")
                 .Value;
 
-            function.SetMessageNetClient(new MessageNetClient(nodeId, new Uri(_option.NameServerUri), x => _option.ServiceBusConnection));
-            return function;
+            return new FunctionConfiguration(function, new Uri(_option.NameServerUri), _option.ServiceBusConnection, nodeId);
+
+            //function.FunctionConfiguration(new MessageNetClient(new Uri(_option.NameServerUri), x => _option.ServiceBusConnection), nodeId);
+            //return function;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Client
@@ -15,15 +16,13 @@ namespace Khooversoft.MessageNet.Client
     /// </summary>
     public class MessageNetClient : IMessageNetClient
     {
-        private readonly string _nodeId;
         private readonly NodeRoute _nodeRoute;
         private readonly NameServerClient _nameServerClient;
         private readonly Func<string, string> _getConnectionString;
         private MessageQueueReceiveProcessor? _messageProcessor;
 
-        public MessageNetClient(string nodeId, Uri nameServerUri, Func<string, string> getConnectionString)
+        public MessageNetClient(Uri nameServerUri, Func<string, string> getConnectionString)
         {
-            nodeId.Verify(nameof(nodeId)).IsNotEmpty();
             nameServerUri.Verify(nameof(nameServerUri)).IsNotNull();
             getConnectionString.Verify(nameof(getConnectionString)).IsNotNull();
 
@@ -32,7 +31,6 @@ namespace Khooversoft.MessageNet.Client
                 BaseAddress = new Uri(nameServerUri.ToString()),
             };
 
-            _nodeId = nodeId;
             _nameServerClient = new NameServerClient(httpClient);
             _nodeRoute = new NodeRoute(_nameServerClient);
             _getConnectionString = getConnectionString;
@@ -65,11 +63,12 @@ namespace Khooversoft.MessageNet.Client
         /// <param name="context">context</param>
         /// <param name="receiver">function to call</param>
         /// <returns>task</returns>
-        public async Task RegisterReceiver(IWorkContext context, Func<Message, Task> receiver)
+        public async Task RegisterReceiver(IWorkContext context, string nodeId, Func<Message, Task> receiver)
         {
+            nodeId.Verify(nameof(nodeId)).IsNotEmpty();
             _messageProcessor.Verify().Assert(x => x == null, "Message process has already been started");
 
-            var request = new RouteRegistrationRequest { NodeId = _nodeId };
+            var request = new RouteRegistrationRequest { NodeId = nodeId };
 
             RouteRegistrationResponse response = await _nameServerClient.Register(context, request);
             response.Verify().IsNotNull($"Registration failed with name server");
@@ -80,6 +79,12 @@ namespace Khooversoft.MessageNet.Client
 
             _messageProcessor = new MessageQueueReceiveProcessor(connectionString, builder.EntityName);
             await _messageProcessor.Register(context, receiver);
+        }
+
+        public void Dispose()
+        {
+            var subject = Interlocked.Exchange(ref _messageProcessor, null!);
+            subject?.Dispose();
         }
     }
 }

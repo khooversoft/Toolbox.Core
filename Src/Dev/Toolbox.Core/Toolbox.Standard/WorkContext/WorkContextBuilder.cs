@@ -22,7 +22,7 @@ namespace Khooversoft.Toolbox.Standard
         {
             Cv = new CorrelationVector();
             Tag = StringVector.Empty;
-            EventLog = new TelemetryLogNull();
+            Telemetry = new TelemetryLogNull();
             Dimensions = new EventDimensions();
         }
 
@@ -38,7 +38,7 @@ namespace Khooversoft.Toolbox.Standard
             Tag = context.Tag;
             Container = context.Container;
             CancellationToken = context.CancellationToken;
-            EventLog = context.Telemetry;
+            Telemetry = context.Telemetry;
             Dimensions = context.Dimensions;
         }
 
@@ -50,7 +50,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public CancellationToken? CancellationToken { get; set; }
 
-        public ITelemetry EventLog { get; set; }
+        public ITelemetry Telemetry { get; set; }
 
         public IEventDimensions Dimensions { get; set; }
 
@@ -83,13 +83,13 @@ namespace Khooversoft.Toolbox.Standard
         /// <summary>
         /// Set event log
         /// </summary>
-        /// <param name="eventLog">event log</param>
+        /// <param name="telemetry">event log</param>
         /// <returns>this</returns>
-        public WorkContextBuilder Set(ITelemetry eventLog)
+        public WorkContextBuilder Set(ITelemetry telemetry)
         {
-            eventLog.Verify().IsNotNull();
+            telemetry.Verify().IsNotNull();
 
-            EventLog = eventLog;
+            Telemetry = telemetry;
             return this;
         }
 
@@ -141,7 +141,7 @@ namespace Khooversoft.Toolbox.Standard
                 tag: Tag,
                 container: Container,
                 CancellationToken,
-                eventLog: EventLog,
+                telemetry: Telemetry,
                 dimensions: new EventDimensions(Dimensions)
                 );
         }

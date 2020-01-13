@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Client
 {
-    public interface IMessageNetClient
+    public interface IMessageNetClient : IDisposable
     {
         Task<IMessageClient> GetMessageClient(IWorkContext context, string nodeId);
 
-        Task RegisterReceiver(IWorkContext context, Func<Message, Task> receiver);
+        Task RegisterReceiver(IWorkContext context, string nodeId, Func<Message, Task> receiver);
     }
 }

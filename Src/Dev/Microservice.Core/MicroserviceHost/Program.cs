@@ -78,13 +78,13 @@ namespace MicroserviceHost
                 Console.WriteLine("Hit Ctrl C to quit");
                 Console.WriteLine();
 
-                IExecutionContext executionContext = new ExecutionContext();
+                //IExecutionContext executionContext = new ExecutionContext();
 
-                await new IAction[]
-                {
-                    container.Resolve<LoadAssemblyAction>(),
-                }
-                .ForEachAsync(x => x.Run(context, executionContext));
+                //await new IAction[]
+                //{
+                //    container.Resolve<LoadAssemblyAction>(),
+                //}
+                //.ForEachAsync(x => x.Run(context, executionContext));
 
                 return _ok;
             }

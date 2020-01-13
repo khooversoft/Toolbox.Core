@@ -44,7 +44,7 @@ namespace MicroserviceHost
                 }
             }
 
-            executionContext.SetFunctions(list);
+            //executionContext.SetFunctions(list);
 
             return Task.CompletedTask;
         }

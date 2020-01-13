@@ -105,7 +105,6 @@ namespace Khooversoft.Toolbox.Standard
             lock (_lock)
             {
                 Root.Complete();
-                //_register.ForEach(x => x.Complete());
             }
         }
 
@@ -120,13 +119,16 @@ namespace Khooversoft.Toolbox.Standard
 
                 var tasks = _blockList.OfType<IDataflowBlock>()
                     .Select(x => x.Completion)
-                    //.Concat(_register.Select(x => x.Completion))
                     .ToArray();
 
                 return Task.WhenAll(tasks);
             }
         }
 
+        /// <summary>
+        /// Complete and wait on all pipelines
+        /// </summary>
+        /// <returns></returns>
         public async Task CompleteAndWait()
         {
             Root.Complete();

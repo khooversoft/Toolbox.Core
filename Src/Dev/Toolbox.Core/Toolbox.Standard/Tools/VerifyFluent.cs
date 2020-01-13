@@ -37,6 +37,13 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         [DebuggerStepThrough]
+        public static VerifyContext<T> Assert<T>(this VerifyContext<T> context, Func<T, bool> assertOpr, Func<T, string> message)
+        {
+            if (!assertOpr(context.Value)) throw new ArgumentException(context.Format(message(context.Value)));
+            return context;
+        }
+
+        [DebuggerStepThrough]
         public static VerifyContext<T> Assert<T, TException>(this VerifyContext<T> context, Func<T, bool> assertOpr, string message)
         {
             if (!assertOpr(context.Value)) throw (Exception)Activator.CreateInstance(typeof(TException), context.Format(message));
