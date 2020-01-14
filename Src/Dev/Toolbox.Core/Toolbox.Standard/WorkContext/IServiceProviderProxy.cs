@@ -2,11 +2,17 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 
 namespace Khooversoft.Toolbox.Standard
 {
     public interface IServiceProviderProxy : IServiceProvider
     {
         object GetServiceOptional(Type serviceType);
+
+        T BeginLifetimeScope<T>(string tag) where T : IDisposable;
+
+
+        T BeginLifetimeScope<T>(string tag, Func<IEnumerable<Type>> configurationAction) where T : IDisposable;
     }
 }

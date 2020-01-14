@@ -54,7 +54,7 @@ namespace Khooversoft.Toolbox.Standard
         public WorkContext(
             CorrelationVector cv,
             StringVector tag,
-            IServiceProvider? container,
+            IServiceProviderProxy? container,
             CancellationToken? cancellationToken = null,
             ITelemetry? telemetry = null,
             IEventDimensions? dimensions = null
@@ -80,7 +80,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public StringVector Tag { get; private set; }
 
-        public IServiceProvider? Container { get; }
+        public IServiceProviderProxy? Container { get; }
 
         public CancellationToken CancellationToken { get; private set; } = CancellationToken.None;
 

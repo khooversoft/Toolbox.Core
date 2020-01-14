@@ -7,6 +7,7 @@ using Khooversoft.Toolbox.Actor;
 using System.Threading.Tasks;
 using Xunit;
 using Autofac;
+using Khooversoft.Toolbox.Autofac;
 
 namespace Toolbox.Actor.Tests
 {
@@ -73,7 +74,7 @@ namespace Toolbox.Actor.Tests
             ILifetimeScope container = builder.Build();
 
             IWorkContext context = new WorkContextBuilder()
-                .Set(new ServiceProviderProxy(x => container.Resolve<ICache>(), x => container.ResolveOptional<ICache>()))
+                .Set(new ServiceProviderAutofac(container))
                 .Build();
 
             IActorManager? manager = new ActorConfigurationBuilder()

@@ -2,6 +2,7 @@ using Autofac;
 using CustomerInfo.MicroService;
 using FluentAssertions;
 using Khooversoft.MessageNet.Client;
+using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Standard;
 using Microservice.Interface;
 using Microservice.Interface.Test;
@@ -31,25 +32,25 @@ namespace CustomerInfo.Microservice.Test
 
             var diBuilder = new ContainerBuilder();
             diBuilder.RegisterInstance(testContext).As<ITestContext>();
+            using IContainer container = diBuilder.Build();
+            using ILifetimeScope lifetimeScope = container.BeginLifetimeScope();
 
-            IReadOnlyList<FunctionConfiguration> functionConfigurations = assemblyLoader.LoadFromAssemblyPath(assemblyPathToLoad)
-                .GetExportedTypes()
-                .GetFunctionMethods()
-                .GetFunctionConfiguration(new Uri("http://localhost"), "endpoint:fake.connections", new PropertyResolver())
-                .RegisterTypesWithContainer(x => diBuilder.RegisterType(x));
+            IServiceProviderProxy serviceProviderAutofac = new ServiceProviderAutofac(lifetimeScope);
 
-            using ILifetimeScope lifetimeScope = diBuilder.Build().BeginLifetimeScope();
+            FunctionHost host = new FunctionHostBuilder()
+                .AddFunctionType(assemblyLoader.LoadFromAssemblyPath(assemblyPathToLoad).GetExportedTypes())
+                .UseContainer(serviceProviderAutofac)
+                .SetMessageNetClient(messageNetClient)
+                .Build(workContext);
 
-            IReadOnlyList<FunctionMessageReceiver> receivers = await functionConfigurations
-                .Run(workContext, lifetimeScope, messageNetClient);
+            await host.Start(workContext);
 
             string message = "Hello, my name is HAL";
             await messageNetClient.SendMessage(Encoding.UTF8.GetBytes(message));
 
             messageNetClient.Dispose();
 
-            await receivers
-                .ForEachAsync(x => x.Stop(workContext));
+            host.Stop(workContext);
 
             testContext.MessageCount.Should().Be(1);
             testContext.Messages.Count.Should().Be(1);

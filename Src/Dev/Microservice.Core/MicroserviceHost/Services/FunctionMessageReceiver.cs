@@ -21,25 +21,20 @@ namespace MicroserviceHost
     public class FunctionMessageReceiver : IDisposable
     {
         private readonly FunctionConfiguration _functionConfiguration;
-        private readonly ILifetimeScope _lifetimeScope;
+        private readonly ILifetimeScope? _lifetimeScope;
         private IWorkContext? _workContext;
         private bool _running = false;
         public object? _functionClassInstance;
         public IMessageNetClient _messageNetClient;
 
-        public FunctionMessageReceiver(FunctionConfiguration functionConfiguration, ILifetimeScope lifetimeScope)
+        public FunctionMessageReceiver(FunctionConfiguration functionConfiguration, IMessageNetClient messageNetClient, ILifetimeScope? lifetimeScope = null)
         {
-            _functionConfiguration = functionConfiguration;
-            _lifetimeScope = lifetimeScope;
-            _messageNetClient = new MessageNetClient(_functionConfiguration.NameServerUri, x => _functionConfiguration.ServiceBusConnection);
-        }
+            functionConfiguration.Verify(nameof(functionConfiguration)).IsNotNull();
+            messageNetClient.Verify(nameof(messageNetClient)).IsNotNull();
 
-
-        public FunctionMessageReceiver(FunctionConfiguration functionConfiguration, ILifetimeScope lifetimeScope, IMessageNetClient messageNetClient)
-        {
             _functionConfiguration = functionConfiguration;
-            _lifetimeScope = lifetimeScope;
             _messageNetClient = messageNetClient;
+            _lifetimeScope = lifetimeScope;
         }
 
         /// <summary>
@@ -60,7 +55,7 @@ namespace MicroserviceHost
 
             context.Telemetry.Info(context, $"Create function for {_functionConfiguration.NodeId}");
 
-            _functionClassInstance = (_lifetimeScope.IsRegistered(_functionConfiguration.Function.MethodInfo.DeclaringType!) ? _lifetimeScope.Resolve(_functionConfiguration.Function.MethodInfo.DeclaringType!) : null) ??
+            _functionClassInstance = (_lifetimeScope?.IsRegistered(_functionConfiguration.Function.MethodInfo.DeclaringType!) == true ? _lifetimeScope.Resolve(_functionConfiguration.Function.MethodInfo.DeclaringType!) : null) ??
                 context.Container?.GetService(_functionConfiguration.Function.MethodInfo.DeclaringType!) ??
                 Activator.CreateInstance(_functionConfiguration.Function.MethodInfo.DeclaringType!);
 
@@ -73,7 +68,7 @@ namespace MicroserviceHost
         /// </summary>
         /// <param name="context"></param>
         /// <returns>task</returns>
-        public Task Stop(IWorkContext context)
+        public void Stop(IWorkContext context)
         {
             context.Verify(nameof(context)).IsNotNull();
             _running.Verify().Assert(x => x == true, "Receiver is not running");
@@ -81,8 +76,6 @@ namespace MicroserviceHost
             context.Telemetry.Info(context, $"Stopping receiver for {_functionConfiguration.NodeId}");
             IMessageNetClient? subject = Interlocked.Exchange(ref _messageNetClient, null!);
             subject?.Dispose();
-
-            return Task.CompletedTask;
         }
 
         /// <summary>

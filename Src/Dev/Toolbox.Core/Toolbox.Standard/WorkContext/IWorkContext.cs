@@ -18,7 +18,7 @@ namespace Khooversoft.Toolbox.Standard
     {
         CorrelationVector Cv { get; }
         StringVector Tag { get; }
-        IServiceProvider? Container { get; }
+        IServiceProviderProxy? Container { get; }
         CancellationToken CancellationToken { get; }
         ITelemetry Telemetry { get; }
         IEventDimensions Dimensions { get; }

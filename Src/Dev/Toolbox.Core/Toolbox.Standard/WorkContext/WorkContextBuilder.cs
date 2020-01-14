@@ -46,7 +46,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public StringVector Tag { get; set; }
 
-        public IServiceProvider? Container { get; set; }
+        public IServiceProviderProxy? Container { get; set; }
 
         public CancellationToken? CancellationToken { get; set; }
 
@@ -111,7 +111,7 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="container">container</param>
         /// <returns>this</returns>
-        public WorkContextBuilder Set(IServiceProvider container)
+        public WorkContextBuilder Set(IServiceProviderProxy container)
         {
             container.Verify().IsNotNull();
 

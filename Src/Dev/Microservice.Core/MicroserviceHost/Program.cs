@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System;
@@ -61,7 +62,7 @@ namespace MicroserviceHost
                 IWorkContext context = new WorkContextBuilder()
                     .Set(cancellationTokenSource.Token)
                     .Set(logger)
-                    .Set(new ServiceProviderProxySimple(x => container.Resolve(x)))
+                    .Set(new ServiceProviderAutofac(container))
                     .Build();
 
                 option
