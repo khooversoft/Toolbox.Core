@@ -19,7 +19,7 @@ stages:
   displayName: Build all solutions
   
   jobs:
-  - job: Agent Job 1
+  - job: AgentJob1
     displayName: Build Tasks
     pool:
       vmImage: 'windows-latest'
