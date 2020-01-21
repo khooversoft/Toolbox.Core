@@ -79,7 +79,7 @@ namespace Khooversoft.MessageNet.Client
                 currentActionBlock.Completion.GetAwaiter().GetResult();
             }
 
-            var subject = Interlocked.Exchange(ref _receiver, null!);
+            _receiver = null;
         }
     }
 }

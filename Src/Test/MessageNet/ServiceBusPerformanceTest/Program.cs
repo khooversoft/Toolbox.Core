@@ -68,7 +68,7 @@ namespace ServiceBusPerformanceTest
                 IWorkContext context = new WorkContextBuilder()
                     .Set(cancellationTokenSource.Token)
                     .Set(logger)
-                    .Set(new ServiceProviderProxySimple(x => container.Resolve(x)))
+                    .Set(new ServiceProviderProxy(x => container.Resolve(x)))
                     .Build();
 
                 option
@@ -110,7 +110,7 @@ namespace ServiceBusPerformanceTest
             builder.RegisterType<ReceiveMessages>().InstancePerLifetimeScope();
 
             builder.RegisterType<MessageClientService>().As<IMessageClient>();
-            builder.RegisterType<MessageProcessor>().As<IMessageProcessor>();
+            builder.RegisterType<MessageQueueReceiveProcessor>().As<IMessageProcessor>();
 
             BuildTelemetry(option, builder);
 

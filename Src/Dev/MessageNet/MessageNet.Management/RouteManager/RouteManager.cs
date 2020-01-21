@@ -33,11 +33,7 @@ namespace Khooversoft.MessageNet.Management
             request.Verify(nameof(request)).IsNotNull();
             request.NodeId.Verify(nameof(request.NodeId)).IsNotNull();
 
-            Uri uri = new ResourcePathBuilder()
-                .SetScheme(ResourceScheme.Queue)
-                .SetServiceBusName("Default")
-                .SetEntityName(request.NodeId!)
-                .Build();
+            Uri uri = new Uri($"mn://{request.NodeId}");
 
             INodeRegistrationActor registgrationActor = await _actorManager.CreateProxy<INodeRegistrationActor>(request.NodeId!);
             await registgrationActor.Set(context, request.ConvertTo(uri));
@@ -67,11 +63,7 @@ namespace Khooversoft.MessageNet.Management
             routeRegistrationRequest.Verify(nameof(routeRegistrationRequest)).IsNotNull();
             routeRegistrationRequest.NodeId.Verify(nameof(routeRegistrationRequest.NodeId)).IsNotNull();
 
-            Uri uri = new ResourcePathBuilder()
-                .SetScheme(ResourceScheme.Queue)
-                .SetServiceBusName("Default")
-                .SetEntityName(routeRegistrationRequest.NodeId!)
-                .Build();
+            Uri uri = new Uri($"mn://{routeRegistrationRequest.NodeId}");
 
             INodeRegistrationActor subject = await _actorManager.CreateProxy<INodeRegistrationActor>(routeRegistrationRequest.NodeId!);
             await subject.Remove(context);

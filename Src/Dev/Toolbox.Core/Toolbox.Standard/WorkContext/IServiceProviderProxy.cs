@@ -9,10 +9,5 @@ namespace Khooversoft.Toolbox.Standard
     public interface IServiceProviderProxy : IServiceProvider
     {
         object GetServiceOptional(Type serviceType);
-
-        T BeginLifetimeScope<T>(string tag) where T : IDisposable;
-
-
-        T BeginLifetimeScope<T>(string tag, Func<IEnumerable<Type>> configurationAction) where T : IDisposable;
     }
 }

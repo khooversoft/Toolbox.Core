@@ -35,11 +35,9 @@ namespace CustomerInfo.Microservice.Test
             using IContainer container = diBuilder.Build();
             using ILifetimeScope lifetimeScope = container.BeginLifetimeScope();
 
-            IServiceProviderProxy serviceProviderAutofac = new ServiceProviderAutofac(lifetimeScope);
-
             FunctionHost host = new FunctionHostBuilder()
                 .AddFunctionType(assemblyLoader.LoadFromAssemblyPath(assemblyPathToLoad).GetExportedTypes())
-                .UseContainer(serviceProviderAutofac)
+                .UseContainer(new ServiceProviderAutofac(lifetimeScope))
                 .SetMessageNetClient(messageNetClient)
                 .Build(workContext);
 

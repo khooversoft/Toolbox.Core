@@ -52,7 +52,7 @@ namespace Khooversoft.MessageNet.Client
             nodeRegistration.Verify().IsNotNull($"Node {nodeId} does not exist in the name server.");
 
             string connectionString = _getConnectionString(nodeId);
-            string queueName = new ResourcePathBuilder(nodeRegistration!.InputUri).EntityName;
+            string queueName = new Uri(nodeRegistration!.InputUri).QueueName();
 
             return new MessageQueueSendClient(connectionString, queueName);
         }
@@ -75,9 +75,9 @@ namespace Khooversoft.MessageNet.Client
             response.InputQueueUri!.Verify().IsNotEmpty("Name server's response did not include input queue uri");
 
             string connectionString = _getConnectionString(response.InputQueueUri!);
-            var builder = new ResourcePathBuilder(response.InputQueueUri!);
+            string queueName = new Uri(response.InputQueueUri!).QueueName();
 
-            _messageProcessor = new MessageQueueReceiveProcessor(connectionString, builder.EntityName);
+            _messageProcessor = new MessageQueueReceiveProcessor(connectionString, queueName);
             await _messageProcessor.Register(context, receiver);
         }
 

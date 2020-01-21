@@ -37,11 +37,7 @@ namespace MessageNet.Management.Test.RouteManagement
                 RouteRegistrationResponse response = await manager.Register(_workContext, request);
                 response.Should().NotBeNull();
 
-                Uri uri = new ResourcePathBuilder()
-                    .SetScheme(ResourceScheme.Queue)
-                    .SetServiceBusName("Default")
-                    .SetEntityName(nodeId)
-                    .Build();
+                Uri uri = new Uri($"mn://{nodeId}");
 
                 response.InputQueueUri.Should().NotBeNullOrEmpty();
                 response.InputQueueUri.Should().Be(uri.ToString());
@@ -86,11 +82,7 @@ namespace MessageNet.Management.Test.RouteManagement
                     .Select(x => new
                     {
                         NodeRigistration = new RouteRegistrationRequest { NodeId = generateName(x) },
-                        Uri = new ResourcePathBuilder()
-                            .SetScheme(ResourceScheme.Queue)
-                            .SetServiceBusName("Default")
-                            .SetEntityName(generateName(x))
-                            .Build(),
+                        Uri = new Uri($"mn://{generateName(x)}")
                     })
                     .ToList();
 

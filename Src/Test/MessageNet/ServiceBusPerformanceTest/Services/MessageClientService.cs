@@ -6,7 +6,7 @@ using Khooversoft.MessageNet.Client;
 
 namespace ServiceBusPerformanceTest
 {
-    internal class MessageClientService : MessageClient
+    internal class MessageClientService : MessageQueueSendClient
     {
         public MessageClientService(IOption option)
             : base(option.ServiceBusConnectionString!, option.QueueName!)
