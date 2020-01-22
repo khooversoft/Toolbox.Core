@@ -11,12 +11,16 @@ namespace Khooversoft.Toolbox.Standard
 
         public ServiceProviderProxy(Func<Type, object> getService)
         {
+            getService.Verify(nameof(getService)).IsNotNull();
+
             _getService = getService;
         }
 
         public ServiceProviderProxy(Func<Type, object> getService, Func<Type, object> getServiceOptional)
+            : this(getService)
         {
-            _getService = getService;
+            getServiceOptional.Verify(nameof(getServiceOptional)).IsNotNull();
+
             _getServiceOptional = getServiceOptional;
         }
 

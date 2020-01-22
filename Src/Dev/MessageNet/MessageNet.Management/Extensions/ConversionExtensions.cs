@@ -12,11 +12,11 @@ namespace Khooversoft.MessageNet.Management
 {
     public static class ConversionExtensions
     {
-        public static NodeRegistrationModel ConvertTo(this RouteRegistrationRequest subject, Uri uri)
+        public static NodeRegistrationModel ConvertTo(this RouteRegistrationRequest subject, string inputUri)
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new NodeRegistrationModel(subject.NodeId!, uri.ToString());
+            return new NodeRegistrationModel(subject.NodeId!, inputUri);
         }
 
         public static RouteRegistrationRequest ConvertTo(this NodeRegistrationModel subject)

@@ -30,15 +30,13 @@ namespace Khooversoft.MessageNet.Management
             };
         }
 
-        public static QueueDefinition ConvertTo(this QueueDescription subject/*, ServiceBusConnection serviceBusConnection*/)
+        public static QueueDefinition ConvertTo(this QueueDescription subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
-            //serviceBusConnection.Verify(nameof(serviceBusConnection)).IsNotNull();
 
             return new QueueDefinition
             {
                 QueueName = subject.Path,
-                //ResourcePath = new ResourcePathBuilder().SetScheme(ResourceScheme.Queue).SetServiceBusName(serviceBusConnection.ServiceBusName).SetEntityName(subject.Path).Build(),
                 LockDuration = subject.LockDuration,
                 RequiresDuplicateDetection = subject.RequiresDuplicateDetection,
                 DuplicateDetectionHistoryTimeWindow = subject.DuplicateDetectionHistoryTimeWindow,

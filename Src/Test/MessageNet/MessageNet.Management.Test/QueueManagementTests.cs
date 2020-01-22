@@ -19,7 +19,7 @@ namespace MessageNet.Management.Test
     [Collection("QueueTests")]
     public class QueueManagementTests : IClassFixture<ApplicationFixture>
     {
-        private const string _connectionString = "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={messagehub.accesskey};TransportType=Amqp";
+        private const string _connectionString = "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=TestAccess;SharedAccessKey={messagehub.accesskey};TransportType=Amqp";
         private readonly ServiceBusConnection _serviceBusConnection;
         private readonly IWorkContext _workContext = WorkContext.Empty;
         private readonly QueueManagement _queueManagement;

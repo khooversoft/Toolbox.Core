@@ -19,7 +19,7 @@ namespace CustomerInfo.MicroService
             _testContext = testContext;
         }
 
-        [Function("CustomerAddress", "ms://{node.id}/{function.name}")]
+        [Function("CustomerAddress", "{node.id}/{function.name}")]
         public Task GetCustomerAddress(IWorkContext context, string /*RouteMessage<CustomerInfoRequest>*/ request)
         {
             context.Verify(nameof(context)).IsNotNull();

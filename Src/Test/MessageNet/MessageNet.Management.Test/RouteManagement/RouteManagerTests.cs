@@ -13,6 +13,7 @@ using Xunit;
 
 namespace MessageNet.Management.Test.RouteManagement
 {
+    [Collection("QueueTests")]
     public class RouteManagerTests
     {
         private static IWorkContext? _workContext;
@@ -37,10 +38,8 @@ namespace MessageNet.Management.Test.RouteManagement
                 RouteRegistrationResponse response = await manager.Register(_workContext, request);
                 response.Should().NotBeNull();
 
-                Uri uri = new Uri($"mn://{nodeId}");
-
                 response.InputQueueUri.Should().NotBeNullOrEmpty();
-                response.InputQueueUri.Should().Be(uri.ToString());
+                response.InputQueueUri.Should().Be(nodeId);
 
                 RouteLookupRequest routeLookupRequest = new RouteLookupRequest
                 {
@@ -51,7 +50,7 @@ namespace MessageNet.Management.Test.RouteManagement
                 routeLookupResponses.Should().NotBeNull();
                 routeLookupResponses.Count.Should().Be(1);
                 routeLookupResponses[0].NodeId.Should().Be(nodeId);
-                routeLookupResponses[0].InputUri.Should().Be(uri.ToString());
+                routeLookupResponses[0].InputUri.Should().Be(nodeId);
 
                 await manager.Unregister(_workContext, request);
 
@@ -82,7 +81,7 @@ namespace MessageNet.Management.Test.RouteManagement
                     .Select(x => new
                     {
                         NodeRigistration = new RouteRegistrationRequest { NodeId = generateName(x) },
-                        Uri = new Uri($"mn://{generateName(x)}")
+                        NodeId = generateName(x)
                     })
                     .ToList();
 
@@ -95,8 +94,8 @@ namespace MessageNet.Management.Test.RouteManagement
                 responses.Length.Should().Be(max);
 
                 responses.OrderBy(x => x.InputQueueUri)
-                    .Zip(routeRegistrations.OrderBy(x => x.Uri.ToString()), (o, i) => (o, i))
-                    .All(x => x.o.InputQueueUri == x.i.Uri.ToString())
+                    .Zip(routeRegistrations.OrderBy(x => x.NodeId), (o, i) => (o, i))
+                    .All(x => x.o.InputQueueUri == x.i.NodeId)
                     .Should().BeTrue();
 
                 // Search for all nodes
@@ -105,8 +104,8 @@ namespace MessageNet.Management.Test.RouteManagement
                 routeLookupResponse.Count.Should().Be(max);
 
                 routeLookupResponse.OrderBy(x => x.InputUri)
-                    .Zip(routeRegistrations.OrderBy(x => x.Uri.ToString()), (o, i) => (o, i))
-                    .All(x => x.o.InputUri == x.i.Uri.ToString())
+                    .Zip(routeRegistrations.OrderBy(x => x.NodeId), (o, i) => (o, i))
+                    .All(x => x.o.InputUri == x.i.NodeId)
                     .Should().BeTrue();
 
                 // Unregister

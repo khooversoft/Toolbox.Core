@@ -27,7 +27,7 @@ namespace MessageHub.NameServer.Test.Registration
         {
             await _fixture.NameServerClient.ClearAll(_workContext);
 
-            var request = new RouteRegistrationRequest { NodeId = "mn://test/Node1" };
+            var request = new RouteRegistrationRequest { NodeId = "test/Node1" };
             var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
 
             var httpResponse = await _fixture.Client
@@ -38,7 +38,7 @@ namespace MessageHub.NameServer.Test.Registration
             var responseString = await httpResponse.Content.ReadAsStringAsync();
             RouteRegistrationResponse response = JsonConvert.DeserializeObject<RouteRegistrationResponse>(responseString);
 
-            response.InputQueueUri.Should().Be("queue://default/test/Node1");
+            response.InputQueueUri.Should().Be("test/Node1");
             response.ForwardRoutes.Should().BeNull();
         }
 
@@ -47,11 +47,11 @@ namespace MessageHub.NameServer.Test.Registration
         {
             await _fixture.NameServerClient.ClearAll(_workContext);
 
-            var request = new RouteRegistrationRequest { NodeId = "mn://test/Node1" };
+            var request = new RouteRegistrationRequest { NodeId = "test/Node1" };
 
             RouteRegistrationResponse response = await _fixture.NameServerClient.Register(_workContext, request);
 
-            response.InputQueueUri.Should().Be("ms://test/Node1");
+            response.InputQueueUri.Should().Be("test/Node1");
             response.ForwardRoutes.Should().BeNull();
         }
 

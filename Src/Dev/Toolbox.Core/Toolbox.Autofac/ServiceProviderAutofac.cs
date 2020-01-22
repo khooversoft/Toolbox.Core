@@ -2,47 +2,33 @@
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Khooversoft.Toolbox.Autofac
 {
-    public class ServiceProviderAutofac : IServiceProviderProxy
+    public class ServiceProviderAutofac : ServiceProviderProxy, IServiceProviderAutoFac
     {
-        private readonly ILifetimeScope _container;
+        private readonly Func<string, IEnumerable<Type>, ILifetimeScope> _getLifetimeScope;
 
-        public ServiceProviderAutofac(ILifetimeScope container)
+        public ServiceProviderAutofac(Func<Type, object> getService, Func<Type, object> getServiceOptional, Func<string, IEnumerable<Type>, ILifetimeScope> getLifetimeScope)
+            : base(getService, getServiceOptional)
         {
-            container.Verify(nameof(container)).IsNotNull();
+            getLifetimeScope.Verify(nameof(getLifetimeScope)).IsNotNull();
 
-            _container = container;
+            _getLifetimeScope = getLifetimeScope;
         }
 
-        public T BeginLifetimeScope<T>(string tag)
-            where T : IDisposable
+        public ILifetimeScope BeginLifetimeScope(string tag)
         {
-            return (T)_container.BeginLifetimeScope(tag);
+            return _getLifetimeScope(tag, Enumerable.Empty<Type>());
         }
 
-        public T BeginLifetimeScope<T>(string tag, Func<IEnumerable<Type>> configurationAction)
-            where T : IDisposable
+        public ILifetimeScope BeginLifetimeScope(string tag, Func<IEnumerable<Type>> configurationAction)
         {
             configurationAction.Verify(nameof(configurationAction)).IsNotNull();
 
-            return (T)_container.BeginLifetimeScope(tag, builder =>
-            {
-                configurationAction()
-                    .ForEach(type => builder.RegisterType(type));
-            });
+            return _getLifetimeScope(tag, configurationAction());
         }
-
-        public object GetService(Type serviceType)
-        {
-            return _container.Resolve(serviceType);
-        }
-
-        public object GetServiceOptional(Type serviceType)
-        {
-            return _container.ResolveOptional(serviceType);
-        }        
     }
 }
