@@ -8,10 +8,10 @@ namespace Microservice.Interface.Test
     {
         int MessageCount { get; }
 
-        IReadOnlyList<string> Messages { get; }
+        IReadOnlyList<object> Messages { get; }
 
         void IncrementMessageCount();
 
-        void AddMessageAsString(string message);
+        void AddMessage(object message);
     }
 }

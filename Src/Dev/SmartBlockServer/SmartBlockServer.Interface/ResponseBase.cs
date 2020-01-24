@@ -6,10 +6,10 @@ namespace Khooversoft.SmartBlockServer.Interface
 {
     public abstract class ResponseBase
     {
-        public string BlockChainUri { get; set; }
+        public string? BlockChainUri { get; set; }
 
         public bool Completed { get; set; }
 
-        public string ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
     }
 }

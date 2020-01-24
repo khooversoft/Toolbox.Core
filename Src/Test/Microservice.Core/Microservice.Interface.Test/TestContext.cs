@@ -10,10 +10,10 @@ namespace Microservice.Interface.Test
     public class TestContext : ITestContext
     {
         private int _messageCount;
-        private readonly List<string> _messages = new List<string>();
+        private readonly List<object> _messages = new List<object>();
         private readonly object _lock = new object();
 
-        public IReadOnlyList<string> Messages
+        public IReadOnlyList<object> Messages
         {
             get
             {
@@ -26,10 +26,10 @@ namespace Microservice.Interface.Test
 
         public int MessageCount => _messageCount;
 
-        public void AddMessageAsString(string message)
+        public void AddMessage(object message)
         {
             Interlocked.Increment(ref _messageCount);
-            lock(_lock)
+            lock (_lock)
             {
                 _messages.Add(message);
             }

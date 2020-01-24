@@ -2,12 +2,14 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 
 namespace Khooversoft.Toolbox.Standard
 {
-    public interface IServiceProviderProxy : IServiceProvider
+    public static class ServiceContainerExtensions
     {
-        object GetServiceOptional(Type serviceType);
+        public static T Resolve<T>(this IServiceProvider service)
+        {
+            return (T)service.GetService(typeof(T));
+        }
     }
 }

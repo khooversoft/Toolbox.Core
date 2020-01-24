@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Khooversoft.Toolbox.Autofac;
 
 namespace MicroserviceHost
 {
@@ -18,7 +19,7 @@ namespace MicroserviceHost
 
         public IReadOnlyList<Type> FunctionTypes => _functionTypes;
 
-        public IServiceProviderProxy? Container { get; set; }
+        public IServiceContainer? Container { get; set; }
 
         public IPropertyResolver? PropertyResolver { get; set; }
 
@@ -30,11 +31,11 @@ namespace MicroserviceHost
             return this;
         }
 
-        public FunctionHostBuilder UseContainer(IServiceProviderProxy serviceProviderProxy)
+        public FunctionHostBuilder UseContainer(IServiceContainer serviceContainer)
         {
-            serviceProviderProxy.Verify(nameof(serviceProviderProxy)).IsNotNull();
+            serviceContainer.Verify(nameof(serviceContainer)).IsNotNull();
 
-            Container = serviceProviderProxy;
+            Container = serviceContainer;
             return this;
         }
 
@@ -61,15 +62,15 @@ namespace MicroserviceHost
             PropertyResolver ??= new PropertyResolver();
 
             IReadOnlyList<FunctionConfiguration> functionConfigurations = FunctionTypes
-                .Select(x => GetFunctionMethods(x))
-                .Select(x => GetFunctionConfiguration(x, PropertyResolver))
+                .Do(x => GetFunctionMethods(x))
+                .Do(x => GetFunctionConfiguration(x, PropertyResolver))
                 .ToList();
 
             ILifetimeScope? lifetimeScope = null;
 
             if (context.Container != null)
             {
-                lifetimeScope = context.Container.BeginLifetimeScope<ILifetimeScope>(nameof(FunctionHost), () => functionConfigurations.Select(x => x.Function.MethodInfo.DeclaringType!).ToList());
+                lifetimeScope = context.Container.BeginLifetimeScope(nameof(FunctionHost), functionConfigurations.Select(x => x.Function.MethodInfo.DeclaringType!));
             }
 
             return new FunctionHost(functionConfigurations, MessageNetClient!, lifetimeScope);

@@ -6,7 +6,7 @@ namespace Khooversoft.SmartBlockServer.Interface
 {
     public class ReadBlockChainRequest
     {
-        public string BlockChainUri { get; set; }
+        public string? BlockChainUri { get; set; }
 
         public int StartIndex { get; set; }
 
@@ -15,6 +15,6 @@ namespace Khooversoft.SmartBlockServer.Interface
 
     public class ReadBlockChainResponse : ResponseBase
     {
-        public IReadOnlyList<string> Blocks { get; set; }
+        public IReadOnlyList<string>? Blocks { get; set; }
     }
 }

@@ -38,7 +38,7 @@ namespace MicroserviceHost
 
         private static void DisplayStartDetails(string[] args) => Console.WriteLine($"Arguments: {string.Join(", ", args)}");
 
-        private async Task<int> Run(string[] args)
+        private Task<int> Run(string[] args)
         {
             Console.WriteLine(_programTitle);
             Console.WriteLine();
@@ -50,7 +50,7 @@ namespace MicroserviceHost
                 option.FormatHelp()
                     .ForEach(x => Console.WriteLine(option.SecretManager.Mask(x)));
 
-                return _ok;
+                return Task.FromResult(_ok);
             }
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -62,7 +62,7 @@ namespace MicroserviceHost
                 IWorkContext context = new WorkContextBuilder()
                     .Set(cancellationTokenSource.Token)
                     .Set(logger)
-                    .Set(new ServiceProviderAutofac(container))
+                    .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
                     .Build();
 
                 option
@@ -87,7 +87,7 @@ namespace MicroserviceHost
                 //}
                 //.ForEachAsync(x => x.Run(context, executionContext));
 
-                return _ok;
+                return Task.FromResult(_ok);
             }
         }
 
@@ -96,7 +96,6 @@ namespace MicroserviceHost
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(option).As<IOption>();
-
             builder.RegisterType<LoadAssemblyAction>().InstancePerLifetimeScope();
 
             BuildTelemetry(option, builder);

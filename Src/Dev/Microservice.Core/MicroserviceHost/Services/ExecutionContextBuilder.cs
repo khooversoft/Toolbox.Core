@@ -159,7 +159,7 @@ namespace MicroserviceHost
                 .Assert(x => x.GetPropertyNames()?.Count == 0, $"Unresolved properties for {function.FunctionAttribute.NodeId}")
                 .Value;
 
-            return new FunctionConfiguration(function, NameServerUri!, ServiceBusConnection!, nodeId);
+            return new FunctionConfiguration(function, nodeId);
         }
     }
 }

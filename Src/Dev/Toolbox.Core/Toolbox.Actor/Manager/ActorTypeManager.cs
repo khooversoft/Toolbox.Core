@@ -115,7 +115,7 @@ namespace Khooversoft.Toolbox.Actor
 
         private ActorTypeRegistration? GetTypeFromDi(IWorkContext context, Type actorType)
         {
-            IServiceProviderProxy? serviceProviderProxy = context.Container as IServiceProviderProxy;
+            IServiceContainer? serviceProviderProxy = context.Container as IServiceContainer;
             if (serviceProviderProxy == null) return null;
 
             var actor = serviceProviderProxy.GetServiceOptional(actorType);

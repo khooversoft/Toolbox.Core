@@ -16,7 +16,7 @@ namespace MicroserviceHost
             _option = option;
         }
 
-        public async Task Run(IWorkContext context, IExecutionContext executionContext)
+        public Task Run(IWorkContext context, IExecutionContext executionContext)
         {
             context.Verify(nameof(context)).IsNotNull();
             executionContext.Verify(nameof(executionContext)).IsNotNull();
@@ -39,6 +39,8 @@ namespace MicroserviceHost
             context.Telemetry.Info(context, "Shutting down receivers");
             //await receivers
             //    .ForEachAsync(x => x.Stop(context));
+
+            return Task.CompletedTask;
         }
     }
 }

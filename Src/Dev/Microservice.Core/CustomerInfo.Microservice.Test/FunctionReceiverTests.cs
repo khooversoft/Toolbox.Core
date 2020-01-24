@@ -37,7 +37,7 @@ namespace CustomerInfo.Microservice.Test
 
             FunctionHost host = new FunctionHostBuilder()
                 .AddFunctionType(assemblyLoader.LoadFromAssemblyPath(assemblyPathToLoad).GetExportedTypes())
-                .UseContainer(new ServiceProviderAutofac(lifetimeScope))
+                .UseContainer(new ServiceContainerBuilder().SetLifetimeScope(lifetimeScope).Build())
                 .SetMessageNetClient(messageNetClient)
                 .Build(workContext);
 

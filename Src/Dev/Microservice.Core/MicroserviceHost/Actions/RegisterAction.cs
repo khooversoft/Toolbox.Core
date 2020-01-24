@@ -39,10 +39,7 @@ namespace MicroserviceHost.Actions
                 .Assert(x => x.GetPropertyNames()?.Count == 0, $"Unresolved properties for {function.FunctionAttribute.NodeId}")
                 .Value;
 
-            return new FunctionConfiguration(function, new Uri(_option.NameServerUri), _option.ServiceBusConnection, nodeId);
-
-            //function.FunctionConfiguration(new MessageNetClient(new Uri(_option.NameServerUri), x => _option.ServiceBusConnection), nodeId);
-            //return function;
+            return new FunctionConfiguration(function, nodeId);
         }
     }
 }

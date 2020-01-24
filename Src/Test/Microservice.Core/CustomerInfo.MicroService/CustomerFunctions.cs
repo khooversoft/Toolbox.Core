@@ -25,7 +25,18 @@ namespace CustomerInfo.MicroService
             context.Verify(nameof(context)).IsNotNull();
             request.Verify(nameof(request)).IsNotNull();
 
-            _testContext.AddMessageAsString(request);
+            _testContext.AddMessage(request);
+
+            return Task.CompletedTask;
+        }
+
+        [Function("CustomerAddress", "{node.id}/{function.name}")]
+        public Task GetCustomerInfo(IWorkContext context, RouteMessage<CustomerInfoRequest> request)
+        {
+            context.Verify(nameof(context)).IsNotNull();
+            request.Verify(nameof(request)).IsNotNull();
+
+            _testContext.AddMessage(request);
 
             return Task.CompletedTask;
         }

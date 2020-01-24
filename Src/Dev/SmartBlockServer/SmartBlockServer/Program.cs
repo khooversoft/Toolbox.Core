@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Khooversoft.MessageNet.Client;
 using Khooversoft.MessageNet.Interface;
+using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System;
@@ -64,7 +65,7 @@ namespace SmartBlockServer
                 IWorkContext context = new WorkContextBuilder()
                     .Set(cancellationTokenSource.Token)
                     .Set(logger)
-                    .Set(new ServiceProviderProxySimple(x => container.Resolve(x)))
+                    .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
                     .Build();
 
                 option

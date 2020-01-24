@@ -74,7 +74,7 @@ namespace Toolbox.Actor.Tests
             ILifetimeScope container = builder.Build();
 
             IWorkContext context = new WorkContextBuilder()
-                .Set(new ServiceProviderAutofac(x => container.Resolve(x), x => container.ResolveOptional(x), (tag, types) => container.BeginLifetimeScope(tag, x => types.ForEach(x => container.Resolve(x)))))
+                .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
                 .Build();
 
             IActorManager? manager = new ActorConfigurationBuilder()

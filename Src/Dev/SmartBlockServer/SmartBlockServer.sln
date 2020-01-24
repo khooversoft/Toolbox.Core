@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartBlockServer.Interface"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Interface", "..\MessageNet\MessageNet.Interface\MessageNet.Interface.csproj", "{92DC3DD6-72EE-4E89-A0B7-9C1F962F607D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Autofac", "..\Toolbox.Core\Toolbox.Autofac\Toolbox.Autofac.csproj", "{5E6A3077-BFB7-4055-B48F-082BB31EF41B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{92DC3DD6-72EE-4E89-A0B7-9C1F962F607D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92DC3DD6-72EE-4E89-A0B7-9C1F962F607D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92DC3DD6-72EE-4E89-A0B7-9C1F962F607D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E6A3077-BFB7-4055-B48F-082BB31EF41B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E6A3077-BFB7-4055-B48F-082BB31EF41B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E6A3077-BFB7-4055-B48F-082BB31EF41B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E6A3077-BFB7-4055-B48F-082BB31EF41B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,6 +76,7 @@ Global
 		{327C53DF-CB1E-479C-8EEA-25ACB0B8FD3B} = {AA00CDCE-F9D8-4AEB-9F76-91DA69B10455}
 		{7E40964E-A695-4C27-AF05-8D0963460D1F} = {AA00CDCE-F9D8-4AEB-9F76-91DA69B10455}
 		{92DC3DD6-72EE-4E89-A0B7-9C1F962F607D} = {AA00CDCE-F9D8-4AEB-9F76-91DA69B10455}
+		{5E6A3077-BFB7-4055-B48F-082BB31EF41B} = {AA00CDCE-F9D8-4AEB-9F76-91DA69B10455}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {316C976C-EBFC-4B22-A591-B2EFA1DE5C6C}
