@@ -72,12 +72,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             return false;
         }
 
-        public override int GetHashCode()
-        {
-            return Index.GetHashCode() ^
-                PreviousHash?.GetHashCode() ?? 0 ^
-                Digest.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(Index, PreviousHash, Digest);
 
         public static bool operator ==(BlockNode v1, BlockNode v2) => v1.Equals(v2);
 

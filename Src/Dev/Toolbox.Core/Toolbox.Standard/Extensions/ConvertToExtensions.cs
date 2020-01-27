@@ -64,15 +64,32 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
-        /// Safely casts the specified object to the type specified through T/>.
-        /// </summary>
-        /// <remarks>
+        /// Casts the specified object to the type specified through type.
         /// Has been introduced to allow casting objects without breaking the fluent API.
-        /// </remarks>
         /// <typeparam name="TTo"></typeparam>
-        public static T CastAs<T>(this object subject)
+        /// <param name="subject">subject to cast</param>
+        public static T CastAs<T>(this object subject) where T : class
         {
-            return subject is T ? (T)subject : default;
+            return (T)subject;
+        }
+
+        /// <summary>
+        /// Try to casts the specified object to the type specified through type.
+        /// Has been introduced to allow casting objects without breaking the fluent API.
+        ///
+        /// <typeparam name="TTo"></typeparam>
+        /// <param name="subject">subject to cast</param>
+        /// <param name="value">output value if same type, or default</param>
+        public static bool TryCastAs<T>(this object subject, out T? value) where T : class
+        {
+            if(subject is T)
+            {
+                value = (T)subject;
+                return true;
+            }
+
+            value = default;
+            return false;
         }
 
         /// <summary>

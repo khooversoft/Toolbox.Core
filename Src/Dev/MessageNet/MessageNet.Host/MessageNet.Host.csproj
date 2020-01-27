@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Actor\Toolbox.Actor.csproj" />
+    <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
+    <ProjectReference Include="..\MessageNet.Client\MessageNet.Client.csproj" />
+    <ProjectReference Include="..\MessageNet.Interface\MessageNet.Interface.csproj" />
+  </ItemGroup>
+
+</Project>

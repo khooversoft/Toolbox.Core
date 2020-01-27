@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.MessageNet.Client;
+using Khooversoft.Toolbox.Autofac;
 
 namespace ServiceBusPerformanceTest
 {
@@ -68,7 +69,7 @@ namespace ServiceBusPerformanceTest
                 IWorkContext context = new WorkContextBuilder()
                     .Set(cancellationTokenSource.Token)
                     .Set(logger)
-                    .Set(new ServiceProviderProxy(x => container.Resolve(x)))
+                    .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
                     .Build();
 
                 option

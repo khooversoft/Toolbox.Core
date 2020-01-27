@@ -12,7 +12,14 @@ namespace Khooversoft.MessageNet.Client
         {
             self.Verify(nameof(self)).IsNotNull();
 
-            return new NodeRegistrationModel(self.NodeId!, self.InputUri!);
+            return new NodeRegistrationModel(self.NetworkId!, self.NodeId!, self.InputUri!);
+        }
+
+        public static NodeRegistrationModel ConvertTo(this RouteRegistrationResponse subject)
+        {
+            subject.Verify(nameof(subject)).IsNotNull();
+
+            return new NodeRegistrationModel(subject.NetworkId!, subject.NodeId!, subject.InputQueueUri!);
         }
     }
 }

@@ -3,6 +3,7 @@ using FluentAssertions;
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Actor;
+using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace MessageNet.Management.Test.RouteManagement
             using (ILifetimeScope container = rootContainer.BeginLifetimeScope())
             {
                 _workContext = new WorkContextBuilder()
-                    .Set(new ServiceProviderProxy(x => container.Resolve(x), x => container.ResolveOptional(x)))
+                    .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
                     .Build();
 
                 RouteManager manager = container.Resolve<RouteManager>();
@@ -43,7 +44,7 @@ namespace MessageNet.Management.Test.RouteManagement
 
                 RouteLookupRequest routeLookupRequest = new RouteLookupRequest
                 {
-                    SearchNodeId = nodeId,
+                    NodeId = nodeId,
                 };
 
                 IReadOnlyList<RouteLookupResponse>? routeLookupResponses = await manager.Search(_workContext, routeLookupRequest);
@@ -69,7 +70,7 @@ namespace MessageNet.Management.Test.RouteManagement
             using (ILifetimeScope container = rootContainer.BeginLifetimeScope())
             {
                 _workContext = new WorkContextBuilder()
-                    .Set(new ServiceProviderProxy(x => container.Resolve(x), x => container.ResolveOptional(x)))
+                    .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
                     .Build();
 
                 RouteManager manager = container.Resolve<RouteManager>();
@@ -99,7 +100,7 @@ namespace MessageNet.Management.Test.RouteManagement
                     .Should().BeTrue();
 
                 // Search for all nodes
-                IReadOnlyList<RouteLookupResponse> routeLookupResponse = await manager.Search(_workContext, new RouteLookupRequest { SearchNodeId = "*" });
+                IReadOnlyList<RouteLookupResponse> routeLookupResponse = await manager.Search(_workContext, new RouteLookupRequest { NodeId = "*" });
                 routeLookupResponse.Should().NotBeNull();
                 routeLookupResponse.Count.Should().Be(max);
 
@@ -113,7 +114,7 @@ namespace MessageNet.Management.Test.RouteManagement
                     .Select(x => manager.Unregister(_workContext, x.NodeRigistration))
                     .WhenAll();
 
-                routeLookupResponse = await manager.Search(_workContext, new RouteLookupRequest { SearchNodeId = "*" });
+                routeLookupResponse = await manager.Search(_workContext, new RouteLookupRequest { NodeId = "*" });
                 routeLookupResponse.Should().NotBeNull();
                 routeLookupResponse.Count.Should().Be(0);
             }

@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Autofac;
+using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System;
@@ -66,7 +67,7 @@ namespace EventHubPerformanceTest
                 IWorkContext context = new WorkContextBuilder()
                     .Set(cancellationTokenSource.Token)
                     .Set(logger)
-                    .Set(new ServiceProviderProxy(x => container.Resolve(x)))
+                    .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
                     .Build();
 
                 option

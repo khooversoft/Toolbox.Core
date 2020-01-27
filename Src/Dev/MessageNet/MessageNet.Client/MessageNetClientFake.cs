@@ -17,8 +17,8 @@ namespace Khooversoft.MessageNet.Client
     /// </summary>
     public class MessageNetClientFake : IMessageNetClient
     {
-        private ActionBlock<Message>? _messageBlock;
-        private Func<Message, Task>? _receiver;
+        private ActionBlock<NetMessage>? _messageBlock;
+        private Func<NetMessage, Task>? _receiver;
 
         public MessageNetClientFake()
         {
@@ -43,14 +43,14 @@ namespace Khooversoft.MessageNet.Client
         /// <param name="context">context</param>
         /// <param name="receiver">function to call</param>
         /// <returns>task</returns>
-        public Task RegisterReceiver(IWorkContext context, string nodeId, Func<Message, Task> receiver)
+        public Task RegisterReceiver(IWorkContext context, string nodeId, Func<NetMessage, Task> receiver)
         {
             context.Verify(nameof(context)).IsNotNull();
             nodeId.Verify(nameof(nodeId)).IsNotEmpty();
             _receiver.Verify().Assert(x => x == null, "Message process has already been started");
 
             _receiver = receiver;
-            _messageBlock = new ActionBlock<Message>(x => _receiver(x));
+            _messageBlock = new ActionBlock<NetMessage>(x => _receiver(x));
             return Task.CompletedTask;
         }
 
@@ -59,14 +59,12 @@ namespace Khooversoft.MessageNet.Client
         /// </summary>
         /// <param name="messageData"></param>
         /// <returns></returns>
-        public Task SendMessage(byte[] messageData)
+        public Task SendMessage(NetMessage netMessage)
         {
-            messageData.Verify(nameof(messageData)).IsNotNull();
+            netMessage.Verify(nameof(netMessage)).IsNotNull();
             _receiver.Verify().Assert(x => x != null, "Message process has not been started");
 
-            Message message = new Message(messageData);
-            _messageBlock!.Post(message);
-
+            _messageBlock!.Post(netMessage);
             return Task.CompletedTask;
         }
 

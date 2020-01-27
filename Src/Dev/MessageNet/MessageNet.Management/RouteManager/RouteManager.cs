@@ -33,7 +33,7 @@ namespace Khooversoft.MessageNet.Management
             request.Verify(nameof(request)).IsNotNull();
             request.NodeId.Verify(nameof(request.NodeId)).IsNotNull();
 
-            INodeRegistrationActor registgrationActor = await _actorManager.CreateProxy<INodeRegistrationActor>(request.NodeId!);
+            INodeRegistrationActor registgrationActor = await _actorManager.GetActor<INodeRegistrationActor>(request.NodeId!);
             await registgrationActor.Set(context, request.ConvertTo(request.NodeId!));
 
             QueueDefinition queueDefinition = new QueueDefinition
@@ -41,7 +41,7 @@ namespace Khooversoft.MessageNet.Management
                 QueueName = request.NodeId,
             };
 
-            IQueueManagementActor queueActor = await _actorManager.CreateProxy<IQueueManagementActor>(request.NodeId!);
+            IQueueManagementActor queueActor = await _actorManager.GetActor<IQueueManagementActor>(request.NodeId!);
             await queueActor.Set(context, queueDefinition);
 
             return new RouteRegistrationResponse
@@ -61,10 +61,10 @@ namespace Khooversoft.MessageNet.Management
             routeRegistrationRequest.Verify(nameof(routeRegistrationRequest)).IsNotNull();
             routeRegistrationRequest.NodeId.Verify(nameof(routeRegistrationRequest.NodeId)).IsNotNull();
 
-            INodeRegistrationActor subject = await _actorManager.CreateProxy<INodeRegistrationActor>(routeRegistrationRequest.NodeId!);
+            INodeRegistrationActor subject = await _actorManager.GetActor<INodeRegistrationActor>(routeRegistrationRequest.NodeId!);
             await subject.Remove(context);
 
-            IQueueManagementActor queueActor = await _actorManager.CreateProxy<IQueueManagementActor>(routeRegistrationRequest.NodeId!);
+            IQueueManagementActor queueActor = await _actorManager.GetActor<IQueueManagementActor>(routeRegistrationRequest.NodeId!);
             await queueActor.Remove(context);
         }
 
@@ -78,14 +78,14 @@ namespace Khooversoft.MessageNet.Management
         {
             request.Verify(nameof(request)).IsNotNull();
 
-            INodeRegistrationManagementActor managementActor = await _actorManager.CreateProxy<INodeRegistrationManagementActor>("default");
-            IReadOnlyList<NodeRegistrationModel> registrations = await managementActor.List(context, request.SearchNodeId!);
+            INodeRegistrationManagementActor managementActor = await _actorManager.GetActor<INodeRegistrationManagementActor>("default");
+            IReadOnlyList<NodeRegistrationModel> registrations = await managementActor.List(context, request.NodeId!);
 
             return registrations
                 .Select(x => new RouteLookupResponse
                 {
                     NodeId = x.NodeId,
-                    InputUri = x.InputUri,
+                    InputUri = x.InputQueueUri,
                 })
                 .ToList();
         }
@@ -97,7 +97,7 @@ namespace Khooversoft.MessageNet.Management
         /// <returns></returns>
         public async Task Clear(IWorkContext context)
         {
-            INodeRegistrationManagementActor managementActor = await _actorManager.CreateProxy<INodeRegistrationManagementActor>("default");
+            INodeRegistrationManagementActor managementActor = await _actorManager.GetActor<INodeRegistrationManagementActor>("default");
             await managementActor.ClearRegistery(context);
         }
     }

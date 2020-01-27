@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Threading.Tasks;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 
 namespace Khooversoft.MessageNet.Client
@@ -12,6 +13,6 @@ namespace Khooversoft.MessageNet.Client
 
         void Dispose();
 
-        Task Send(IWorkContext context, string message);
+        Task Send(IWorkContext context, NetMessage message);
     }
 }

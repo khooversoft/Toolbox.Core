@@ -60,7 +60,7 @@ namespace MessageHub.NameServer.Test.Registration
         {
             await _fixture.NameServerClient.ClearAll(_workContext);
 
-            var request = new RouteLookupRequest { SearchNodeId = "test/Node1" };
+            var request = new RouteLookupRequest { NodeId = "test/Node1" };
 
             RouteLookupResponse? response = await _fixture.NameServerClient.Lookup(_workContext, request);
             response.Should().BeNull();
@@ -75,7 +75,7 @@ namespace MessageHub.NameServer.Test.Registration
 
             RouteRegistrationResponse response = await _fixture.NameServerClient.Register(_workContext, request);
 
-            var lookupRequest = new RouteLookupRequest { SearchNodeId = request.NodeId };
+            var lookupRequest = new RouteLookupRequest { NodeId = request.NodeId };
 
             RouteLookupResponse? lookupResponse = await _fixture.NameServerClient.Lookup(_workContext, lookupRequest);
             lookupResponse.Should().NotBeNull();

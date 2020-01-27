@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Dev\Toolbox.Core\Toolbox.Autofac\Toolbox.Autofac.csproj" />
     <ProjectReference Include="..\..\..\Dev\Toolbox.Core\Toolbox.Configuration\Toolbox.Configuration.csproj" />
     <ProjectReference Include="..\..\..\Dev\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
   </ItemGroup>

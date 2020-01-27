@@ -61,11 +61,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode() ^
-                ContentType.GetHashCode() ^
-                Author.GetHashCode() ^
-                Content.GetHashCode() ^
-                Digest.GetHashCode();
+            return HashCode.Combine(Name, ContentType, Author, Content, Digest);
         }
 
         public static bool operator ==(BlobBlock v1, BlobBlock v2) => v1.Equals(v2);

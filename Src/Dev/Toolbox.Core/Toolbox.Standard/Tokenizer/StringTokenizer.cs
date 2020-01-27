@@ -53,6 +53,8 @@ namespace Khooversoft.Toolbox.Standard
 
         public IReadOnlyList<IToken> Parse(string source)
         {
+            source.Verify(nameof(source)).IsNotEmpty();
+
             ITokenSyntax[] syntaxRules = _syntaxList
                 .OrderByDescending(x => x.Priority)
                 .ToArray();

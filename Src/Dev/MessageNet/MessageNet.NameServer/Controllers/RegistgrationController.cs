@@ -54,7 +54,7 @@ namespace MessageHub.NameServer.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Lookup([FromBody] RouteLookupRequest routeLookupRequest)
         {
-            if (routeLookupRequest == null || routeLookupRequest.SearchNodeId.IsEmpty()) return StatusCode(StatusCodes.Status400BadRequest);
+            if (routeLookupRequest == null || routeLookupRequest.NodeId.IsEmpty()) return StatusCode(StatusCodes.Status400BadRequest);
 
             IReadOnlyList<RouteLookupResponse> response = await _routeManager.Search(_workContext, routeLookupRequest);
             if (response == null || response.Count != 1) return StatusCode(StatusCodes.Status404NotFound);

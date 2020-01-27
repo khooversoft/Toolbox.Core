@@ -31,7 +31,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Autofac", "..\Toolb
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Management.Test", "..\..\Test\MessageNet\MessageNet.Management.Test\MessageNet.Management.Test.csproj", "{BA38F83D-A16F-474A-AFC8-C173DB1C20C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageNet.NameServer.Test", "..\..\Test\MessageNet\MessageNet.NameServer.Test\MessageNet.NameServer.Test.csproj", "{28436DA8-A52F-4591-9811-ECB7FBE4B7FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.NameServer.Test", "..\..\Test\MessageNet\MessageNet.NameServer.Test\MessageNet.NameServer.Test.csproj", "{28436DA8-A52F-4591-9811-ECB7FBE4B7FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Interface.Test", "..\..\Test\MessageNet\MessageNet.Interface.Test\MessageNet.Interface.Test.csproj", "{696B3542-B7DE-432C-8FD3-917CE0420475}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Node.Tests", "..\..\Test\MessageNet\MessageNet.Node.Tests\MessageNet.Node.Tests.csproj", "{D88054E6-13F1-4090-93E3-BD826E34D8D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageNet.Host", "MessageNet.Host\MessageNet.Host.csproj", "{6D26A784-E04E-4FFF-9EFC-22FD6B77D7D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +93,18 @@ Global
 		{28436DA8-A52F-4591-9811-ECB7FBE4B7FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28436DA8-A52F-4591-9811-ECB7FBE4B7FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28436DA8-A52F-4591-9811-ECB7FBE4B7FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{696B3542-B7DE-432C-8FD3-917CE0420475}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{696B3542-B7DE-432C-8FD3-917CE0420475}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{696B3542-B7DE-432C-8FD3-917CE0420475}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{696B3542-B7DE-432C-8FD3-917CE0420475}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D88054E6-13F1-4090-93E3-BD826E34D8D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D88054E6-13F1-4090-93E3-BD826E34D8D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D88054E6-13F1-4090-93E3-BD826E34D8D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D88054E6-13F1-4090-93E3-BD826E34D8D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D26A784-E04E-4FFF-9EFC-22FD6B77D7D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D26A784-E04E-4FFF-9EFC-22FD6B77D7D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D26A784-E04E-4FFF-9EFC-22FD6B77D7D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D26A784-E04E-4FFF-9EFC-22FD6B77D7D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,6 +119,8 @@ Global
 		{462260A1-E3D3-49D7-98C7-3F2F04A3570B} = {91187767-1603-4119-A9C3-B08FDAA095CF}
 		{BA38F83D-A16F-474A-AFC8-C173DB1C20C9} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
 		{28436DA8-A52F-4591-9811-ECB7FBE4B7FA} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
+		{696B3542-B7DE-432C-8FD3-917CE0420475} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
+		{D88054E6-13F1-4090-93E3-BD826E34D8D3} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4227659D-BED0-4F5F-ABA6-CA6CCA3575A9}

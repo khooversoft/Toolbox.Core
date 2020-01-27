@@ -38,12 +38,6 @@ namespace MessageHub.NameServer.Test
                         .AddSingleton<IBlobRepository, BlobRepository>()
                         .AddSingleton<IQueueManagement, QueueManagement>()
                         .AddSingleton<IRegisterStore, BlobStore>();
-
-                    //services.AddSingleton<IBlobRepository, BlobRepository>();
-                    //services.AddSingleton<IQueueManagement, QueueManagementFake>();
-                    //services.AddSingleton<IRegisterStore, BlobStore>();
-                    //services.AddSingleton(x => new BlobStoreConnection("Default", "ConnectionString"));
-                    //services.AddSingleton(x => new ServiceBusConnection("Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={key};TransportType=Amqp"));
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

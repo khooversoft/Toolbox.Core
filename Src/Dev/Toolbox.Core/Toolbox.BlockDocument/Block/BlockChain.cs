@@ -11,6 +11,9 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.BlockDocument
 {
+    /// <summary>
+    /// Block chain container
+    /// </summary>
     public class BlockChain : IEnumerable<BlockNode>
     {
         private readonly List<BlockNode> _blocks;
@@ -34,6 +37,9 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public IReadOnlyList<BlockNode> Blocks => _blocks;
 
+        /// <summary>
+        /// Get digest of block
+        /// </summary>
         public string Digest
         {
             get
@@ -49,7 +55,11 @@ namespace Khooversoft.Toolbox.BlockDocument
             }
         }
 
-        public void Add(params IDataBlock[] dataBlocks)
+        /// <summary>
+        /// Add data blocks
+        /// </summary>
+        /// <param name="dataBlocks"></param>
+        public BlockChain Add(params IDataBlock[] dataBlocks)
         {
             lock (_lock)
             {
@@ -63,6 +73,8 @@ namespace Khooversoft.Toolbox.BlockDocument
                     _blocks.Add(newBlock);
                 }
             }
+
+            return this;
         }
 
         public bool IsValid()

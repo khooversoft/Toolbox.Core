@@ -10,8 +10,13 @@ namespace Khooversoft.MessageNet.Interface
     public class RouteLookupRequest
     {
         /// <summary>
+        /// Network ID to lookup
+        /// </summary>
+        public string? NetworkId { get; set; }
+
+        /// <summary>
         /// Node ID to lookup
         /// </summary>
-        public string? SearchNodeId { get; set; }
+        public string? NodeId { get; set; }
     }
 }

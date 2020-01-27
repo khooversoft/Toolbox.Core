@@ -50,9 +50,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public override int GetHashCode()
         {
-            return TimeStamp.GetHashCode() ^
-                Description.GetHashCode() ^
-                Digest.GetHashCode();
+            return HashCode.Combine(TimeStamp, Description, Digest);
         }
 
         public static bool operator ==(HeaderBlock v1, HeaderBlock v2) => v1.Equals(v2);

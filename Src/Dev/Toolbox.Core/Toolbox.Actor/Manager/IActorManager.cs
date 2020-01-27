@@ -14,9 +14,9 @@ namespace Khooversoft.Toolbox.Actor
 
         IActorManager Register<T>(Func<IWorkContext, T> createImplementation) where T : IActor;
 
-        Task<T> CreateProxy<T>(string actorKey) where T : IActor;
+        bool Exist<T>(ActorKey actorKey) where T : IActor;
 
-        Task<T> CreateProxy<T>(ActorKey actorKey) where T : IActor;
+        Task<T> GetActor<T>(ActorKey actorKey) where T : IActor;
 
         Task<bool> Deactivate<T>(ActorKey actorKey);
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.MessageNet.Client;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
@@ -25,12 +26,11 @@ namespace ServiceBusPerformanceTest
         /// <summary>
         /// Run receiver
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="context"></param>
-        /// <param name="taskCount"></param>
-        /// <param name="receiver"></param>
+        /// <param name="context">context</param>
+        /// <param name="taskCount">number of tasks</param>
+        /// <param name="receiver">lambda for receiver</param>
         /// <returns></returns>
-        public Task Run(IWorkContext context, int taskCount, Func<Message, Task> receiver)
+        public Task Run(IWorkContext context, int taskCount, Func<NetMessage, Task> receiver)
         {
             context.Verify(nameof(context)).IsNotNull();
             context.Container.Verify(nameof(context.Container)).IsNotNull();
@@ -43,7 +43,7 @@ namespace ServiceBusPerformanceTest
                     IMessageProcessor messageProcessor = context.Container!.Resolve<IMessageProcessor>();
                     _messageProcessors.Add(messageProcessor);
                     context.Telemetry.Info(context, "Starting receiver");
-                    return messageProcessor.Register(context, receiver);
+                    return messageProcessor.Start(context, receiver);
                 })
                 .ToList();
 
@@ -54,7 +54,7 @@ namespace ServiceBusPerformanceTest
         {
             while(_messageProcessors.TryTake(out IMessageProcessor? messageProcessor))
             {
-                await messageProcessor.Close();
+                await messageProcessor.Stop();
             }
         }
 

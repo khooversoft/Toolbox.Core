@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -52,7 +53,7 @@ namespace Khooversoft.MessageNet.Client
             nodeRegistration.Verify().IsNotNull($"Node {nodeId} does not exist in the name server.");
 
             string connectionString = _getConnectionString(nodeId);
-            string queueName = new Uri(nodeRegistration!.InputUri).QueueName();
+            string queueName = new Uri(nodeRegistration!.InputQueueUri).QueueName();
 
             return new MessageQueueSendClient(connectionString, queueName);
         }
@@ -63,7 +64,7 @@ namespace Khooversoft.MessageNet.Client
         /// <param name="context">context</param>
         /// <param name="receiver">function to call</param>
         /// <returns>task</returns>
-        public async Task RegisterReceiver(IWorkContext context, string nodeId, Func<Message, Task> receiver)
+        public async Task RegisterReceiver(IWorkContext context, string nodeId, Func<NetMessage, Task> receiver)
         {
             nodeId.Verify(nameof(nodeId)).IsNotEmpty();
             _messageProcessor.Verify().Assert(x => x == null, "Message process has already been started");
@@ -78,7 +79,7 @@ namespace Khooversoft.MessageNet.Client
             string queueName = new Uri(response.InputQueueUri!).QueueName();
 
             _messageProcessor = new MessageQueueReceiveProcessor(connectionString, queueName);
-            await _messageProcessor.Register(context, receiver);
+            await _messageProcessor.Start(context, receiver);
         }
 
         public void Dispose()

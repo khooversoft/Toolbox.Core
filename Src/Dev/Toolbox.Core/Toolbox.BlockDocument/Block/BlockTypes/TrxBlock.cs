@@ -50,13 +50,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             return false;
         }
 
-        public override int GetHashCode()
-        {
-            return ReferenceId.GetHashCode() ^
-                TransactionType.GetHashCode() ^
-                Value.GetHashCode() ^
-                Digest.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(ReferenceId, TransactionType, Value, Digest);
 
         public static bool operator ==(TrxBlock v1, TrxBlock v2) => v1.Equals(v2);
 

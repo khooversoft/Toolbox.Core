@@ -10,17 +10,21 @@ namespace Khooversoft.MessageNet.Interface
 {
     public class NodeRegistrationModel
     {
-        public NodeRegistrationModel(string nodeId, string inputUri)
+        public NodeRegistrationModel(string netorkId, string nodeId, string inputQueueUri)
         {
+            netorkId.Verify(nameof(netorkId)).IsNotEmpty();
             nodeId.Verify(nameof(nodeId)).IsNotEmpty();
-            inputUri.Verify(nameof(inputUri)).IsNotEmpty();
+            inputQueueUri.Verify(nameof(inputQueueUri)).IsNotEmpty();
 
+            NetorkId = netorkId;
             NodeId = nodeId;
-            InputUri = inputUri;
+            InputQueueUri = inputQueueUri;
         }
+
+        public string NetorkId { get; }
 
         public string NodeId { get; }
 
-        public string InputUri { get; }
+        public string InputQueueUri { get; }
     }
 }

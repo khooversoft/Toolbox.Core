@@ -21,7 +21,6 @@ namespace Khooversoft.Toolbox.Actor
         private readonly IActorRepository _actorRepository;
         private readonly ActorTypeManager _typeManager = new ActorTypeManager();
         private int _disposed;
-        private bool _disposing = false;
         private const string _disposedTestText = "Actor Manager has been disposed";
 
         public ActorManager()
@@ -50,7 +49,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <summary>
         /// Is actor manager running (not disposed)
         /// </summary>
-        public bool IsRunning { get { return _disposed == 0 || _disposing; } }
+        public bool IsRunning { get { return _disposed == 0; } }
 
         /// <summary>
         /// Register actor by interface type
@@ -84,15 +83,14 @@ namespace Khooversoft.Toolbox.Actor
         }
 
         /// <summary>
-        /// Create proxy to actor, return current instance or create one
+        /// Does actor instance exist?
         /// </summary>
-        /// <typeparam name="T">actor interface </typeparam>
-        /// <param name="context">context</param>
+        /// <typeparam name="T">interface of actor</typeparam>
         /// <param name="actorKey">actor key</param>
         /// <returns></returns>
-        public Task<T> CreateProxy<T>(string actorKey) where T : IActor
+        public bool Exist<T>(ActorKey actorKey) where T : IActor
         {
-            return CreateProxy<T>(new ActorKey(actorKey));
+            return _actorRepository.Lookup(typeof(T), actorKey) != null;
         }
 
         /// <summary>
@@ -102,7 +100,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="context">context</param>
         /// <param name="actorKey">actor key</param>
         /// <returns>actor proxy interface</returns>
-        public async Task<T> CreateProxy<T>(ActorKey actorKey) where T : IActor
+        public async Task<T> GetActor<T>(ActorKey actorKey) where T : IActor
         {
             Verify.Assert(IsRunning, _disposedTestText);
 
@@ -197,20 +195,12 @@ namespace Khooversoft.Toolbox.Actor
         /// </summary>
         public void Dispose()
         {
-            try
+            int testDisposed = Interlocked.CompareExchange(ref _disposed, 1, 0);
+            if (testDisposed == 0)
             {
-                _disposing = true;
-                int testDisposed = Interlocked.CompareExchange(ref _disposed, 1, 0);
-                if (testDisposed == 0)
-                {
-                    Task.Run(() => _actorRepository.Clear(_actorManagerWorkContext))
-                        .ConfigureAwait(false)
-                        .GetAwaiter();
-                }
-            }
-            finally
-            {
-                _disposing = false;
+                Task.Run(() => _actorRepository.Clear(_actorManagerWorkContext))
+                    .ConfigureAwait(false)
+                    .GetAwaiter();
             }
         }
     }

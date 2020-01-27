@@ -13,13 +13,18 @@ namespace Khooversoft.MessageNet.Interface
     public class RouteRegistrationResponse
     {
         /// <summary>
+        /// Network ID
+        /// </summary>
+        public string? NetworkId { get; set; }
+
+        /// <summary>
+        /// Node id
+        /// </summary>
+        public string? NodeId { get; set; }
+
+        /// <summary>
         /// Node's input queue URI, queue to receive messages
         /// </summary>
         public string? InputQueueUri { get; set; }
-
-        /// <summary>
-        /// Routes to forward all messages
-        /// </summary>
-        public IReadOnlyList<string>? ForwardRoutes { get; set; }
     }
 }

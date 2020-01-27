@@ -1,4 +1,5 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿using Khooversoft.MessageNet.Interface;
+using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using System;
@@ -11,7 +12,7 @@ namespace Khooversoft.MessageNet.Client
 {
     public class MessageQueueReceiveProcessor : IMessageProcessor, IDisposable
     {
-        private Func<Message, Task>? _receiver;
+        private Func<NetMessage, Task>? _receiver;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
         private MessageReceiver _messageReceiver;
 
@@ -23,7 +24,7 @@ namespace Khooversoft.MessageNet.Client
             _messageReceiver = new MessageReceiver(connectionString, queueName, ReceiveMode.PeekLock);
         }
 
-        public Task Register(IWorkContext context, Func<Message, Task> receiver)
+        public Task Start(IWorkContext context, Func<NetMessage, Task> receiver)
         {
             _messageReceiver.Verify().IsNotNull("MessageProcessor is closed");
             context.Verify(nameof(context)).IsNotNull();
@@ -36,7 +37,7 @@ namespace Khooversoft.MessageNet.Client
             context.CancellationToken.Register(
                  async () =>
                  {
-                     await Close();
+                     await Stop();
                      doneReceiving.SetResult(true);
                  });
 
@@ -56,7 +57,7 @@ namespace Khooversoft.MessageNet.Client
             return doneReceiving.Task;
         }
 
-        public async Task Close()
+        public async Task Stop()
         {
             await _lock.WaitAsync();
 
@@ -75,7 +76,7 @@ namespace Khooversoft.MessageNet.Client
         }
         public void Dispose()
         {
-            Close().GetAwaiter().GetResult();
+            Stop().GetAwaiter().GetResult();
         }
 
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
@@ -87,8 +88,7 @@ namespace Khooversoft.MessageNet.Client
                 if (_messageReceiver == null || message == null || _messageReceiver?.IsClosedOrClosing == true || token.IsCancellationRequested) return;
 
                 // Process the message
-                await _receiver!(message);
-                //Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
+                await _receiver!(message.ConvertTo());
 
                 // Complete the message so that it is not received again.
                 // This can be done only if the queueClient is created in ReceiveMode.PeekLock mode (which is default).

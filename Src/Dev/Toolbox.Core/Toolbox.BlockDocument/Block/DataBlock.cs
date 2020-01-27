@@ -128,15 +128,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             return false;
         }
 
-        public override int GetHashCode()
-        {
-            return TimeStamp.GetHashCode() ^
-                BlockType.GetHashCode() ^
-                BlockId.GetHashCode() ^
-                Data.GetHashCode() ^
-                Digest.GetHashCode() ^
-                Properties.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(TimeStamp, BlockType, BlockId, Data, Digest, Properties);
 
         public static bool operator ==(DataBlock<T> v1, DataBlock<T> v2) => v1.Equals(v2);
 

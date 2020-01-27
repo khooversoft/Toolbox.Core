@@ -284,21 +284,20 @@ namespace Khooversoft.Toolbox.Security
 
         private void BuildAuditTrail(List<MerkleProofHash> auditTrail, MerkleNode? parent, MerkleNode child)
         {
-            if (parent != null)
+            if (parent == null) return;
+
+            child.Verify(nameof(child)).Assert(x => x.Parent == parent, "Parent of child is not expected parent.");
+            var nextChild = parent.LeftNode == child ? parent.RightNode : parent.LeftNode;
+            var direction = parent.LeftNode == child ? MerkleProofHash.Branch.Left : MerkleProofHash.Branch.Right;
+
+            // For the last leaf, the right node may not exist.  In that case, we ignore it because it's
+            // the hash we are given to verify.
+            if (nextChild != null)
             {
-                child.Verify(nameof(child)).Assert(x => x.Parent == parent, "Parent of child is not expected parent.");
-                var nextChild = parent.LeftNode == child ? parent.RightNode : parent.LeftNode;
-                var direction = parent.LeftNode == child ? MerkleProofHash.Branch.Left : MerkleProofHash.Branch.Right;
-
-                // For the last leaf, the right node may not exist.  In that case, we ignore it because it's
-                // the hash we are given to verify.
-                if (nextChild != null)
-                {
-                    auditTrail.Add(new MerkleProofHash(nextChild.Hash, direction));
-                }
-
-                BuildAuditTrail(auditTrail, child.Parent!.Parent, child.Parent);
+                auditTrail.Add(new MerkleProofHash(nextChild.Hash, direction));
             }
+
+            BuildAuditTrail(auditTrail, child.Parent!.Parent, child.Parent);
         }
 
         private MerkleNode FindLeaf(MerkleHash leafHash)

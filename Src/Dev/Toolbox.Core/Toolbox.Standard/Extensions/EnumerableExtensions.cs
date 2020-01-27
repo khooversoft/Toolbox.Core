@@ -107,6 +107,32 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
+        /// Drain stack
+        /// </summary>
+        /// <typeparam name="T">T of stack</typeparam>
+        /// <param name="subject">stack</param>
+        /// <returns>enumerable of T</returns>
+        public static IEnumerable<T> Drain<T>(this Stack<T> subject)
+        {
+            subject.Verify(nameof(subject)).IsNotNull();
+
+            while (subject.TryPop(out T item)) yield return item;
+        }
+
+        /// <summary>
+        /// Drain stack
+        /// </summary>
+        /// <typeparam name="T">T of stack</typeparam>
+        /// <param name="subject">stack</param>
+        /// <returns>enumerable of T</returns>
+        public static IEnumerable<T> Drain<T>(this Queue<T> subject)
+        {
+            subject.Verify(nameof(subject)).IsNotNull();
+
+            while (subject.TryDequeue(out T item)) yield return item;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="tasks">task to join</param>

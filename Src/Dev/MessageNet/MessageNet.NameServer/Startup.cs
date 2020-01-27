@@ -43,7 +43,7 @@ namespace MessageHub.NameServer
             // Register your own things directly with Autofac, like:
             //builder.RegisterModule(new MyApplicationModule());
 
-            builder.Register(x => new WorkContextBuilder().Set(new ServiceProviderProxy(x => AutofacContainer.Resolve(x), x => AutofacContainer.ResolveOptional(x))).Build())
+            builder.Register(x => new WorkContextBuilder().Set(new ServiceContainerBuilder().SetLifetimeScope(AutofacContainer).Build()).Build())
                 .As<IWorkContext>()
                 .InstancePerLifetimeScope();
 
@@ -60,7 +60,11 @@ namespace MessageHub.NameServer
             builder.Register(x => new ServiceBusConnection(option.ServiceBusConnection));
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">application builder</param>
+        /// <param name="env">web host environment</param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();

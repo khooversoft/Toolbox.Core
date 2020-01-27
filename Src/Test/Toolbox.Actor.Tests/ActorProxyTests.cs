@@ -46,7 +46,7 @@ namespace Toolbox.Actor.Tests
         {
             const string firstText = "first";
 
-            ICache cache1 = await manager.CreateProxy<ICache>(actorKey);
+            ICache cache1 = await manager.GetActor<ICache>(actorKey);
             while (!token.IsCancellationRequested)
             {
                 bool test = await cache1.IsCached(firstText);

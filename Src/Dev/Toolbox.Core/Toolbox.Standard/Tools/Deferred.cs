@@ -9,7 +9,7 @@ using System.Threading;
 namespace Khooversoft.Toolbox.Standard
 {
     /// <summary>
-    /// Fast deferred execution using lambda
+    /// Fast deferred execution using lambda, will only execute action once
     /// </summary>
     public class Deferred
     {

@@ -31,17 +31,15 @@ namespace Khooversoft.MessageNet.Client
             _messageSender = new MessageSender(_connectionString, _queueName);
         }
 
-        public async Task Send(IWorkContext context, string message)
+        public async Task Send(IWorkContext context, NetMessage message)
         {
             if (_messageSender == null || _messageSender?.IsClosedOrClosing == true) return;
-
-            var messageToSend = new Message(message.ToByteArray());
 
             // Write the body of the message to the console
             context.Telemetry.Verbose(context, $"Sending message: {message}");
 
             // Send the message to the queue
-            await _messageSender!.SendAsync(messageToSend);
+            await _messageSender!.SendAsync(message.ConvertTo());
         }
 
         public async Task Close()

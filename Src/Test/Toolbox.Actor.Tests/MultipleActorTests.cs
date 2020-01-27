@@ -36,12 +36,12 @@ namespace Toolbox.Actor.Tests
                 .Select(async x =>
                 {
                     ActorKey key = new ActorKey($"cache/test/{x}");
-                    ICache cache = await manager.CreateProxy<ICache>(key);
+                    ICache cache = await manager.GetActor<ICache>(key);
                     cache.GetActorKey().Should().Be(key);
                     cache.GetActorManager().Should().Be(manager);
 
                     ActorKey key2 = new ActorKey($"cache/test/{x}");
-                    ICache2 cache2 = await manager.CreateProxy<ICache2>(key2);
+                    ICache2 cache2 = await manager.GetActor<ICache2>(key2);
                     cache2.GetActorKey().Should().Be(key2);
                     cache2.GetActorManager().Should().Be(manager);
                 })
@@ -90,13 +90,13 @@ namespace Toolbox.Actor.Tests
                     {
                         Task.Run(async () => {
                             ActorKey key = new ActorKey($"cache/test/{x}");
-                            ICache cache = await manager.CreateProxy<ICache>(key);
+                            ICache cache = await manager.GetActor<ICache>(key);
                             cache.GetActorKey().Should().Be(key);
                             cache.GetActorManager().Should().Be(manager);
                         }),
                         Task.Run(async () => {
                             ActorKey key2 = new ActorKey($"cache/test/{x}");
-                            ICache2 cache2 = await manager.CreateProxy<ICache2>(key2);
+                            ICache2 cache2 = await manager.GetActor<ICache2>(key2);
                             cache2.GetActorKey().Should().Be(key2);
                             cache2.GetActorManager().Should().Be(manager);
                         }),
@@ -145,8 +145,8 @@ namespace Toolbox.Actor.Tests
                 await Enumerable.Range(0, max)
                     .Select((x, i) => new Task[]
                     {
-                        Task.Run(async () => await manager.CreateProxy<ICache>(new ActorKey($"cache/test/{i}"))),
-                        Task.Run(async () => await manager.CreateProxy<ICache2>(new ActorKey($"cache/test/{i+100}"))),
+                        Task.Run(async () => await manager.GetActor<ICache>(new ActorKey($"cache/test/{i}"))),
+                        Task.Run(async () => await manager.GetActor<ICache2>(new ActorKey($"cache/test/{i+100}"))),
                     })
                     .SelectMany(x => x)
                     .WhenAll();

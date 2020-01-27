@@ -61,10 +61,9 @@ namespace ServiceBusPerformanceTest
             return Task.CompletedTask;
         }
 
-        private Task ReceiveMessage(IWorkContext context, Message message)
+        private Task ReceiveMessage(IWorkContext context, NetMessage message)
         {
             _sampler.Add(1);
-            //context.Telemetry.Info(context, $"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
             return Task.FromResult(0);
         }
 

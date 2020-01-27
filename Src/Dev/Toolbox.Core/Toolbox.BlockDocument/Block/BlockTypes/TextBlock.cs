@@ -55,14 +55,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             return false;
         }
 
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode() ^
-                ContentType.GetHashCode() ^
-                Author.GetHashCode() ^
-                Content.GetHashCode() ^
-                Digest.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(Name.Length, ContentType, Author, Content, Digest);
 
         public static bool operator ==(TextBlock v1, TextBlock v2) =>v1.Equals(v2);
 

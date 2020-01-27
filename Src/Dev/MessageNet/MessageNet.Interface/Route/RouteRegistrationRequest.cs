@@ -13,6 +13,11 @@ namespace Khooversoft.MessageNet.Interface
     public class RouteRegistrationRequest
     {
         /// <summary>
+        /// Network ID
+        /// </summary>
+        public string? NetworkId { get; set; }
+
+        /// <summary>
         /// Node's ID
         /// </summary>
         public string? NodeId { get; set; }

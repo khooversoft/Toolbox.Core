@@ -1,4 +1,5 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿using Khooversoft.MessageNet.Interface;
+using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus;
 using System;
 using System.Threading.Tasks;
@@ -7,8 +8,8 @@ namespace Khooversoft.MessageNet.Client
 {
     public interface IMessageProcessor
     {
-        Task Close();
+        Task Stop();
         void Dispose();
-        Task Register(IWorkContext context, Func<Message, Task> receiver);
+        Task Start(IWorkContext context, Func<NetMessage, Task> receiver);
     }
 }

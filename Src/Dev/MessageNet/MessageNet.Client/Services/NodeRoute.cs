@@ -27,7 +27,7 @@ namespace Khooversoft.MessageNet.Client
                 if (cacheModel.TryGetValue(out NodeRegistrationModel model)) return model;
             }
 
-            RouteLookupResponse? lookup = await _nameServer.Lookup(context, new RouteLookupRequest { SearchNodeId = nodeId });
+            RouteLookupResponse? lookup = await _nameServer.Lookup(context, new RouteLookupRequest { NodeId = nodeId });
             if (lookup == null) return null;
 
             NodeRegistrationModel lookupModel = lookup.ConvertTo();
