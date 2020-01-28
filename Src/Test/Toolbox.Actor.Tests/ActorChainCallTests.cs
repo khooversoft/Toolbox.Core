@@ -33,7 +33,7 @@ namespace Toolbox.Actor.Tests
             using (container)
             {
                 ActorKey key = new ActorKey("node/test");
-                IActorNode node = await manager.GetActor<IActorNode>(key);
+                IActorNode node = manager.GetActor<IActorNode>(key);
 
                 int sum = 0;
                 for (int i = 0; i < 10; i++)
@@ -42,7 +42,7 @@ namespace Toolbox.Actor.Tests
                     sum += i;
                 }
 
-                IActorSum sumActor = await manager.GetActor<IActorSum>(new ActorKey(sumActorName));
+                IActorSum sumActor = manager.GetActor<IActorSum>(new ActorKey(sumActorName));
                 (await sumActor.GetSum()).Should().Be(sum);
             }
 
@@ -71,7 +71,7 @@ namespace Toolbox.Actor.Tests
 
             public async Task Add(IWorkContext context, int value)
             {
-                _actorSum = _actorSum ?? (await ActorManager.GetActor<IActorSum>(new ActorKey(sumActorName)));
+                _actorSum = _actorSum ?? ActorManager.GetActor<IActorSum>(new ActorKey(sumActorName));
                 await _actorSum.Add(value);
             }
         }

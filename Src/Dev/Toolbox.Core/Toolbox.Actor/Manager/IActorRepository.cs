@@ -15,7 +15,7 @@ namespace Khooversoft.Toolbox.Actor
     {
         Task Clear(IWorkContext context);
 
-        Task Set(IWorkContext context, IActorRegistration registration);
+        void Set(IWorkContext context, IActorRegistration registration);
 
         IActorRegistration? Lookup(Type actorType, ActorKey actorKey);
 

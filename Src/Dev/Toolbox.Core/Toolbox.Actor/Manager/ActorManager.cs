@@ -17,11 +17,12 @@ namespace Khooversoft.Toolbox.Actor
     {
         private static readonly StringVector _tag = new StringVector(nameof(ActorManager));
         private static readonly IWorkContext _actorManagerWorkContext = new WorkContextBuilder().Set(_tag).Build();
+        private const string _disposedTestText = "Actor Manager has been disposed";
 
         private readonly IActorRepository _actorRepository;
         private readonly ActorTypeManager _typeManager = new ActorTypeManager();
+        private readonly object _lock = new object();
         private int _disposed;
-        private const string _disposedTestText = "Actor Manager has been disposed";
 
         public ActorManager()
             : this(ActorConfiguration.Default)
@@ -100,7 +101,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="context">context</param>
         /// <param name="actorKey">actor key</param>
         /// <returns>actor proxy interface</returns>
-        public async Task<T> GetActor<T>(ActorKey actorKey) where T : IActor
+        public T GetActor<T>(ActorKey actorKey) where T : IActor
         {
             Verify.Assert(IsRunning, _disposedTestText);
 
@@ -108,32 +109,35 @@ namespace Khooversoft.Toolbox.Actor
 
             Type actorType = typeof(T);
 
-            // Lookup instance of actor (type + actorKey)
-            IActorRegistration? actorRegistration = _actorRepository.Lookup(actorType, actorKey);
-            if (actorRegistration != null)
+            lock (_lock)
             {
+                // Lookup instance of actor (type + actorKey)
+                IActorRegistration? actorRegistration = _actorRepository.Lookup(actorType, actorKey);
+                if (actorRegistration != null)
+                {
+                    return actorRegistration.GetInstance<T>();
+                }
+
+                // Create actor
+                IActor actorObject = _typeManager.Create<T>(Configuration.WorkContext.With(_tag), actorKey, this);
+
+                IActorBase? actorBase = actorObject as IActorBase;
+                if (actorBase == null)
+                {
+                    var ex = new ArgumentException($"Actor {actorObject.GetType().FullName} does not implement IActorBase");
+                    Configuration.WorkContext.Telemetry.Error(Configuration.WorkContext.With(_tag), "Cannot create", ex);
+                    throw ex;
+                }
+
+                // Create proxy
+                T actorInterface = ActorProxy<T>.Create(Configuration.WorkContext.With(_tag), actorBase, this);
+                actorRegistration = new ActorRegistration(typeof(T), actorKey, actorBase, actorInterface);
+
+                _actorRepository.Set(Configuration.WorkContext.With(_tag), actorRegistration);
+
+                // Create proxy for interface
                 return actorRegistration.GetInstance<T>();
             }
-
-            // Create actor
-            IActor actorObject = _typeManager.Create<T>(Configuration.WorkContext.With(_tag), actorKey, this);
-
-            IActorBase? actorBase = actorObject as IActorBase;
-            if (actorBase == null)
-            {
-                var ex = new ArgumentException($"Actor {actorObject.GetType().FullName} does not implement IActorBase");
-                Configuration.WorkContext.Telemetry.Error(Configuration.WorkContext.With(_tag), "Cannot create", ex);
-                throw ex;
-            }
-
-            // Create proxy
-            T actorInterface = ActorProxy<T>.Create(Configuration.WorkContext.With(_tag), actorBase, this);
-            actorRegistration = new ActorRegistration(typeof(T), actorKey, actorBase, actorInterface);
-
-            await _actorRepository.Set(Configuration.WorkContext.With(_tag), actorRegistration).ConfigureAwait(false);
-
-            // Create proxy for interface
-            return actorRegistration.GetInstance<T>();
         }
 
         /// <summary>
@@ -199,8 +203,8 @@ namespace Khooversoft.Toolbox.Actor
             if (testDisposed == 0)
             {
                 Task.Run(() => _actorRepository.Clear(_actorManagerWorkContext))
-                    .ConfigureAwait(false)
-                    .GetAwaiter();
+                    .GetAwaiter()
+                    .GetResult();
             }
         }
     }

@@ -25,7 +25,7 @@ namespace Toolbox.Actor.Tests
             manager.Register<ITimerActor>(_ => new TimeActor());
 
             ActorKey key = new ActorKey("timer/test");
-            ITimerActor timerActor = await manager.GetActor<ITimerActor>(key);
+            ITimerActor timerActor = manager.GetActor<ITimerActor>(key);
 
             foreach (var index in Enumerable.Range(0, 20))
             {

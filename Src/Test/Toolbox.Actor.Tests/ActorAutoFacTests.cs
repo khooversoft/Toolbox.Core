@@ -31,7 +31,7 @@ namespace Toolbox.Actor.Tests
                 manager.Register<ICache>(_ => container.Resolve<ICache>());
 
                 ActorKey key = new ActorKey("cache/test");
-                ICache cache = await manager.GetActor<ICache>(key);
+                ICache cache = manager.GetActor<ICache>(key);
 
                 (await cache.GetCount()).Should().Be(1);
                 await manager.Deactivate<ICache>(key);
@@ -56,7 +56,7 @@ namespace Toolbox.Actor.Tests
             using (container.BeginLifetimeScope())
             {
                 ActorKey key = new ActorKey("cache/test");
-                ICache cache = await manager.GetActor<ICache>(key);
+                ICache cache = manager.GetActor<ICache>(key);
 
                 (await cache.GetCount()).Should().Be(1);
                 await manager.Deactivate<ICache>(key);
@@ -85,7 +85,7 @@ namespace Toolbox.Actor.Tests
             using (container.BeginLifetimeScope())
             {
                 ActorKey key = new ActorKey("cache/test");
-                ICache cache = await manager.GetActor<ICache>(key);
+                ICache cache = manager.GetActor<ICache>(key);
 
                 (await cache.GetCount()).Should().Be(1);
                 await manager.Deactivate<ICache>(key);

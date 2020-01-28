@@ -16,7 +16,7 @@ namespace Khooversoft.Toolbox.Actor
 
         bool Exist<T>(ActorKey actorKey) where T : IActor;
 
-        Task<T> GetActor<T>(ActorKey actorKey) where T : IActor;
+        T GetActor<T>(ActorKey actorKey) where T : IActor;
 
         Task<bool> Deactivate<T>(ActorKey actorKey);
 

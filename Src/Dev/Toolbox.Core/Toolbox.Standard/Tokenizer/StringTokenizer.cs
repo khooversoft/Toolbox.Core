@@ -53,30 +53,31 @@ namespace Khooversoft.Toolbox.Standard
 
         public IReadOnlyList<IToken> Parse(string source)
         {
-            source.Verify(nameof(source)).IsNotEmpty();
+            var tokenList = new List<IToken>();
+
+            if (source == null || source == string.Empty) return tokenList;
 
             ITokenSyntax[] syntaxRules = _syntaxList
                 .OrderByDescending(x => x.Priority)
                 .ToArray();
 
-            var tokenList = new List<IToken>();
             int? dataStart = null;
 
             ReadOnlySpan<char> span = source.AsSpan();
 
-            for(int index = 0; index < span.Length; index++)
+            for (int index = 0; index < span.Length; index++)
             {
                 int? matchLength = null;
 
-                for(int syntaxIndex = 0; syntaxIndex < syntaxRules.Length; syntaxIndex++)
+                for (int syntaxIndex = 0; syntaxIndex < syntaxRules.Length; syntaxIndex++)
                 {
                     matchLength = syntaxRules[syntaxIndex].Match(span.Slice(index));
-                    if( matchLength == null)
+                    if (matchLength == null)
                     {
                         continue;
                     }
 
-                    if( dataStart != null)
+                    if (dataStart != null)
                     {
                         string dataValue = span
                             .Slice((int)dataStart, index - (int)dataStart)

@@ -64,26 +64,18 @@ namespace Khooversoft.Toolbox.Actor
         {
             try
             {
-                using (var scope = LockActor())
-                {
-                    return targetMethod.Invoke(_instance, args);
-               }
+                _lockSemaphore.Wait(_manager!.Configuration.ActorCallTimeout);
+                return targetMethod.Invoke(_instance, args);
             }
             catch (Exception ex)
             {
                 _workContext!.Telemetry.Error(_workContext, ex.Message, ex);
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Create actor lock scope
-        /// </summary>
-        /// <returns>disposable scope for semaphore</returns>
-        private IDisposable LockActor()
-        {
-            _lockSemaphore.Wait(_manager!.Configuration.ActorCallTimeout);
-            return new Scope<ActorProxy<T>>(this, x => x._lockSemaphore.Release());
+            finally
+            {
+                _lockSemaphore.Release();
+            }
         }
     }
 }

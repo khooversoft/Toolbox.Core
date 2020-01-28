@@ -32,20 +32,19 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache(y => CountControl(ref count, y)));
             manager.Register<ICache2>(_ => new StringCache2(y => CountControl(ref count2, y)));
 
-            await Enumerable.Range(0, max)
-                .Select(async x =>
+            Enumerable.Range(0, max)
+                .ForEach(x =>
                 {
                     ActorKey key = new ActorKey($"cache/test/{x}");
-                    ICache cache = await manager.GetActor<ICache>(key);
+                    ICache cache = manager.GetActor<ICache>(key);
                     cache.GetActorKey().Should().Be(key);
                     cache.GetActorManager().Should().Be(manager);
 
                     ActorKey key2 = new ActorKey($"cache/test/{x}");
-                    ICache2 cache2 = await manager.GetActor<ICache2>(key2);
+                    ICache2 cache2 = manager.GetActor<ICache2>(key2);
                     cache2.GetActorKey().Should().Be(key2);
                     cache2.GetActorManager().Should().Be(manager);
-                })
-                .WhenAll();
+                });
 
             count.Should().Be(max);
             count2.Should().Be(max);
@@ -88,15 +87,15 @@ namespace Toolbox.Actor.Tests
                 await Enumerable.Range(0, max)
                     .Select(x => new Task[]
                     {
-                        Task.Run(async () => {
+                        Task.Run(() => {
                             ActorKey key = new ActorKey($"cache/test/{x}");
-                            ICache cache = await manager.GetActor<ICache>(key);
+                            ICache cache = manager.GetActor<ICache>(key);
                             cache.GetActorKey().Should().Be(key);
                             cache.GetActorManager().Should().Be(manager);
                         }),
-                        Task.Run(async () => {
+                        Task.Run(() => {
                             ActorKey key2 = new ActorKey($"cache/test/{x}");
-                            ICache2 cache2 = await manager.GetActor<ICache2>(key2);
+                            ICache2 cache2 = manager.GetActor<ICache2>(key2);
                             cache2.GetActorKey().Should().Be(key2);
                             cache2.GetActorManager().Should().Be(manager);
                         }),
@@ -125,7 +124,6 @@ namespace Toolbox.Actor.Tests
             }
         }
 
-
         [Fact]
         public async Task Given2Actors_WhenCreatedAndDeletedDifferentKeyRange_ShouldPass()
         {
@@ -145,8 +143,8 @@ namespace Toolbox.Actor.Tests
                 await Enumerable.Range(0, max)
                     .Select((x, i) => new Task[]
                     {
-                        Task.Run(async () => await manager.GetActor<ICache>(new ActorKey($"cache/test/{i}"))),
-                        Task.Run(async () => await manager.GetActor<ICache2>(new ActorKey($"cache/test/{i+100}"))),
+                        Task.Run(() => manager.GetActor<ICache>(new ActorKey($"cache/test/{i}"))),
+                        Task.Run(() => manager.GetActor<ICache2>(new ActorKey($"cache/test/{i+100}"))),
                     })
                     .SelectMany(x => x)
                     .WhenAll();

@@ -26,7 +26,7 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key = new ActorKey("cache/test");
-            ICache cache = await manager.GetActor<ICache>(key);
+            ICache cache = manager.GetActor<ICache>(key);
             cache.GetActorKey().Should().Be(key);
             cache.GetActorManager().Should().Be(manager);
 
@@ -49,23 +49,23 @@ namespace Toolbox.Actor.Tests
             const int max = 10;
             var keyList = new List<ActorKey>();
 
-            await Enumerable.Range(0, max)
-                .ForEachAsync(async (x, index) =>
+            Enumerable.Range(0, max)
+                .ForEach((x, index) =>
                 {
                     ActorKey key = new ActorKey($"cache/test_{index}");
                     keyList.Add(key);
 
-                    ICache cache = await manager.GetActor<ICache>(key);
+                    ICache cache = manager.GetActor<ICache>(key);
                     cache.GetActorKey().Should().Be(key);
                     cache.GetActorManager().Should().Be(manager);
                 });
 
             count.Should().Be(max);
 
-            await keyList
-                .ForEachAsync(async x =>
+            keyList
+                .ForEach(x =>
                 {
-                    ICache cache = await manager.GetActor<ICache>(x);
+                    ICache cache = manager.GetActor<ICache>(x);
                     cache.GetActorKey().Should().Be(x);
                     cache.GetActorManager().Should().Be(manager);
                 });
@@ -93,7 +93,7 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key = new ActorKey("cache/test");
-            ICache cache = await manager.GetActor<ICache>(key);
+            ICache cache = manager.GetActor<ICache>(key);
 
             count.Should().Be(1);
             (await manager.Deactivate<ICache>(key)).Should().BeTrue();
@@ -112,7 +112,7 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key = new ActorKey("cache/test");
-            ICache cache = await manager.GetActor<ICache>(key);
+            ICache cache = manager.GetActor<ICache>(key);
 
             count.Should().Be(1);
             await manager.DeactivateAll();
@@ -129,11 +129,11 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key1 = new ActorKey("Cache/Test1");
-            ICache cache1 = await manager.GetActor<ICache>(key1);
+            ICache cache1 = manager.GetActor<ICache>(key1);
             count.Should().Be(1);
 
             ActorKey key2 = new ActorKey("Cache/Test2");
-            ICache cache2 = await manager.GetActor<ICache>(key2);
+            ICache cache2 = manager.GetActor<ICache>(key2);
             count.Should().Be(2);
 
             (await manager.Deactivate<ICache>(key1)).Should().BeTrue();
@@ -154,7 +154,7 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key1 = new ActorKey("Cache/Test1");
-            ICache cache1 = await manager.GetActor<ICache>(key1);
+            ICache cache1 = manager.GetActor<ICache>(key1);
             count.Should().Be(1);
 
             const string firstText = "first";
@@ -181,11 +181,11 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache(y => count += y));
 
             ActorKey key1 = new ActorKey("Cache/Test1");
-            ICache cache1 = await manager.GetActor<ICache>(key1);
+            ICache cache1 = manager.GetActor<ICache>(key1);
             count.Should().Be(1);
 
             ActorKey key2 = new ActorKey("Cache/Test2");
-            ICache cache2 = await manager.GetActor<ICache>(key2);
+            ICache cache2 = manager.GetActor<ICache>(key2);
             count.Should().Be(2);
 
             const string firstText = "first";
@@ -199,7 +199,7 @@ namespace Toolbox.Actor.Tests
             bool test2 = await cache2.IsCached(secondText);
             test2.Should().BeTrue();
 
-            ICache cache1Dup = await manager.GetActor<ICache>(key1);
+            ICache cache1Dup = manager.GetActor<ICache>(key1);
             test = await cache1Dup.IsCached(firstText);
             test.Should().BeTrue();
             test = await cache1Dup.IsCached(secondText);

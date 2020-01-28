@@ -25,7 +25,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="context">context</param>
         /// <param name="actorKey">actor key</param>
         /// <returns></returns>
-        public static Task<T> GetActor<T>(this IActorManager actorManager, string actorKey) where T : IActor
+        public static T GetActor<T>(this IActorManager actorManager, string actorKey) where T : IActor
         {
             return actorManager.GetActor<T>(new ActorKey(actorKey));
         }

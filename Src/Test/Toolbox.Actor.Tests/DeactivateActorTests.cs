@@ -24,7 +24,7 @@ namespace Toolbox.Actor.Tests
             manager.Register<ICache>(_ => new StringCache());
 
             ActorKey actorKey = new ActorKey("Cache/Test1");
-            ICache cache = await manager.GetActor<ICache>(actorKey);
+            ICache cache = manager.GetActor<ICache>(actorKey);
 
             int count = await cache.GetCount();
             count.Should().Be(1);

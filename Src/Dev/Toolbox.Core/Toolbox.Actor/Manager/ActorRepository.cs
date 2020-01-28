@@ -6,6 +6,7 @@ using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -52,7 +53,7 @@ namespace Khooversoft.Toolbox.Actor
         /// </summary>
         /// <param name="context">context</param>
         /// <returns></returns>
-        public async Task Clear(IWorkContext context)
+        public Task Clear(IWorkContext context)
         {
             context.Verify(nameof(context)).IsNotNull();
             context = context.With(_tag);
@@ -66,11 +67,9 @@ namespace Khooversoft.Toolbox.Actor
                 _actorCache.Clear();
             }
 
-            foreach (var item in list)
-            {
-                await item.Instance.Deactivate(context).ConfigureAwait(false);
-                item.Instance.Dispose();
-            }
+            return list
+                .Select(x => x.Instance.Deactivate(context))
+                .WhenAll();
         }
 
         /// <summary>
@@ -78,7 +77,7 @@ namespace Khooversoft.Toolbox.Actor
         /// </summary>
         /// <param name="registration">actor registration</param>
         /// <returns>task</returns>
-        public async Task Set(IWorkContext context, IActorRegistration registration)
+        public void Set(IWorkContext context, IActorRegistration registration)
         {
             registration.Verify(nameof(registration)).IsNotNull();
             context = context.With(_tag);
@@ -98,13 +97,10 @@ namespace Khooversoft.Toolbox.Actor
                 _actorCache.Set(key, registration);
             }
 
-            if (currentActorRegistration != null)
-            {
-                await currentActorRegistration.Instance!.Deactivate(context).ConfigureAwait(false);
-                currentActorRegistration.Instance.Dispose();
-            }
+            // Dispose of the old actor
+            if (currentActorRegistration != null) _actorRemove.Post(currentActorRegistration);
 
-            await registration.Instance!.Activate(context).ConfigureAwait(false);
+            registration.Instance!.Activate(context).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -152,7 +148,7 @@ namespace Khooversoft.Toolbox.Actor
 
             try
             {
-                await registration.Instance.Deactivate(context).ConfigureAwait(false);
+                await registration.Instance.Deactivate(context);
             }
             finally
             {
@@ -200,7 +196,7 @@ namespace Khooversoft.Toolbox.Actor
             var key = new RegistrationKey(actorRegistration.ActorType, actorRegistration.ActorKey.Key);
             _actorCache.Remove(key);
 
-            await Remove(_workContext, actorRegistration.ActorType, actorRegistration.ActorKey).ConfigureAwait(false);
+            await Remove(_workContext, actorRegistration.ActorType, actorRegistration.ActorKey);
         }
 
         /// <summary>
