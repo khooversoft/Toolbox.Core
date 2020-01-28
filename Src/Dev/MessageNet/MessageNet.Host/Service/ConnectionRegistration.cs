@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MessageNet.Host
 {
-    internal class ConnectionRegistration
+    public class ConnectionRegistration
     {
         public ConnectionRegistration(string networkId, string connectionString)
         {

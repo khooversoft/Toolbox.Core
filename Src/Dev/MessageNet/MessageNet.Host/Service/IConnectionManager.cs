@@ -1,6 +1,6 @@
 ﻿namespace MessageNet.Host
 {
-    internal interface IConnectionManager
+    public interface IConnectionManager
     {
         ConnectionManager Add(params ConnectionRegistration[] connectionRegistrations);
 

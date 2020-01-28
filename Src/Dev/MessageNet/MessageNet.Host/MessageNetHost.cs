@@ -12,6 +12,7 @@ namespace MessageNet.Host
         private readonly Uri _nameServerUri;
         private readonly IConnectionManager _connectionManager;
         private readonly IEnumerable<NodeHostRegistration> _nodeRegistrations;
+        private readonly IAwaiterManager _awaiterManager = new AwaiterManager();
 
         public MessageNetHost(Uri nameServerUri, IConnectionManager connectionManager, IEnumerable<NodeHostRegistration> nodeRegistrations)
         {

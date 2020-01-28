@@ -7,7 +7,7 @@ using Khooversoft.Toolbox.Standard;
 
 namespace MessageNet.Host
 {
-    internal class ConnectionManager : ConcurrentDictionary<string, ConnectionRegistration>, IConnectionManager
+    public class ConnectionManager : ConcurrentDictionary<string, ConnectionRegistration>, IConnectionManager
     {
         public ConnectionManager()
             : base(StringComparer.OrdinalIgnoreCase)

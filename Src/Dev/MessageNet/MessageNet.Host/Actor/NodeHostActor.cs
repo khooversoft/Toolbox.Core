@@ -15,18 +15,15 @@ namespace MessageNet.Host
     {
         private readonly IConnectionManager _connectionManager;
         private readonly NodeHostRegistration _nodeRegistration;
-        private readonly IActorManager _actorManager;
         private MessageQueueReceiveProcessor? _messageProcessor;
 
-        public NodeHostActor(IConnectionManager connectionManager, NodeHostRegistration nodeRegistration, IActorManager actorManager)
+        public NodeHostActor(IConnectionManager connectionManager, NodeHostRegistration nodeRegistration)
         {
             connectionManager.Verify(nameof(connectionManager)).IsNotNull();
             nodeRegistration.Verify(nameof(nodeRegistration)).IsNotNull();
-            actorManager.Verify(nameof(actorManager)).IsNotNull();
 
             _connectionManager = connectionManager;
             _nodeRegistration = nodeRegistration;
-            _actorManager = actorManager;
         }
 
         public async Task Run(IWorkContext context, Func<NetMessage, Task> receiver)
@@ -57,7 +54,7 @@ namespace MessageNet.Host
 
         private async Task<NodeRegistrationModel> RegisterNode(IWorkContext context)
         {
-            return await (await _actorManager.GetActor<INodeRouteActor>(_nodeRegistration.QueueName)).Register(context);
+            return await (await ActorManager.GetActor<INodeRouteActor>(_nodeRegistration.QueueName)).Register(context);
         }
 
         protected override Task OnDeactivate(IWorkContext context)
