@@ -13,6 +13,7 @@ namespace Khooversoft.MessageNet.Client
 {
     public class NameServerClient : INameServerClient
     {
+        private readonly Uri? _nameServiceUri;
         private readonly HttpClient _httpClient;
 
         public NameServerClient(HttpClient httpClient)
@@ -22,9 +23,19 @@ namespace Khooversoft.MessageNet.Client
             _httpClient = httpClient;
         }
 
+        public NameServerClient(Uri nameServiceUri, HttpClient httpClient)
+        {
+            nameServiceUri.Verify(nameof(nameServiceUri)).IsNotNull();
+            httpClient.Verify(nameof(httpClient)).IsNotNull();
+
+            _nameServiceUri = nameServiceUri;
+            _httpClient = httpClient;
+        }
+
         public async Task<bool> Ping(IWorkContext context)
         {
             string response = await new RestClient(_httpClient)
+                .SetBaseAddress(_nameServiceUri)
                 .AddPath("api/Ping")
                 .SetEnsureSuccessStatusCode()
                 .GetAsync(context)
@@ -37,6 +48,7 @@ namespace Khooversoft.MessageNet.Client
         public Task<RouteRegistrationResponse> Register(IWorkContext context, RouteRegistrationRequest request)
         {
             return new RestClient(_httpClient)
+                .SetBaseAddress(_nameServiceUri)
                 .AddPath("api/Registgration")
                 .SetContent(request)
                 .SetEnsureSuccessStatusCode()
@@ -47,6 +59,7 @@ namespace Khooversoft.MessageNet.Client
         public Task Unregister(IWorkContext context, RouteRegistrationRequest request)
         {
             return new RestClient(_httpClient)
+                .SetBaseAddress(_nameServiceUri)
                 .AddPath("api/Registgration")
                 .SetContent(request)
                 .SetEnsureSuccessStatusCode()
@@ -57,6 +70,7 @@ namespace Khooversoft.MessageNet.Client
         public async Task<RouteLookupResponse?> Lookup(IWorkContext context, RouteLookupRequest request)
         {
             RestResponse<RouteLookupResponse> response = await new RestClient(_httpClient)
+                .SetBaseAddress(_nameServiceUri)
                 .AddPath("api/Registgration")
                 .SetContent(request)
                 .SetValidHttpStatusCodes(HttpStatusCode.NotFound)
@@ -71,6 +85,7 @@ namespace Khooversoft.MessageNet.Client
         public Task ClearAll(IWorkContext context)
         {
             return new RestClient(_httpClient)
+                .SetBaseAddress(_nameServiceUri)
                 .AddPath("api/Administration/clear")
                 .SetEnsureSuccessStatusCode()
                 .PostAsync(context);

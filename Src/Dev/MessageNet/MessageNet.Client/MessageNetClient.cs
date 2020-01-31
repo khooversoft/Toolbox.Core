@@ -73,7 +73,7 @@ namespace Khooversoft.MessageNet.Client
 
             RouteRegistrationResponse response = await _nameServerClient.Register(context, request);
             response.Verify().IsNotNull($"Registration failed with name server");
-            response.InputQueueUri!.Verify().IsNotEmpty("Name server's response did not include input queue uri");
+            response.InputQueueUri!.Verify().IsNotEmpty("Name server's response did not include input queue URI");
 
             string connectionString = _getConnectionString(response.InputQueueUri!);
             string queueName = new Uri(response.InputQueueUri!).QueueName();

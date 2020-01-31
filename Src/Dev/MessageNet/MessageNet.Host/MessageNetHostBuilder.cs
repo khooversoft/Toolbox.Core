@@ -15,8 +15,6 @@ namespace MessageNet.Host
 
         public IList<NodeHostRegistration>? NodeRegistrations { get; set; }
 
-        public IActorManager? ActorManager { get; set; }
-
         public MessageNetHostBuilder SetNameServerUri(Uri nameServerUri)
         {
             NameServerUri = nameServerUri;
@@ -35,22 +33,13 @@ namespace MessageNet.Host
             return this;
         }
 
-        public MessageNetHostBuilder SetActorManager(IActorManager actorManager)
-        {
-            actorManager.Verify(nameof(actorManager)).IsNotNull();
-
-            ActorManager = actorManager;
-            return this;
-        }
-
         public IMessageNetHost Build()
         {
             NameServerUri.Verify(nameof(NameServerUri)).IsNotNull();
             ConnectionManager.Verify(nameof(ConnectionManager)).IsNotNull();
             NodeRegistrations.Verify(nameof(NodeRegistrations)).IsNotNull().Assert(x => x.Count > 0, "Node registrations are required");
-            ActorManager.Verify(nameof(ActorManager)).IsNotNull();
 
-
+            return null;
         }
     }
 }

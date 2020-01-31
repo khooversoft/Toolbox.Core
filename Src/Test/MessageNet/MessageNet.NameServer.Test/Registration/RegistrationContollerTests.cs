@@ -39,7 +39,6 @@ namespace MessageHub.NameServer.Test.Registration
             RouteRegistrationResponse response = JsonConvert.DeserializeObject<RouteRegistrationResponse>(responseString);
 
             response.InputQueueUri.Should().Be("test/Node1");
-            response.ForwardRoutes.Should().BeNull();
         }
 
         [Fact]
@@ -52,7 +51,6 @@ namespace MessageHub.NameServer.Test.Registration
             RouteRegistrationResponse response = await _fixture.NameServerClient.Register(_workContext, request);
 
             response.InputQueueUri.Should().Be("test/Node1");
-            response.ForwardRoutes.Should().BeNull();
         }
 
         [Fact]

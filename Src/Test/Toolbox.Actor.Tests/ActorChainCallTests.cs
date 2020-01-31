@@ -25,10 +25,10 @@ namespace Toolbox.Actor.Tests
             ILifetimeScope container = builder.Build();
 
             IActorManager manager = new ActorConfigurationBuilder()
-                .Register<IActorNode>(_ => container.Resolve<IActorNode>())
-                .Register<IActorSum>(_ => container.Resolve<IActorSum>())
                 .Build()
-                .ToActorManager();
+                .ToActorManager()
+                .Register(_ => container.Resolve<IActorNode>())
+                .Register(_ => container.Resolve<IActorSum>());
 
             using (container)
             {

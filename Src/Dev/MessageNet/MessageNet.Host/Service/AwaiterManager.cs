@@ -1,4 +1,5 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿using Khooversoft.MessageNet.Interface;
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,30 +8,29 @@ using System.Threading.Tasks;
 
 namespace MessageNet.Host
 {
-    internal class AwaiterManager : IAwaiterManager
+    internal class AwaiterManager
     {
-        private readonly ConcurrentDictionary<string, TaskCompletionSource<bool>> _completion = new ConcurrentDictionary<string, TaskCompletionSource<bool>>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<Guid, TaskCompletionSource<NetMessage>> _completion = new ConcurrentDictionary<Guid, TaskCompletionSource<NetMessage>>();
 
         public AwaiterManager() { }
 
-        public AwaiterManager Add(string id, TaskCompletionSource<bool> task)
+        public AwaiterManager Add(Guid id, TaskCompletionSource<NetMessage> task)
         {
-            id.Verify(nameof(id)).IsNotEmpty();
             task.Verify(nameof(task)).IsNotNull();
 
             _completion[id] = task;
             return this;
         }
 
-        public AwaiterManager SetResult(string id, bool state)
+        public AwaiterManager SetResult(NetMessage? netMessage)
         {
-            id.Verify(nameof(id)).IsNotEmpty();
+            if (netMessage == null!) return this;
 
-            TaskCompletionSource<bool> tcs;
+            TaskCompletionSource<NetMessage> tcs;
 
-            if (_completion.TryRemove(id, out tcs!))
+            if (_completion.TryRemove(netMessage.Header.MessageId, out tcs!))
             {
-                tcs.SetResult(state);
+                tcs.SetResult(netMessage);
             }
 
             return this;

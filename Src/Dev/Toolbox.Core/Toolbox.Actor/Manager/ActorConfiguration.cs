@@ -17,20 +17,18 @@ namespace Khooversoft.Toolbox.Actor
             TimeSpan actorCallTimeout,
             TimeSpan actorRetirementPeriod,
             TimeSpan inactivityScanPeriod,
-            IEnumerable<ActorTypeRegistration> registrations,
             IWorkContext workContext
             )
         {
+            workContext.Verify(nameof(workContext)).IsNotNull();
+
             Capacity = capacity;
             ActorRepository = actorRepository;
             ActorCallTimeout = actorCallTimeout;
             ActorRetirementPeriod = actorRetirementPeriod;
             InactivityScanPeriod = inactivityScanPeriod;
-            Registration = registrations?.ToList() ?? new List<ActorTypeRegistration>();
-            WorkContext = workContext ?? Standard.WorkContext.Empty;
+            WorkContext = workContext;
         }
-
-        public static ActorConfiguration Default { get; } = new ActorConfigurationBuilder().Build();
 
         public int Capacity { get; }
 
@@ -41,8 +39,6 @@ namespace Khooversoft.Toolbox.Actor
         public TimeSpan ActorRetirementPeriod { get; }
 
         public TimeSpan InactivityScanPeriod { get; }
-
-        public IList<ActorTypeRegistration> Registration { get; }
 
         public IWorkContext WorkContext { get; }
     }

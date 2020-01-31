@@ -25,7 +25,7 @@ namespace Khooversoft.Toolbox.Actor
         private int _disposed;
 
         public ActorManager()
-            : this(ActorConfiguration.Default)
+            : this(ActorConfigurationBuilder.Default)
         {
         }
 
@@ -35,11 +35,6 @@ namespace Khooversoft.Toolbox.Actor
 
             Configuration = configuration;
             _actorRepository = Configuration.ActorRepository ?? new ActorRepository(Configuration);
-
-            foreach (ActorTypeRegistration registration in configuration?.Registration ?? Enumerable.Empty<ActorTypeRegistration>())
-            {
-                _typeManager.Register(_actorManagerWorkContext, registration);
-            }
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace MessageNet.Host
 {
     internal interface INodeHostActor : IActor
     {
-        Task Run(IWorkContext context, Func<NetMessage, Task> receiver);
+        Task Run(IWorkContext context, NodeHostRegistration nodeRegistration);
 
         Task Stop(IWorkContext context);
     }

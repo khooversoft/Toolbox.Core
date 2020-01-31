@@ -81,7 +81,7 @@ namespace Khooversoft.MessageNet.Interface
             return new NetMessage(netMessageItems.Concat(MessageItems));
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is NetMessage header)
             {
@@ -107,8 +107,8 @@ namespace Khooversoft.MessageNet.Interface
             return $"NetMessage: Id: {Header.MessageId}, ToUri: {Header.ToUri}, FromUri: {Header.FromUri}, Method: {Header.Method}, Items.Count={MessageItems.Count}";
         }
 
-        public static bool operator ==(NetMessage v1, NetMessage v2) => v1?.Equals(v2) ?? false;
+        public static bool operator ==(NetMessage? v1, NetMessage? v2) => v1?.Equals(v2) ?? false;
 
-        public static bool operator !=(NetMessage v1, NetMessage v2) => !v1?.Equals(v2) ?? false;
+        public static bool operator !=(NetMessage? v1, NetMessage? v2) => !v1?.Equals(v2) ?? false;
     }
 }

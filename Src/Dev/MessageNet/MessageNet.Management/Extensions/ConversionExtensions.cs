@@ -16,7 +16,7 @@ namespace Khooversoft.MessageNet.Management
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new NodeRegistrationModel(subject.NodeId!, inputUri);
+            return new NodeRegistrationModel(subject.NetworkId!, subject.NodeId!, inputUri);
         }
 
         public static RouteRegistrationRequest ConvertTo(this NodeRegistrationModel subject)

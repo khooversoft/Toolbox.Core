@@ -26,9 +26,10 @@ namespace Khooversoft.Toolbox.Actor
             ActorCallTimeout = configuration.ActorCallTimeout;
             ActorRetirementPeriod = configuration.ActorRetirementPeriod;
             InactivityScanPeriod = configuration.InactivityScanPeriod;
-            Registration = configuration.Registration;
             WorkContext = configuration.WorkContext;
         }
+
+        public static ActorConfiguration Default { get; } = new ActorConfigurationBuilder().Build();
 
         /// <summary>
         /// Maximum number of actors the manager can handle
@@ -57,14 +58,9 @@ namespace Khooversoft.Toolbox.Actor
         public TimeSpan InactivityScanPeriod { get; private set; } = TimeSpan.FromMinutes(5);
 
         /// <summary>
-        /// Actor type registrations
-        /// </summary>
-        public IList<ActorTypeRegistration> Registration { get; } = new List<ActorTypeRegistration>();
-
-        /// <summary>
         /// Work context for manager
         /// </summary>
-        public IWorkContext? WorkContext { get; private set; }
+        public IWorkContext? WorkContext { get; private set; } = Standard.WorkContext.Empty;
 
         public ActorConfigurationBuilder Set(int capacity)
         {
@@ -81,20 +77,6 @@ namespace Khooversoft.Toolbox.Actor
         public ActorConfigurationBuilder Set(IWorkContext context)
         {
             WorkContext = context;
-            return this;
-        }
-
-        public ActorConfigurationBuilder Register<T>() where T : IActor
-        {
-            Registration.Add(new ActorTypeRegistration(typeof(T), x => x.Container!.Resolve<T>()));
-            return this;
-        }
-
-        public ActorConfigurationBuilder Register<T>(Func<IWorkContext, T> createImplementation) where T : IActor
-        {
-            createImplementation.Verify(nameof(createImplementation)).IsNotNull();
-
-            Registration.Add(new ActorTypeRegistration(typeof(T), x => createImplementation(x)));
             return this;
         }
 
@@ -124,7 +106,6 @@ namespace Khooversoft.Toolbox.Actor
                 actorCallTimeout: ActorCallTimeout,
                 actorRetirementPeriod: ActorRetirementPeriod,
                 inactivityScanPeriod: InactivityScanPeriod,
-                registrations: Registration,
                 workContext: WorkContext!
             );
         }

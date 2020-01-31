@@ -77,17 +77,22 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
-        /// Set base address of the REST URI
+        /// Set base address of the REST URI, null will clear it
         /// </summary>
-        /// <param name="baseAddress"></param>
+        /// <param name="baseAddress">base URI address</param>
         /// <returns>this</returns>
-        public RestClient SetBaseAddress(Uri baseAddress)
+        public RestClient SetBaseAddress(Uri? baseAddress)
         {
-            baseAddress.Verify(nameof(baseAddress)).IsNotNull();
+            if (baseAddress == null)
+            {
+                BaseAddress = null;
+                return this;
+            }
 
-            var build = new UriBuilder(baseAddress);
-            build.Path = null;
-            build.Query = null;
+            var build = new UriBuilder(baseAddress)
+            {
+                Query = null
+            };
 
             BaseAddress = build.Uri;
             return this;
@@ -254,10 +259,11 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>HTTP request message</returns>
         private HttpRequestMessage BuildRequestMessage(HttpMethod method)
         {
-            var builder = BaseAddress != null ? new UriBuilder(BaseAddress) : new UriBuilder()
-            {
-                Path = PathItems
-            };
+            var builder = BaseAddress != null ? new UriBuilder(BaseAddress) : new UriBuilder();
+
+            builder.Path = (builder.Path?.Split("/") ?? new string[0])
+                .Concat(PathItems)
+                .Do(x => string.Join("/", x));
 
             if (QueryItems.Count > 0)
             {

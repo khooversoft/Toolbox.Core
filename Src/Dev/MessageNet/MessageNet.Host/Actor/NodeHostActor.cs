@@ -14,22 +14,23 @@ namespace MessageNet.Host
     internal class NodeHostActor : ActorBase, INodeHostActor
     {
         private readonly IConnectionManager _connectionManager;
-        private readonly NodeHostRegistration _nodeRegistration;
+        private NodeHostRegistration? _nodeRegistration;
         private MessageQueueReceiveProcessor? _messageProcessor;
 
-        public NodeHostActor(IConnectionManager connectionManager, NodeHostRegistration nodeRegistration)
+        public NodeHostActor(IConnectionManager connectionManager)
         {
             connectionManager.Verify(nameof(connectionManager)).IsNotNull();
-            nodeRegistration.Verify(nameof(nodeRegistration)).IsNotNull();
 
             _connectionManager = connectionManager;
-            _nodeRegistration = nodeRegistration;
         }
 
-        public async Task Run(IWorkContext context, Func<NetMessage, Task> receiver)
+        public async Task Run(IWorkContext context, NodeHostRegistration nodeRegistration)
         {
             context.Verify(nameof(context)).IsNotNull();
+            nodeRegistration.Verify(nameof(nodeRegistration)).IsNotNull();
             _messageProcessor.Verify().Assert(x => x == null, "Node host is already running");
+
+            _nodeRegistration = nodeRegistration;
 
             context.Telemetry.Info(context, $"Register node's host for {_nodeRegistration.QueueName}");
             NodeRegistrationModel nodeRegistrationModel = await RegisterNode(context);
@@ -38,7 +39,7 @@ namespace MessageNet.Host
 
             context.Telemetry.Info(context, $"Starting node host for {_nodeRegistration.QueueName}");
             _messageProcessor = new MessageQueueReceiveProcessor(connectionString, _nodeRegistration.QueueName);
-            await _messageProcessor.Start(context, receiver);
+            await _messageProcessor.Start(context, _nodeRegistration.Receiver);
         }
 
         public async Task Stop(IWorkContext context)
@@ -48,13 +49,13 @@ namespace MessageNet.Host
             MessageQueueReceiveProcessor? messageQueueReceiveProcessor = Interlocked.Exchange(ref _messageProcessor, null!);
             if (messageQueueReceiveProcessor == null) return;
 
-            context.Telemetry.Info(context, $"Stopping node's host for {_nodeRegistration.QueueName}");
+            context.Telemetry.Info(context, $"Stopping node's host for {_nodeRegistration!.QueueName}");
             await messageQueueReceiveProcessor!.Stop();
         }
 
         private async Task<NodeRegistrationModel> RegisterNode(IWorkContext context)
         {
-            return await (await ActorManager.GetActor<INodeRouteActor>(_nodeRegistration.QueueName)).Register(context);
+            return await ActorManager.GetActor<INodeRouteActor>(_nodeRegistration!.QueueName).Register(context);
         }
 
         protected override Task OnDeactivate(IWorkContext context)

@@ -47,7 +47,7 @@ namespace MessageNet.Host
 
             RouteRegistrationResponse response = await _nameServer.Register(context, request);
             response.Verify().IsNotNull($"Registration failed with name server");
-            response.InputQueueUri!.Verify().IsNotEmpty("Name server's response did not include input queue uri");
+            response.InputQueueUri!.Verify().IsNotEmpty("Name server's response did not include input queue URI");
 
             NodeRegistrationModel nodeRegistrationModel = response.ConvertTo();
             _cache.Set(nodeRegistrationModel);

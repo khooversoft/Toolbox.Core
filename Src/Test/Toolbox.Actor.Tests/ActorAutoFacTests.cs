@@ -49,9 +49,9 @@ namespace Toolbox.Actor.Tests
             ILifetimeScope container = builder.Build();
 
             IActorManager? manager = new ActorConfigurationBuilder()
-                .Register(_ => container.Resolve<ICache>())
                 .Build()
-                .ToActorManager();
+                .ToActorManager()
+                .Register(_ => container.Resolve<ICache>());
 
             using (container.BeginLifetimeScope())
             {

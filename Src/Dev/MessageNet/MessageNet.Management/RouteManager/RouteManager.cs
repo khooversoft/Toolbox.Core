@@ -33,16 +33,16 @@ namespace Khooversoft.MessageNet.Management
             request.Verify(nameof(request)).IsNotNull();
             request.NodeId.Verify(nameof(request.NodeId)).IsNotNull();
 
-            INodeRegistrationActor registgrationActor = await _actorManager.GetActor<INodeRegistrationActor>(request.NodeId!);
-            await registgrationActor.Set(context, request.ConvertTo(request.NodeId!));
+            await _actorManager.GetActor<INodeRegistrationActor>(request.NodeId!)
+                .Set(context, request.ConvertTo(request.NodeId!));
 
             QueueDefinition queueDefinition = new QueueDefinition
             {
                 QueueName = request.NodeId,
             };
 
-            IQueueManagementActor queueActor = await _actorManager.GetActor<IQueueManagementActor>(request.NodeId!);
-            await queueActor.Set(context, queueDefinition);
+            await _actorManager.GetActor<IQueueManagementActor>(request.NodeId!)
+                .Set(context, queueDefinition);
 
             return new RouteRegistrationResponse
             {
@@ -61,11 +61,11 @@ namespace Khooversoft.MessageNet.Management
             routeRegistrationRequest.Verify(nameof(routeRegistrationRequest)).IsNotNull();
             routeRegistrationRequest.NodeId.Verify(nameof(routeRegistrationRequest.NodeId)).IsNotNull();
 
-            INodeRegistrationActor subject = await _actorManager.GetActor<INodeRegistrationActor>(routeRegistrationRequest.NodeId!);
-            await subject.Remove(context);
+            await _actorManager.GetActor<INodeRegistrationActor>(routeRegistrationRequest.NodeId!)
+                .Remove(context);
 
-            IQueueManagementActor queueActor = await _actorManager.GetActor<IQueueManagementActor>(routeRegistrationRequest.NodeId!);
-            await queueActor.Remove(context);
+            await _actorManager.GetActor<IQueueManagementActor>(routeRegistrationRequest.NodeId!)
+                .Remove(context);
         }
 
         /// <summary>
@@ -78,8 +78,8 @@ namespace Khooversoft.MessageNet.Management
         {
             request.Verify(nameof(request)).IsNotNull();
 
-            INodeRegistrationManagementActor managementActor = await _actorManager.GetActor<INodeRegistrationManagementActor>("default");
-            IReadOnlyList<NodeRegistrationModel> registrations = await managementActor.List(context, request.NodeId!);
+            IReadOnlyList<NodeRegistrationModel> registrations = await _actorManager.GetActor<INodeRegistrationManagementActor>("default")
+                .List(context, request.NodeId!);
 
             return registrations
                 .Select(x => new RouteLookupResponse
@@ -97,8 +97,8 @@ namespace Khooversoft.MessageNet.Management
         /// <returns></returns>
         public async Task Clear(IWorkContext context)
         {
-            INodeRegistrationManagementActor managementActor = await _actorManager.GetActor<INodeRegistrationManagementActor>("default");
-            await managementActor.ClearRegistery(context);
+            await _actorManager.GetActor<INodeRegistrationManagementActor>("default")
+                .ClearRegistery(context);
         }
     }
 }
