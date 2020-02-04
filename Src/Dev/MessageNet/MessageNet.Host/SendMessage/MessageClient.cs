@@ -42,7 +42,7 @@ namespace MessageNet.Host
 
         public Task RegisterForMessageCallBack(Guid messageId)
         {
-            var tcs = new TaskCompletionSource<bool>();
+            var tcs = new TaskCompletionSource<NetMessage>();
             _awaiterManager.Add(messageId, tcs);
 
             return tcs.Task;

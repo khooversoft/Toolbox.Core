@@ -55,7 +55,7 @@ namespace KHooversoft.Toolbox.Graph
 
             foreach (var item in _items)
             {
-                AddItem(map, item, default(TKey));
+                AddItem(map, item, default);
             }
 
             return map;
