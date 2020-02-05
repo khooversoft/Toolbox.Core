@@ -11,7 +11,18 @@ namespace Khooversoft.Toolbox.Standard
     {
         private readonly IList<IDataflow<T>> _targets = new List<IDataflow<T>>();
 
-        public BroadcastDataflow() { }
+        public BroadcastDataflow()
+        {
+            Predicate = x => true;
+        }
+
+        public BroadcastDataflow(Func<T, bool> predicate)
+        {
+            predicate.Verify(nameof(predicate)).IsNotNull();
+            Predicate = predicate;
+        }
+
+        public Func<T, bool> Predicate { get; }
 
         public Task Post(T message)
         {

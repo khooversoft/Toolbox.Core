@@ -2,8 +2,10 @@
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks.Dataflow;
 using Xunit;
 
@@ -134,33 +136,33 @@ namespace Toolbox.Standard.Test.Tools
         {
             const int max = 1000;
             const int offset = 10000;
-            var list = new List<int>();
-            var list2 = new List<int>();
-            var s1 = new List<int>();
-            var s2 = new List<int>();
+            var list = new List<ItemValue>();
+            var list2 = new List<ItemValue>();
+            var s1 = new List<ItemValue>();
+            var s2 = new List<ItemValue>();
 
-            IDataflowSource<int> dataflow = new DataflowBuilder<int>()
+            IDataflowSource<ItemValue> dataflow = new DataflowBuilder<ItemValue>()
             {
-                new SelectDataflow<int>(x => x + 5),
-                new BroadcastDataflow<int>()
+                new SelectDataflow<ItemValue>(x => new ItemValue(x.Index + 5)),
+                new BroadcastDataflow<ItemValue>()
                 {
-                    new ActionDataflow<int>(x => list.Add(x)),
-                    new ActionDataflow<int>(x => list2.Add(x + offset)),
+                    new ActionDataflow<ItemValue>(x => list.Add(new ItemValue(x.Index))),
+                    new ActionDataflow<ItemValue>(x => list2.Add(new ItemValue(x.Index + offset))),
 
-                    new BroadcastDataflow<int>()
+                    new BroadcastDataflow<ItemValue>()
                     {
-                        new ActionDataflow<int>(x => s1.Add(x))
+                        new ActionDataflow<ItemValue>(x => s1.Add(new ItemValue(x.Index)))
                     },
 
-                    new BroadcastDataflow<int>()
+                    new BroadcastDataflow<ItemValue>()
                     {
-                        new ActionDataflow<int>(x => s2.Add(x))
+                        new ActionDataflow<ItemValue>(x => s2.Add(new ItemValue(x.Index)))
                     },
                 }
             }.Build();
 
             Enumerable.Range(0, max)
-                .ForEach(async x => await dataflow.PostAsync(x));
+                .ForEach(async x => await dataflow.PostAsync(new ItemValue(x)));
 
             dataflow.Complete();
             dataflow.Completion.Wait();
@@ -171,24 +173,45 @@ namespace Toolbox.Standard.Test.Tools
             s2.Count.Should().Be(max);
 
             list
-                .Select((x, i) => new { x, i })
-                .All(x => x.x == x.i + 5)
+                .Select((x, i) => (x, i))
+                .All(x => x.x.Index == x.i + 5)
                 .Should().BeTrue();
 
             list2
-                .Select((x, i) => new { i, x })
-                .All(x => x.i + offset + 5 == x.x)
+                .Select((x, i) => (x, i, c: i + offset + 5))
+                .All(x => x.x.Index == x.c)
                 .Should().BeTrue();
 
             s1
-                .Select((x, i) => new { x, i })
-                .All(x => x.x == x.i + 5)
+                .Select((x, i) => (x, i))
+                .All(x => x.x.Index == x.i + 5)
                 .Should().BeTrue();
 
             s2
-                .Select((x, i) => new { x, i })
-                .All(x => x.x == x.i + 5)
+                .Select((x, i) => (x, i))
+                .All(x => x.x.Index == x.i + 5)
                 .Should().BeTrue();
+
+            list.Select(x => x.ThreadId)
+                .Concat(list2.Select(x => x.ThreadId))
+                .Concat(s1.Select(x => x.ThreadId))
+                .Concat(s2.Select(x => x.ThreadId))
+                .GroupBy(x => x)
+                .Count().Should().BeGreaterThan(1);
+        }
+
+        [DebuggerDisplay("Index={Index}, ThreadId={ThreadId}")]
+        private struct ItemValue
+        {
+            public ItemValue(int index)
+            {
+                Index = index;
+                ThreadId = Thread.CurrentThread.ManagedThreadId;
+            }
+
+            public int Index { get; }
+
+            public int ThreadId { get; }
         }
     }
 }

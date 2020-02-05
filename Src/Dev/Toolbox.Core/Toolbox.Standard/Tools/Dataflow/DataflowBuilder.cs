@@ -24,8 +24,6 @@ namespace Khooversoft.Toolbox.Standard
                 PropagateCompletion = true,
             };
 
-            //ISourceBlock<T>? root = null;
-
             var stack = new Stack<IDataflow<T>>(_targets.Reverse());
             var rootStack = new Stack<ISourceBlock<T>>();
 
@@ -42,7 +40,7 @@ namespace Khooversoft.Toolbox.Standard
                         var broadcastBlock = new BroadcastBlock<T>(x => x);
                         blockList.Add(broadcastBlock);
 
-                        if( rootStack.Count > 0) rootStack.Peek().LinkTo(broadcastBlock, option);
+                        if( rootStack.Count > 0) rootStack.Peek().LinkTo(broadcastBlock, option, x => broadcast.Predicate(x));
                         rootStack.Push(broadcastBlock);
 
                         stack.Push(new PopMarker());
@@ -53,7 +51,7 @@ namespace Khooversoft.Toolbox.Standard
                         var transformBlock = new TransformBlock<T, T>(select.Transform);
                         blockList.Add(transformBlock);
 
-                        if (rootStack.Count > 0) rootStack.Peek().LinkTo(transformBlock, option);
+                        if (rootStack.Count > 0) rootStack.Peek().LinkTo(transformBlock, option, x => select.Predicate(x));
                         rootStack.Push(transformBlock);
                         break;
 
@@ -67,7 +65,7 @@ namespace Khooversoft.Toolbox.Standard
 
                         var actionBlock = new ActionBlock<T>(action.Action);
                         blockList.Add(actionBlock);
-                        rootStack.Peek().LinkTo(actionBlock, option);
+                        rootStack.Peek().LinkTo(actionBlock, option, x => action.Predicate(x));
                         break;
 
                     default:

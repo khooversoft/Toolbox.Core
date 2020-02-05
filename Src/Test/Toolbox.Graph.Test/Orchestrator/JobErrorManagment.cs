@@ -24,8 +24,9 @@ namespace Toolbox.Test.Orchestrator
         {
             _output = output;
 
-            var telemetryBuilder = new TelemetryService()
-                .DoAction(x => _output.WriteLine(x.ToString()));
+            var telemetryBuilder = new TelemetryServiceBuilder()
+                .DoAction(x => _output.WriteLine(x.ToString()))
+                .Build();
 
             _workContext = WorkContext.Empty
                 .With(telemetryBuilder.CreateLogger("test"));

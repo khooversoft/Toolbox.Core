@@ -12,20 +12,11 @@ namespace Khooversoft.Toolbox.Standard
 {
     public class TelemetryService : ITelemetryService, IDisposable
     {
-        private IPipelineBlock<TelemetryMessage> _pipeline;
+        private IDataflowSource<TelemetryMessage> _dataflow;
 
-        public TelemetryService()
+        public TelemetryService(IDataflowSource<TelemetryMessage> dataflow)
         {
-            _pipeline = new PipelineBlock<TelemetryMessage>()
-                .Broadcast();
-        }
-        public TelemetryService(Func<TelemetryMessage, TelemetryMessage> transform)
-        {
-            transform.Verify(nameof(transform)).IsNotNull();
-
-            _pipeline = new PipelineBlock<TelemetryMessage>()
-                .Select(transform)
-                .Broadcast();
+            _dataflow = dataflow;
         }
 
         public ITelemetry CreateLogger(string eventSourceName)
@@ -39,70 +30,15 @@ namespace Khooversoft.Toolbox.Standard
         {
             message.Verify(nameof(message)).IsNotNull();
 
-            _pipeline.Post(message);
-        }
-
-        public TelemetryService DoAction(Action<TelemetryMessage> action, Predicate<TelemetryMessage>? predicate = null)
-        {
-            _pipeline.DoAction(action, predicate);
-            return this;
-        }
-
-        public TelemetryService AddConsoleLogger(TelemetryType telemetryType, ITelemetryLogger logger)
-        {
-            logger.Verify(nameof(logger)).IsNotNull();
-
-            _pipeline.DoAction(x => logger.Write(x), x => x.TelemetryType.IsReplay() || x.TelemetryType.FilterLevel(telemetryType));
-            return this;
-        }
-
-        public TelemetryService AddFileLogger(ITelemetryLogger logger)
-        {
-            logger.Verify(nameof(logger)).IsNotNull();
-
-            _pipeline.DoAction(x => logger.Write(x), x => !x.TelemetryType.IsReplay() && !x.TelemetryType.IsMetric());
-            return this;
-        }
-
-        public TelemetryService AddEventLogger(ITelemetryLogger logger)
-        {
-            logger.Verify(nameof(logger)).IsNotNull();
-
-            _pipeline.DoAction(x => logger.Write(x), x => !x.TelemetryType.IsReplay() && x.TelemetryType.IsEvent() && !x.TelemetryType.IsVerbose());
-            return this;
-        }
-
-        public TelemetryService AddErrorReplay(IWorkContext context, TelemetryType console, ITelemetryQuery logger, ITelemetryService telemetryService)
-        {
-            context.Verify(nameof(context)).IsNotNull();
-            logger.Verify(nameof(logger)).IsNotNull();
-            telemetryService.Verify(nameof(telemetryService)).IsNotNull();
-
-            void action(TelemetryMessage x)
-            {
-                IReadOnlyList<TelemetryMessage> loggedMessages = logger.Query(y => x.WorkContext.Cv == y.WorkContext.Cv, 30, 100);
-
-                loggedMessages.ForEach(y => telemetryService.Write(y.WithReplay()));
-            }
-
-            bool filter(TelemetryMessage x) =>
-                    (console != TelemetryType.Verbose) &&
-                    (!x.TelemetryType.IsReplay()) &&
-                    (x.TelemetryType.IsEvent()) &&
-                    (x.TelemetryType.IsErrorOrCritical()) &&
-                    (x?.WorkContext?.Cv != null);
-
-            _pipeline.DoAction(action, filter);
-
-            return this;
+            _dataflow.Post(message);
         }
 
         public void Dispose()
         {
-            var pipeline = Interlocked.Exchange(ref _pipeline, null!);
+            var dataflow = Interlocked.Exchange(ref _dataflow, null!);
 
-            pipeline?.Complete();
-            pipeline?.Completion?.Wait();
+            dataflow?.Complete();
+            dataflow?.Completion?.Wait();
         }
     }
 }
