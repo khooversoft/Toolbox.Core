@@ -61,7 +61,7 @@ namespace Toolbox.Standard.Test.Tools
         public void GivenDeferred_WhenActionThrow_ShouldThrow()
         {
             var subject = new Deferred(x => throw new ArgumentException());
-            IWorkContext context = WorkContext.Empty;
+            IWorkContext context = WorkContextBuilder.Default;
 
             subject.Invoking(x => x.Execute(context)).Should().Throw<ArgumentException>();
         }

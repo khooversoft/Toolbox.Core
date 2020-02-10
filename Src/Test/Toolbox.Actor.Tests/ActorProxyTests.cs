@@ -15,7 +15,7 @@ namespace Toolbox.Actor.Tests
     [Trait("Category", "Actor")]
     public class ActorProxyTests
     {
-        private IWorkContext _context = WorkContext.Empty;
+        private IWorkContext _context = WorkContextBuilder.Default;
 
         [Fact]
         public async Task ActorProxyMultiTaskTest()

@@ -15,7 +15,7 @@ namespace Toolbox.BlockDocument.Test.Blocks
 {
     public class BlockChainSignTests
     {
-        private static readonly IWorkContext _workContext = WorkContext.Empty;
+        private static readonly IWorkContext _workContext = WorkContextBuilder.Default;
 
         [Fact]
         public void GivenString_WhenHashed_Match()

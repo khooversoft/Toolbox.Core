@@ -13,7 +13,7 @@ namespace Toolbox.Standard.Test.Tools
 {
     public class StateManagerTests
     {
-        private static IWorkContext _workContext = WorkContext.Empty;
+        private static IWorkContext _workContext = WorkContextBuilder.Default;
 
         [Fact]
         public async Task SimpleStateFlowTest()

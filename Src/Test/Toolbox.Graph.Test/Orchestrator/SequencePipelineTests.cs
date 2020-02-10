@@ -18,7 +18,7 @@ namespace Toolbox.Test.Orchestrator
         public void SimplePipelineTest()
         {
             int i = 0;
-            IWorkContext context = WorkContext.Empty;
+            IWorkContext context = WorkContextBuilder.Default;
 
             Enumerable.Empty<Action<IWorkContext>>()
                 .Append(x => i += 2)
@@ -30,7 +30,7 @@ namespace Toolbox.Test.Orchestrator
         [Fact]
         public async Task AsyncSimplePipelineTest()
         {
-            IWorkContext context = WorkContext.Empty;
+            IWorkContext context = WorkContextBuilder.Default;
             var execContext = new ExecutionContext();
 
             await Enumerable.Empty<Func<IWorkContext, Task>>()
@@ -44,7 +44,7 @@ namespace Toolbox.Test.Orchestrator
         [Fact]
         public async Task AsyncSimplePipeline2Test()
         {
-            IWorkContext context = WorkContext.Empty;
+            IWorkContext context = WorkContextBuilder.Default;
             var execContext = new ExecutionContext(5);
 
             await Enumerable.Empty<Func<IWorkContext, Task>>()

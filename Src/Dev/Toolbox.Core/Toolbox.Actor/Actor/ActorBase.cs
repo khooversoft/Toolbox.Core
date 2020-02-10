@@ -20,7 +20,7 @@ namespace Khooversoft.Toolbox.Actor
         private int _timerLockValue;
         private Timer? _timer;
         private readonly StringVector _tag = new StringVector(nameof(ActorBase));
-        private readonly IWorkContext _workContext = WorkContext.Empty;
+        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private int _running = 0;
 
         /// <summary>

@@ -60,7 +60,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <summary>
         /// Work context for manager
         /// </summary>
-        public IWorkContext? WorkContext { get; private set; } = Standard.WorkContext.Empty;
+        public IWorkContext? WorkContext { get; private set; } = WorkContextBuilder.Default;
 
         public ActorConfigurationBuilder Set(int capacity)
         {

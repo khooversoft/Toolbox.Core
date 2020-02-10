@@ -71,11 +71,6 @@ namespace Khooversoft.Toolbox.Standard
             Dimensions = dimensions != null ? new EventDimensions(dimensions) : new EventDimensions();
         }
 
-        /// <summary>
-        /// Static empty
-        /// </summary>
-        public static WorkContext Empty { get; } = new WorkContext();
-
         public CorrelationVector Cv { get; private set; }
 
         public StringVector Tag { get; private set; }

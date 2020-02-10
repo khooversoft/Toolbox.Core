@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MessageNet.Host
 {
-    internal class AwaiterManager
+    internal class AwaiterManager : IAwaiterManager
     {
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<NetMessage>> _completion = new ConcurrentDictionary<Guid, TaskCompletionSource<NetMessage>>();
 

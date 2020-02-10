@@ -15,7 +15,7 @@ namespace Toolbox.BlockDocument.Test
 {
     public class ZipContainerTests
     {
-        private readonly IWorkContext _workContext = WorkContext.Empty;
+        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
 
         [Fact]
         public void GivenBlockChain_WhenContainerIsMemory_ShouldRoundTrip()

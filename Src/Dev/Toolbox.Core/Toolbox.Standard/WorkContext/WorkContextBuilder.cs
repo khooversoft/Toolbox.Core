@@ -42,6 +42,8 @@ namespace Khooversoft.Toolbox.Standard
             Dimensions = context.Dimensions;
         }
 
+        public static IWorkContext Default { get; } = new WorkContext();
+
         public CorrelationVector Cv { get; set; }
 
         public StringVector Tag { get; set; }

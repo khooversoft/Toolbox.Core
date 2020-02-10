@@ -20,7 +20,7 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
     {
         private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey={blob-storage-test-AccountKey};EndpointSuffix=core.windows.net";
         private readonly BlobStoreConnection _blobStore;
-        private readonly IWorkContext _workContext = WorkContext.Empty;
+        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly ApplicationFixture _application;
 
         public BlobContainerTests(ApplicationFixture application)

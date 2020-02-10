@@ -106,8 +106,6 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>this</returns>
         public LruCache<TKey, T> Set(TKey key, T value)
         {
-            key.Verify(nameof(key)).IsNotNull();
-
             lock (_lock)
             {
                 if (_cacheMap.TryGetValue(key, out LinkedListNode<CacheItem> node))
@@ -145,8 +143,6 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>true if found, false if not</returns>
         public bool TryGetValue(TKey key, out T value, bool markUsed = true)
         {
-            key.Verify(nameof(key)).IsNotNull();
-
             value = default!;
             lock (_lock)
             {
@@ -176,8 +172,6 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>true if removed, false if not</returns>
         public bool TryRemove(TKey key, out T value)
         {
-            key.Verify(nameof(key)).IsNotNull();
-
             lock (_lock)
             {
                 if (!_cacheMap.TryGetValue(key, out LinkedListNode<CacheItem> node))
@@ -201,8 +195,6 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>cache item details or null if not found</returns>
         public CacheItem? GetCacheDetails(TKey key)
         {
-            key.Verify(nameof(key)).IsNotNull();
-
             lock (_lock)
             {
                 LinkedListNode<CacheItem> node;

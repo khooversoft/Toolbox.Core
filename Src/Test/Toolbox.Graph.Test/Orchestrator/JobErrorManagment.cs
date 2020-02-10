@@ -28,7 +28,7 @@ namespace Toolbox.Test.Orchestrator
                 .DoAction(x => _output.WriteLine(x.ToString()))
                 .Build();
 
-            _workContext = WorkContext.Empty
+            _workContext = WorkContextBuilder.Default
                 .With(telemetryBuilder.CreateLogger("test"));
         }
 

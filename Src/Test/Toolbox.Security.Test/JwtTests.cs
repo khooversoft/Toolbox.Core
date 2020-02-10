@@ -14,7 +14,7 @@ namespace Toolbox.Security.Test
 {
     public class JwtTests
     {
-        private static readonly IWorkContext _workContext = WorkContext.Empty;
+        private static readonly IWorkContext _workContext = WorkContextBuilder.Default;
 
         private static readonly LocalCertificate _jwtVaultTest =
             new LocalCertificate(StoreLocation.LocalMachine, StoreName.My, "1C7E74F389E668068C9143DFF3E7DD4EF9580981", true);

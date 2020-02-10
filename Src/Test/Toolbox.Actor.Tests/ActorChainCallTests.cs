@@ -14,7 +14,7 @@ namespace Toolbox.Actor.Tests
     public class ActorChainCallTests
     {
         private const string sumActorName = "actorSum";
-        private IWorkContext _context = WorkContext.Empty;
+        private IWorkContext _context = WorkContextBuilder.Default;
 
         [Fact]
         public async Task ActorSingleChainTest()

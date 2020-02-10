@@ -16,7 +16,7 @@ namespace Toolbox.Actor.Tests
     [Trait("Category", "Actor")]
     public class ActorTimerTests
     {
-        private IWorkContext _context = WorkContext.Empty;
+        private IWorkContext _context = WorkContextBuilder.Default;
 
         [Fact]
         public async Task ActorSimpleTimerTest()

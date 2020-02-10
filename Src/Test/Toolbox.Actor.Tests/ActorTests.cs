@@ -15,7 +15,7 @@ namespace Toolbox.Actor.Tests
     [Trait("Category", "Actor")]
     public class ActorTests
     {
-        private IWorkContext _context = WorkContext.Empty;
+        private IWorkContext _context = WorkContextBuilder.Default;
 
         [Fact]
         public async Task GivenActor_WhenCreated_KeyAndManagerShouldBeSet()
