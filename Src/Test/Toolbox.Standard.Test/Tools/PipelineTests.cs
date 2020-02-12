@@ -57,12 +57,12 @@ namespace Toolbox.Standard.Test.Tools
             int oddCounter = 0;
 
             var pipeline = new PipelineBuilder<int>()
-                .Map(x => x % 2 == 0, (context, message, next) =>
+                .Map(x => x % 2 == 0, (context, message) =>
                 {
                     evenCounter += message;
                     return Task.CompletedTask;
                 })
-                .Map(x => x % 2 != 0, (context, message, next) =>
+                .Map(x => x % 2 != 0, (context, message) =>
                 {
                     oddCounter += message;
                     return Task.CompletedTask;

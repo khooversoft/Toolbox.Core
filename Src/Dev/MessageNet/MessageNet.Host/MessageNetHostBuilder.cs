@@ -33,13 +33,14 @@ namespace MessageNet.Host
             return this;
         }
 
-        public IMessageNetHost Build()
+        public IMessageNetHost Build(IWorkContext context)
         {
+            context.Verify(nameof(context)).IsNotNull();
             NameServerUri.Verify(nameof(NameServerUri)).IsNotNull();
             ConnectionManager.Verify(nameof(ConnectionManager)).IsNotNull();
-            NodeRegistrations.Verify(nameof(NodeRegistrations)).IsNotNull().Assert(x => x.Count > 0, "Node registrations are required");
+            NodeRegistrations.Verify(nameof(NodeRegistrations)).IsNotNull().Assert(x => x!.Count > 0, "Node registrations are required");
 
-            return null;
+            return new MessageNetHost(context, NameServerUri!, ConnectionManager!, NodeRegistrations!);
         }
     }
 }

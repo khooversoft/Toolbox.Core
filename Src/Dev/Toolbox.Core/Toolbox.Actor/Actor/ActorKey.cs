@@ -50,20 +50,11 @@ namespace Khooversoft.Toolbox.Actor
             return Key == subject!.Key;
         }
 
-        public override int GetHashCode()
-        {
-            return Key.GetHashCode();
-        }
+        public override int GetHashCode() => Key.GetHashCode();
 
-        public static bool operator ==(ActorKey v1, ActorKey v2)
-        {
-            return v1.Equals(v2);
-        }
+        public static bool operator ==(ActorKey v1, ActorKey v2) => v1.Equals(v2);
 
-        public static bool operator !=(ActorKey v1, ActorKey v2)
-        {
-            return !v1.Equals(v2);
-        }
+        public static bool operator !=(ActorKey v1, ActorKey v2) => !v1.Equals(v2);
 
         /// <summary>
         /// Implicit convert actor key to string

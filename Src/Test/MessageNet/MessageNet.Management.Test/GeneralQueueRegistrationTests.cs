@@ -17,7 +17,7 @@ namespace MessageNet.Management.Test
     {
         private const string _connectionString = "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=TestAccess;SharedAccessKey={messagehub.accesskey};TransportType=Amqp";
         private readonly ServiceBusConnection _serviceBusConnection;
-        private readonly IWorkContext _workContext = WorkContext.Empty;
+        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly QueueManagement _queueManagement;
 
         private readonly QueueDefinition _queueDefinition = new QueueDefinition

@@ -50,7 +50,7 @@ namespace EventHubPerformanceTest
 
             IOption option = Option.Build(args);
 
-            if( option.Help)
+            if (option.Help)
             {
                 option.FormatHelp()
                     .ForEach(x => Console.WriteLine(x));
@@ -80,7 +80,7 @@ namespace EventHubPerformanceTest
                     option.Receive ? container.Resolve<ReceiveEvents>() : null,
                 }
                 .Where(x => x != null)
-                .Select(x => Task.Run(() =>  x!.Run(context)))
+                .Select(x => Task.Run(() => x!.Run(context)))
                 .ToList();
 
                 Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
@@ -125,9 +125,10 @@ namespace EventHubPerformanceTest
             string logType = option.Send ? "Send" : (option.Receive ? "Receive" : "SendReceive");
             builder.Register(x => new FileEventLogger(option.LoggingFolder, logType)).As<FileEventLogger>().InstancePerLifetimeScope();
 
-            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryService()
+            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryServiceBuilder()
                     .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
-                    .AddFileLogger(x.Resolve<FileEventLogger>());
+                    .AddFileLogger(x.Resolve<FileEventLogger>())
+                    .Build();
 
             builder.Register(x => telemetryService(x)).As<ITelemetryService>().InstancePerLifetimeScope();
 

@@ -19,7 +19,7 @@ namespace MessageNet.Management.Test
     {
         private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey={blob.storage.connection};EndpointSuffix=core.windows.net";
         private readonly BlobStoreConnection _blobStore;
-        private readonly IWorkContext _workContext = WorkContext.Empty;
+        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
 
         public BlobRegistorStoreTests(ApplicationFixture application)
         {

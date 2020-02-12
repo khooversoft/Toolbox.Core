@@ -31,10 +31,9 @@ namespace Khooversoft.Toolbox.Standard
 
         public PipelineBuilder<T> Map(Func<T, bool> predicate, Func<IWorkContext, T, Task> middleware)
         {
-            _pipelineItems.Add(new PipelineItem<T>(predicate, async (context, message, next) =>
+            _pipelineItems.Add(new PipelineItem<T>(predicate, (context, message, next) =>
             {
-                await middleware(context, message);
-                await next(context, message);
+                return middleware(context, message);
             }));
 
             return this;
@@ -57,7 +56,7 @@ namespace Khooversoft.Toolbox.Standard
                 throw new InvalidOperationException(errorMsg);
             };
 
-            foreach(var item in _pipelineItems.Reverse())
+            foreach (var item in _pipelineItems.Reverse())
             {
                 Func<IWorkContext, T, Task> nextItem = pipeline;
                 pipeline = (context, message) => item.Invoke(context, message, nextItem);

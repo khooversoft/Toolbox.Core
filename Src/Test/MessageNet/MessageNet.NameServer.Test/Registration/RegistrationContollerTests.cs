@@ -15,7 +15,7 @@ namespace MessageHub.NameServer.Test.Registration
     public class RegistrationContollerTests : IClassFixture<TestServerFixture>
     {
         private readonly TestServerFixture _fixture;
-        private readonly IWorkContext _workContext = WorkContext.Empty;
+        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
 
         public RegistrationContollerTests(TestServerFixture fixture)
         {

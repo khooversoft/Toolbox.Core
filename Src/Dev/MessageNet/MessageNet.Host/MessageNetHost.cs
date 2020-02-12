@@ -12,6 +12,12 @@ using System.Threading.Tasks;
 
 namespace MessageNet.Host
 {
+    /// <summary>
+    /// Message net host creates receivers and routes for each queue name which is = "networkId + "/" + "nodeId".
+    /// 
+    /// Messages are routed to "route" function, which receives the message for processing.
+    /// 
+    /// </summary>
     public class MessageNetHost : IMessageNetHost
     {
         private static readonly HttpClient _httpClient = new HttpClient();
@@ -49,17 +55,13 @@ namespace MessageNet.Host
                 .Value;
 
             _nodeRegistrations
-                .GroupBy(x => x.QueueName)
+                .GroupBy(x => x.Uri)
                 .Where(x => x.Count() > 1)
-                .Select(x => x.Key)
-                .ToList()
-                .Verify()
-                .Assert(x => x.Count == 0, x => $"Duplicate {string.Join(", ", x)} queue names");
+                .Verify().Assert(x => x.Count() == 0, x => $"Duplicate routes have been detected: {string.Join(", ", x)}");
 
             _actorManager.Register<INodeHostActor>(x => new NodeHostActor(_connectionManager));
             _actorManager.Register<INodeRouteActor>(x => new NodeRouteActor(_nameServerClient));
         }
-
 
         public Task Run(IWorkContext context)
         {
@@ -117,9 +119,9 @@ namespace MessageNet.Host
         private void StartReceivers()
         {
             _receivers = _nodeRegistrations
-                .Select(x => new MessageReceiveIntercept(x, _awaiterManager).Build())
-                .Select(x => (NodeRegistration: x, Actor: _actorManager.GetActor<INodeHostActor>(new ActorKey(x.QueueName)), Task: (Task)null!))
-                .Select(x => new ReceiverHost(x.Actor, x.Actor.Run(_workContext, x.NodeRegistration)))
+                .GroupBy(x => x.QueueName)
+                .Select(x => (NodeRegistrations: x, Actor: _actorManager.GetActor<INodeHostActor>(new ActorKey(x.Key))))
+                .Select(x => new ReceiverHost(x.Actor, x.Actor.Run(_workContext, x.NodeRegistrations)))
                 .ToList();
         }
 
@@ -134,29 +136,6 @@ namespace MessageNet.Host
             public INodeHostActor Actor { get; }
 
             public Task Task { get; }
-        }
-
-        private class MessageReceiveIntercept
-        {
-            private readonly NodeHostRegistration _nodeHostRegistration;
-            private readonly AwaiterManager _awaiterManager;
-
-            public MessageReceiveIntercept(NodeHostRegistration nodeHostRegistration, AwaiterManager awaiterManager)
-            {
-                _nodeHostRegistration = nodeHostRegistration;
-                _awaiterManager = awaiterManager;
-            }
-
-            public NodeHostRegistration Build()
-            {
-                return new NodeHostRegistration(_nodeHostRegistration.NetworkId, _nodeHostRegistration.NodeId, x => Intercept(x));
-            }
-
-            private Task Intercept(NetMessage netMessage)
-            {
-                _awaiterManager.SetResult(netMessage);
-                return _nodeHostRegistration.Receiver(netMessage);
-            }
         }
     }
 }

@@ -127,9 +127,10 @@ namespace ServiceBusPerformanceTest
             string logType = option.Send ? "Send" : (option.Receive ? "Receive" : "SendReceive");
             builder.Register(x => new FileEventLogger(option.LoggingFolder!, logType)).As<FileEventLogger>().InstancePerLifetimeScope();
 
-            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryService()
+            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryServiceBuilder()
                     .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
-                    .AddFileLogger(x.Resolve<FileEventLogger>());
+                    .AddFileLogger(x.Resolve<FileEventLogger>())
+                    .Build();
 
             builder.Register(x => telemetryService(x)).As<ITelemetryService>().InstancePerLifetimeScope();
 

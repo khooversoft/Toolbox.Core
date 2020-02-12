@@ -8,13 +8,14 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace MessageNet.Host
 {
     internal class NodeHostActor : ActorBase, INodeHostActor
     {
         private readonly IConnectionManager _connectionManager;
-        private NodeHostRegistration? _nodeRegistration;
+        private IList<NodeHostRegistration>? _nodeRegistrations;
         private MessageQueueReceiveProcessor? _messageProcessor;
 
         public NodeHostActor(IConnectionManager connectionManager)
@@ -24,22 +25,30 @@ namespace MessageNet.Host
             _connectionManager = connectionManager;
         }
 
-        public async Task Run(IWorkContext context, NodeHostRegistration nodeRegistration)
+        public async Task Run(IWorkContext context, IEnumerable<NodeHostRegistration> nodeRegistrations)
         {
             context.Verify(nameof(context)).IsNotNull();
-            nodeRegistration.Verify(nameof(nodeRegistration)).IsNotNull();
+            nodeRegistrations.Verify().Assert(x => x.Count() > 0, "Node registration list is empty");
             _messageProcessor.Verify().Assert(x => x == null, "Node host is already running");
 
-            _nodeRegistration = nodeRegistration;
+            MessageUri msgUri = MessageUriBuilder.Parse(ActorKey.ToString()).Build();
 
-            context.Telemetry.Info(context, $"Register node's host for {_nodeRegistration.QueueName}");
-            NodeRegistrationModel nodeRegistrationModel = await RegisterNode(context);
+            _nodeRegistrations
+                .All(x => x.NetworkId == msgUri.NetworkId && x.NodeId == msgUri.NodeId)
+                .Verify()
+                .Assert(x => x == true, "One or more node registration does not match network id and/or node id for the actor key");
 
-            string connectionString = _connectionManager.GetConnection(_nodeRegistration.NetworkId);
+            _nodeRegistrations = nodeRegistrations.ToList();
 
-            context.Telemetry.Info(context, $"Starting node host for {_nodeRegistration.QueueName}");
-            _messageProcessor = new MessageQueueReceiveProcessor(connectionString, _nodeRegistration.QueueName);
-            await _messageProcessor.Start(context, _nodeRegistration.Receiver);
+            string connectionString = await RegisterReceiverQueue(context, msgUri);
+
+
+            context.Telemetry.Info(context, $"Starting node host for {msgUri}");
+            _messageProcessor = new MessageQueueReceiveProcessor(connectionString, msgUri.GetQueueName());
+
+
+            Func<IWorkContext, NetMessage, Task> pipeline = CreatePipeline();
+            await _messageProcessor.Start(context, x => pipeline(context, x));
         }
 
         public async Task Stop(IWorkContext context)
@@ -49,18 +58,38 @@ namespace MessageNet.Host
             MessageQueueReceiveProcessor? messageQueueReceiveProcessor = Interlocked.Exchange(ref _messageProcessor, null!);
             if (messageQueueReceiveProcessor == null) return;
 
-            context.Telemetry.Info(context, $"Stopping node's host for {_nodeRegistration!.QueueName}");
+            context.Telemetry.Info(context, $"Stopping node's host for {ActorKey}");
             await messageQueueReceiveProcessor!.Stop();
-        }
-
-        private async Task<NodeRegistrationModel> RegisterNode(IWorkContext context)
-        {
-            return await ActorManager.GetActor<INodeRouteActor>(_nodeRegistration!.QueueName).Register(context);
         }
 
         protected override Task OnDeactivate(IWorkContext context)
         {
             return Stop(context);
+        }
+
+        private async Task<string> RegisterReceiverQueue(IWorkContext context, MessageUri msgUri)
+        {
+            context.Telemetry.Info(context, $"Register node's host for {ActorKey}");
+            await ActorManager.GetActor<INodeRouteActor>(ActorKey).Register(context);
+
+            return _connectionManager.GetConnection(msgUri.NetworkId);
+        }
+
+        private Func<IWorkContext, NetMessage, Task> CreatePipeline()
+        {
+            var pipelineBuilder = new PipelineBuilder<NetMessage>();
+
+            foreach(var item in _nodeRegistrations!)
+            {
+                NodeHostRegistration nodeHostRegistration = item;
+
+                pipelineBuilder.Map(
+                    x => x.Header.ToUri.Equals(nodeHostRegistration.Uri, StringComparison.OrdinalIgnoreCase),
+                    (context, message) => nodeHostRegistration.Receiver(message)
+                    );
+            }
+
+            return pipelineBuilder.Build();
         }
     }
 }

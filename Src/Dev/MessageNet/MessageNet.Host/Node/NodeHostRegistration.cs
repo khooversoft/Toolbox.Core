@@ -9,7 +9,7 @@ namespace MessageNet.Host
 {
     public class NodeHostRegistration
     {
-        public NodeHostRegistration(string networkId, string nodeId, Func<NetMessage, Task> receiver)
+        public NodeHostRegistration(string networkId, string nodeId, string? route, Func<NetMessage, Task> receiver)
         {
             networkId.Verify(nameof(networkId)).IsNotEmpty();
             nodeId.Verify(nameof(nodeId)).IsNotEmpty();
@@ -17,15 +17,29 @@ namespace MessageNet.Host
 
             NetworkId = networkId;
             NodeId = nodeId;
+            Route = route;
             Receiver = receiver;
+
+            Uri = new MessageUriBuilder()
+                .SetNetworkId(NetworkId)
+                .SetNodeId(NodeId)
+                .SetRoute(Route)
+                .Build()
+                .ToString();
+
+            QueueName = NetworkId + "/" + NodeId;
         }
 
         public string NetworkId { get; }
 
         public string NodeId { get; }
 
+        public string? Route { get; }
+
         public Func<NetMessage, Task> Receiver { get; }
 
-        public string QueueName => NetworkId + "/" + NodeId;
+        public string Uri { get; }
+
+        public string QueueName { get; }
     }
 }

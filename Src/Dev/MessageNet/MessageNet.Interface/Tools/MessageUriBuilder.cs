@@ -70,9 +70,9 @@ namespace Khooversoft.MessageNet.Interface
         /// </summary>
         /// <param name="route">route to set, empty string or null will clear</param>
         /// <returns>this</returns>
-        public MessageUriBuilder SetRoute(string route)
+        public MessageUriBuilder SetRoute(string? route)
         {
-            Route = new StringVectorBuilder().Parse(route);
+            Route = new StringVectorBuilder().Parse(route ?? string.Empty);
             return this;
         }
 
