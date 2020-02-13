@@ -1,11 +1,14 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Khooversoft.Toolbox.Standard;
 
-namespace MessageNet.Host
+namespace Khooversoft.MessageNet.Host
 {
     public class ConnectionManager : ConcurrentDictionary<string, ConnectionRegistration>, IConnectionManager
     {

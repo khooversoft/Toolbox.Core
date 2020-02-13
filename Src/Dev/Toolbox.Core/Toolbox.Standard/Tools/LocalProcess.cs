@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -56,13 +59,13 @@ namespace Khooversoft.Toolbox.Standard
 
         public LocalProcess SetArguments(string value) { Arguments = value; return this; }
 
-        public LocalProcess SetWorkingDirectory(string value) { WorkingDirectory = value; return this; }
+        public LocalProcess SetWorkingDirectory(string? value) { WorkingDirectory = value; return this; }
 
         public LocalProcess SetCaptureOutput(bool value) { CaptureOutput = value; return this; }
 
         public LocalProcess SetWhatIf(bool value) { WhatIf = value; return this; }
 
-        public static Task<LocalProcess> Run(IWorkContext context, string file, string arguments, string workingDirectory = null)
+        public static Task<LocalProcess> Run(IWorkContext context, string file, string arguments, string? workingDirectory = null)
         {
             return new LocalProcess()
                 .SetFile(file)

@@ -1,18 +1,17 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
-using Khooversoft.Toolbox.Configuration;
-using System;
-using System.Reflection;
-using System.Threading.Tasks;
-using Khooversoft.Toolbox.Standard;
-using System.Threading;
 using Autofac;
+using Khooversoft.MessageNet.Host;
+using Khooversoft.Toolbox.Autofac;
+using Khooversoft.Toolbox.Configuration;
+using Khooversoft.Toolbox.Standard;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Khooversoft.MessageNet.Interface;
-using Khooversoft.MessageNet.Client;
-using Khooversoft.Toolbox.Autofac;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ServiceBusPerformanceTest
 {
@@ -110,7 +109,7 @@ namespace ServiceBusPerformanceTest
             builder.RegisterType<SendMessages>().InstancePerLifetimeScope();
             builder.RegisterType<ReceiveMessages>().InstancePerLifetimeScope();
 
-            builder.RegisterType<MessageClientService>().As<IMessageClient>();
+            //builder.RegisterType<MessageClientService>().As<IMessageClient>();
             builder.RegisterType<MessageQueueReceiveProcessor>().As<IMessageProcessor>();
 
             BuildTelemetry(option, builder);

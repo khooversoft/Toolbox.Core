@@ -1,14 +1,14 @@
-﻿using Khooversoft.MessageNet.Client;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus.Core;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MessageNet.Host
+namespace Khooversoft.MessageNet.Host
 {
     internal class MessageClient : IMessageClient
     {

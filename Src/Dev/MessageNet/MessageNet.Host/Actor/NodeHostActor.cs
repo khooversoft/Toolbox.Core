@@ -1,16 +1,16 @@
-﻿using Khooversoft.MessageNet.Client;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
-namespace MessageNet.Host
+namespace Khooversoft.MessageNet.Host
 {
     internal class NodeHostActor : ActorBase, INodeHostActor
     {

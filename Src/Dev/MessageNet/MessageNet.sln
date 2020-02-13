@@ -23,8 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Actor", "..\Toolbox
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Interface", "MessageNet.Interface\MessageNet.Interface.csproj", "{B5358CC6-77E7-41AC-B9E5-2368A4189A89}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Client", "MessageNet.Client\MessageNet.Client.csproj", "{32622E33-9269-4086-8ABC-B142D66F9ACD}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.NameServer", "MessageNet.NameServer\MessageNet.NameServer.csproj", "{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Autofac", "..\Toolbox.Core\Toolbox.Autofac\Toolbox.Autofac.csproj", "{462260A1-E3D3-49D7-98C7-3F2F04A3570B}"
@@ -37,7 +35,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Interface.Test",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Node.Tests", "..\..\Test\MessageNet\MessageNet.Node.Tests\MessageNet.Node.Tests.csproj", "{D88054E6-13F1-4090-93E3-BD826E34D8D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageNet.Host", "MessageNet.Host\MessageNet.Host.csproj", "{6D26A784-E04E-4FFF-9EFC-22FD6B77D7D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Host", "MessageNet.Host\MessageNet.Host.csproj", "{6D26A784-E04E-4FFF-9EFC-22FD6B77D7D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,10 +71,6 @@ Global
 		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5358CC6-77E7-41AC-B9E5-2368A4189A89}.Release|Any CPU.Build.0 = Release|Any CPU
-		{32622E33-9269-4086-8ABC-B142D66F9ACD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{32622E33-9269-4086-8ABC-B142D66F9ACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{32622E33-9269-4086-8ABC-B142D66F9ACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{32622E33-9269-4086-8ABC-B142D66F9ACD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{418EB058-2DAE-4CF4-8BFB-C0E7047A37EF}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,6 +1,9 @@
-﻿using Autofac.Extensions.DependencyInjection;
+﻿// Copyright (c) KhooverSoft. All rights reserved.
+// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
+
+using Autofac.Extensions.DependencyInjection;
+using Khooversoft.MessageNet.Host;
 using Khooversoft.MessageNet.Management;
-using Khooversoft.MessageNet.Client;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;

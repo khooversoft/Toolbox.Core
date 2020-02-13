@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.Client\MessageNet.Client.csproj" />
+    <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.Host\MessageNet.Host.csproj" />
     <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.Interface\MessageNet.Interface.csproj" />
     <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.Management\MessageNet.Management.csproj" />
     <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.NameServer\MessageNet.NameServer.csproj" />
