@@ -15,13 +15,22 @@ namespace Khooversoft.Toolbox.Standard
     /// </summary>
     public class WorkContextBuilder
     {
+        static WorkContextBuilder()
+        {
+            var builder = new WorkContextBuilder();
+            builder.ActivityId = nameof(WorkContextBuilder).ToGuid();
+            builder.ParentActivityId = builder.ActivityId;
+
+            Default = builder.Build();
+        }
+
         /// <summary>
         /// Default construct
         /// </summary>
         public WorkContextBuilder()
         {
-            Cv = new CorrelationVector();
-            Tag = StringVector.Empty;
+            ActivityId = Guid.NewGuid();
+            ParentActivityId = ActivityId;
             Telemetry = new TelemetryLogNull();
             Dimensions = new EventDimensions();
         }
@@ -34,19 +43,19 @@ namespace Khooversoft.Toolbox.Standard
         {
             context.Verify().IsNotNull();
 
-            Cv = context.Cv;
-            Tag = context.Tag;
+            ActivityId = context.ActivityId;
+            ParentActivityId = context.ParentActivityId;
             Container = context.Container;
             CancellationToken = context.CancellationToken;
             Telemetry = context.Telemetry;
             Dimensions = context.Dimensions;
         }
 
-        public static IWorkContext Default { get; } = new WorkContext();
+        public static IWorkContext Default { get; }
 
-        public CorrelationVector Cv { get; set; }
+        public Guid ActivityId { get; set; }
 
-        public StringVector Tag { get; set; }
+        public Guid ParentActivityId { get; set; }
 
         public IServiceContainer? Container { get; set; }
 
@@ -55,32 +64,6 @@ namespace Khooversoft.Toolbox.Standard
         public ITelemetry Telemetry { get; set; }
 
         public IEventDimensions Dimensions { get; set; }
-
-        /// <summary>
-        /// Set code tag
-        /// </summary>
-        /// <param name="tag">code tag</param>
-        /// <returns>this</returns>
-        public WorkContextBuilder Set(StringVector tag)
-        {
-            tag.Verify().IsNotNull();
-
-            Tag = Tag.With(tag);
-            return this;
-        }
-
-        /// <summary>
-        /// Set correlation vector
-        /// </summary>
-        /// <param name="cv">cv</param>
-        /// <returns>this</returns>
-        public WorkContextBuilder Set(CorrelationVector cv)
-        {
-            cv.Verify().IsNotNull();
-
-            Cv = cv;
-            return this;
-        }
 
         /// <summary>
         /// Set event log
@@ -139,8 +122,8 @@ namespace Khooversoft.Toolbox.Standard
         public IWorkContext Build()
         {
             return new WorkContext(
-                cv: Cv,
-                tag: Tag,
+                activityId: ActivityId,
+                parentActivityId: ParentActivityId,
                 container: Container,
                 CancellationToken,
                 telemetry: Telemetry,

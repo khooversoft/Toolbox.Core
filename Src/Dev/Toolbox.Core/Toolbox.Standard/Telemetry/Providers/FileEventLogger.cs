@@ -64,8 +64,8 @@ namespace Khooversoft.Toolbox.Standard
             {
                 message.TelemetryType.ToString(),
                 message.EventDate.ToString("yyMMdd:HH:mm:ss") + (message.EventDate.Offset.Hours >= 0 ? "+" : string.Empty) + message.EventDate.Offset.Hours.ToString(),
-                message.WorkContext.Cv,
-                message.WorkContext.Tag,
+                message.WorkContext.ActivityId.ToString(),
+                message.WorkContext.ParentActivityId.ToString(),
                 message.EventSourceName,
                 message.EventName,
                 message.Message,

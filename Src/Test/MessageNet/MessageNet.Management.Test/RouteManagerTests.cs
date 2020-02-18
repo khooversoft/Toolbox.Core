@@ -37,7 +37,7 @@ namespace MessageNet.Management.Test.RouteManagement
 
                 const string nodeId = "Need/Customer";
 
-                RouteRegistrationRequest request = new RouteRegistrationRequest { NodeId = nodeId };
+                RouteRegistrationRequest request = new RouteRegistrationRequest { NetworkId = "development", NodeId = nodeId };
 
                 RouteRegistrationResponse response = await manager.Register(_workContext, request);
                 response.Should().NotBeNull();

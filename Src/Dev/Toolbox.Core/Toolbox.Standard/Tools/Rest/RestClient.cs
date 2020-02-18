@@ -231,8 +231,6 @@ namespace Khooversoft.Toolbox.Standard
             context.Verify(nameof(context)).IsNotNull();
             requestMessage.Verify(nameof(requestMessage)).IsNotNull();
 
-            context = context.WithMethodName();
-
             try
             {
                 using var scope = new TelemetryActivityScope(context, requestMessage.RequestUri.ToString());

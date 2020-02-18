@@ -91,7 +91,7 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
-        /// Test if value is an extent or match if source, used to understand lienage
+        /// Test if value is an extent or match if source, used to understand lineage
         /// </summary>
         /// <param name="source">source or base cv</param>
         /// <param name="value">value to test</param>

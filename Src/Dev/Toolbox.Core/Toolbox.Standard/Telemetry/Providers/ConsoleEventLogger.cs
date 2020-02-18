@@ -27,7 +27,8 @@ namespace Khooversoft.Toolbox.Standard
                 message.Message,
                 message.Duration == null ? null : $"{{ Duration={TimeSpan.FromMilliseconds((long)message.Duration)} }}",
                 message.Value == null ? null : $"{{ Value={message.Value} }}",
-                message.WorkContext?.Cv == null ? null : "{ " + (message.WorkContext.Cv + (message.TelemetryType.IsReplay() ? "(R)" : string.Empty)) + " }",
+                "{ " + (message.WorkContext.ActivityId.ToString() + (message.TelemetryType.IsReplay() ? "(R)" : string.Empty)) + " }",
+                "{ " + (message.WorkContext.ParentActivityId.ToString() + (message.TelemetryType.IsReplay() ? "(R)" : string.Empty)) + " }",
                 message.EventDimensions == null ? null : "{ " + string.Join(", ", message.EventDimensions.Select(x => x.Key + "=" + x.Value?.ToString())) + " }",
             };
 

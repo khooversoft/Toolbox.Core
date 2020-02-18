@@ -19,7 +19,6 @@ namespace Khooversoft.Toolbox.Actor
     {
         private int _timerLockValue;
         private Timer? _timer;
-        private readonly StringVector _tag = new StringVector(nameof(ActorBase));
         private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private int _running = 0;
 
@@ -51,7 +50,7 @@ namespace Khooversoft.Toolbox.Actor
         public async Task Activate(IWorkContext context)
         {
             context.Verify(nameof(context)).IsNotNull();
-            context = context.With(_tag);
+            context = context.WithActivity();
 
             int currentValue = Interlocked.CompareExchange(ref _running, 1, 0);
             if (currentValue != 0)
@@ -72,7 +71,7 @@ namespace Khooversoft.Toolbox.Actor
         public async Task Deactivate(IWorkContext context)
         {
             context.Verify(nameof(context)).IsNotNull();
-            context = context.With(_tag);
+            context = context.WithActivity();
 
             int currentValue = Interlocked.CompareExchange(ref _running, 0, 1);
             if (currentValue != 1)
@@ -122,7 +121,7 @@ namespace Khooversoft.Toolbox.Actor
             _timer.Verify().Assert(x => x == null, "Timer already running");
 
             _timer = new Timer(TimerCallback, null, dueTime, period);
-            ActorManager.Configuration.ActorStartTimerEvent(_workContext.WithMethodName(), ActorKey);
+            ActorManager.Configuration.ActorStartTimerEvent(_workContext.WithActivity(), ActorKey);
         }
 
         /// <summary>
@@ -134,7 +133,7 @@ namespace Khooversoft.Toolbox.Actor
             if (t != null)
             {
                 t.Dispose();
-                ActorManager.Configuration.ActorStopTimerEvent(_workContext.WithMethodName(), ActorKey);
+                ActorManager.Configuration.ActorStopTimerEvent(_workContext.WithActivity(), ActorKey);
             }
         }
 
@@ -152,7 +151,7 @@ namespace Khooversoft.Toolbox.Actor
 
             try
             {
-                ActorManager.Configuration.ActorStartTimerEvent(_workContext.WithMethodName(), ActorKey);
+                ActorManager.Configuration.ActorStartTimerEvent(_workContext.WithActivity(), ActorKey);
                 OnTimer().GetAwaiter().GetResult();
             }
             finally

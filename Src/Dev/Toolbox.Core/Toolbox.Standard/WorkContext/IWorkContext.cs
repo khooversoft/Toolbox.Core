@@ -16,20 +16,17 @@ namespace Khooversoft.Toolbox.Standard
     /// </summary>
     public interface IWorkContext
     {
-        CorrelationVector Cv { get; }
-        StringVector Tag { get; }
+        Guid ActivityId { get; }
+        Guid ParentActivityId { get; }
         IServiceContainer? Container { get; }
         CancellationToken CancellationToken { get; }
         ITelemetry Telemetry { get; }
         IEventDimensions Dimensions { get; }
 
-        IWorkContext WithNewCv();
-        IWorkContext WithExtended();
-        IWorkContext WithIncrement();
-        IWorkContext With(StringVector tag, [CallerMemberName] string? memberName = null);
-        IWorkContext WithMethodName([CallerMemberName] string? memberName = null);
+        IWorkContext WithActivity();
         IWorkContext With(ITelemetry eventLog);
         IWorkContext With(IEventDimensions eventDimenensions);
+        IWorkContext With(CancellationToken? token);
 
         WorkContextBuilder ToBuilder();
     }

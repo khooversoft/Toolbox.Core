@@ -66,7 +66,7 @@ namespace Khooversoft.Toolbox.Standard
 
             void action(TelemetryMessage x)
             {
-                IReadOnlyList<TelemetryMessage> loggedMessages = logger.Query(y => x.WorkContext.Cv == y.WorkContext.Cv, 30, 100);
+                IReadOnlyList<TelemetryMessage> loggedMessages = logger.Query(y => x.WorkContext.ActivityId == y.WorkContext.ActivityId, 30, 100);
 
                 loggedMessages.ForEach(y => telemetryService.Write(y.WithReplay()));
             }
@@ -75,8 +75,7 @@ namespace Khooversoft.Toolbox.Standard
                     (console != TelemetryType.Verbose) &&
                     (!x.TelemetryType.IsReplay()) &&
                     (x.TelemetryType.IsEvent()) &&
-                    (x.TelemetryType.IsErrorOrCritical()) &&
-                    (x?.WorkContext?.Cv != null);
+                    (x.TelemetryType.IsErrorOrCritical());
 
             _dataflowBuilder.Add(new ActionDataflow<TelemetryMessage>(action, filter));
             return this;

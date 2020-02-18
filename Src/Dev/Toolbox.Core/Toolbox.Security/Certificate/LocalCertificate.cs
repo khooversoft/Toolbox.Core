@@ -16,7 +16,6 @@ namespace Khooversoft.Toolbox.Security
     [DebuggerDisplay("StoreName={LocalCertificateKey.StoreName}, StoreLocation={LocalCertificateKey.StoreLocation}, Thumbprint={LocalCertificateKey.Thumbprint}")]
     public class LocalCertificate
     {
-        private static readonly StringVector _tag = new StringVector(nameof(LocalCertificate));
         private readonly object _lock = new object();
         private readonly CacheObject<X509Certificate2> _cachedCertificate = new CacheObject<X509Certificate2>(TimeSpan.FromDays(1));
 
@@ -50,7 +49,6 @@ namespace Khooversoft.Toolbox.Security
         /// <exception cref="CertificateNotFoundException">when certificate valid certificate was not found</exception>
         public X509Certificate2 GetCertificate(IWorkContext context, bool? throwOnNotFound = null)
         {
-            context = context.With(_tag);
             X509Certificate2 certificate;
 
             Exception? saveException = null;

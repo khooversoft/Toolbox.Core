@@ -41,7 +41,6 @@ namespace Khooversoft.Toolbox.Standard
             where T : class
         {
             context.Verify(nameof(context)).IsNotNull();
-            context = context.WithMethodName();
 
             try
             {

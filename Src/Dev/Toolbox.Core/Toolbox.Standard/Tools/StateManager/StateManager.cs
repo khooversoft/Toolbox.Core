@@ -10,8 +10,6 @@ namespace Khooversoft.Toolbox.Standard
 {
     public class StateManager : IStateManager
     {
-        private readonly StringVector _tag = new StringVector(nameof(StateManager));
-
         public StateManager(StateManagerBuilder builder)
         {
             builder.Verify(nameof(builder)).IsNotNull();
@@ -29,7 +27,6 @@ namespace Khooversoft.Toolbox.Standard
         public async Task<bool> Set(IWorkContext context)
         {
             context.Verify(nameof(context)).IsNotNull();
-            context = context.With(_tag);
 
             try
             {
@@ -78,7 +75,6 @@ namespace Khooversoft.Toolbox.Standard
         public async Task<bool> Test(IWorkContext context)
         {
             context.Verify(nameof(context)).IsNotNull();
-            context = context.With(_tag);
 
             try
             {

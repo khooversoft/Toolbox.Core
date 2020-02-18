@@ -16,12 +16,10 @@ namespace Khooversoft.Toolbox.Actor
     //[DebuggerStepThrough]
     public class ActorProxy<T> : DispatchProxy where T : IActor
     {
-        private static readonly CorrelationVector _cv = new CorrelationVector("Toolbox-ActorProxy");
         private readonly SemaphoreSlim _lockSemaphore = new SemaphoreSlim(1, 1);
         private IActorBase? _instance;
         private IActorManager? _manager;
         private IWorkContext? _workContext;
-        private static readonly StringVector _tag = new StringVector(nameof(ActorProxy<T>));
 
         public ActorProxy()
         {
@@ -45,11 +43,7 @@ namespace Khooversoft.Toolbox.Actor
             ActorProxy<T> proxy = (ActorProxy<T>)proxyObject;
             proxy._instance = instance;
             proxy._manager = manager;
-
-            proxy._workContext = new WorkContextBuilder(context)
-                .Set(_tag)
-                .Set(_cv)
-                .Build();
+            proxy._workContext = context.WithActivity();
 
             return (T)proxyObject;
         }

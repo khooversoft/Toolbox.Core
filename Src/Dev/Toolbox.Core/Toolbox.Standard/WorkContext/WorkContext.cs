@@ -21,8 +21,9 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         public WorkContext()
         {
-            Cv = new CorrelationVector();
-            Tag = StringVector.Empty;
+            ActivityId = Guid.NewGuid();
+            ParentActivityId = ActivityId;
+
             Telemetry = new TelemetryLogNull();
             Dimensions = EventDimensions.Empty;
         }
@@ -33,8 +34,9 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="workContext">copy from work context</param>
         private WorkContext(WorkContext workContext)
         {
-            Cv = workContext.Cv;
-            Tag = workContext.Tag;
+            ActivityId = workContext.ActivityId;
+            ParentActivityId = workContext.ParentActivityId;
+
             Container = workContext.Container;
             CancellationToken = workContext.CancellationToken;
             Telemetry = workContext.Telemetry;
@@ -44,36 +46,35 @@ namespace Khooversoft.Toolbox.Standard
         /// <summary>
         /// Construct work context, for values that are not known to be immutable, shallow copies are made
         /// </summary>
-        /// <param name="cv">correlation vector</param>
-        /// <param name="tag">code location tag</param>
+        /// <param name="activityId">correlation vector</param>
+        /// <param name="parentActivityId">code location tag</param>
         /// <param name="container">container</param>
         /// <param name="properties">properties (optional)</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <param name="telemetry"></param>
         /// <param name="dimensions"></param>
         public WorkContext(
-            CorrelationVector cv,
-            StringVector tag,
+            Guid activityId,
+            Guid parentActivityId,
+
             IServiceContainer? container,
             CancellationToken? cancellationToken = null,
             ITelemetry? telemetry = null,
             IEventDimensions? dimensions = null
             )
         {
-            cv.Verify().IsNotNull();
-            cv.Verify().IsNotNull();
+            ActivityId = activityId;
+            ParentActivityId = parentActivityId;
 
-            Cv = cv;
-            Tag = tag;
             Container = container;
             CancellationToken = cancellationToken ?? CancellationToken.None;
             Telemetry = telemetry ?? new TelemetryLogNull();
             Dimensions = dimensions != null ? new EventDimensions(dimensions) : new EventDimensions();
         }
 
-        public CorrelationVector Cv { get; private set; }
+        public Guid ActivityId { get; private set; }
 
-        public StringVector Tag { get; private set; }
+        public Guid ParentActivityId { get; private set; }
 
         public IServiceContainer? Container { get; }
 
@@ -82,6 +83,19 @@ namespace Khooversoft.Toolbox.Standard
         public ITelemetry Telemetry { get; private set; }
 
         public IEventDimensions Dimensions { get; private set; }
+
+        /// <summary>
+        /// With new activity id, switches with parent activity id
+        /// </summary>
+        /// <returns></returns>
+        public IWorkContext WithActivity()
+        {
+            var context = new WorkContext(this);
+            context.ParentActivityId = ActivityId;
+            context.ActivityId = Guid.NewGuid();
+
+            return context;
+        }
 
         /// <summary>
         /// Create new context with cancellation token
@@ -123,71 +137,6 @@ namespace Khooversoft.Toolbox.Standard
             return new WorkContext(this)
             {
                 Dimensions = new EventDimensions(Dimensions) + eventDimenensions,
-            };
-        }
-
-        /// <summary>
-        /// Create a new context with a new CV
-        /// </summary>
-        /// <returns></returns>
-        public IWorkContext WithNewCv()
-        {
-            return new WorkContext(this)
-            {
-                Cv = new CorrelationVector(),
-            };
-        }
-
-        /// <summary>
-        /// Create new instance of work context with Increment CV
-        /// </summary>
-        /// <returns>new work context</returns>
-        public IWorkContext WithExtended()
-        {
-            return new WorkContext(this)
-            {
-                Cv = Cv.WithExtend(),
-            };
-        }
-
-        /// <summary>
-        /// Create new instance of work context with Increment CV
-        /// </summary>
-        /// <returns>new work context</returns>
-        public IWorkContext WithIncrement()
-        {
-            return new WorkContext(this)
-            {
-                Cv = Cv.WithIncrement(),
-            };
-        }
-
-        /// <summary>
-        /// Create new instance of work context with method name being added to Tag
-        /// </summary>
-        /// <param name="memberName">member name (compiler will fill in)</param>
-        /// <returns>new work context</returns>
-        public IWorkContext WithMethodName([CallerMemberName] string? memberName = null)
-        {
-            return new WorkContext(this)
-            {
-                Tag = Tag.With(memberName!),
-            };
-        }
-
-        /// <summary>
-        /// Create new instance of work context with Tag being added to current Tag
-        /// </summary>
-        /// <param name="tag">code tag</param>
-        /// <param name="memberName">method name (compiler will fill in)</param>
-        /// <returns>new work context</returns>
-        public IWorkContext With(StringVector tag, [CallerMemberName] string? memberName = null)
-        {
-            tag.Verify(nameof(tag)).IsNotNull();
-
-            return new WorkContext(this)
-            {
-                Tag = Tag.With(tag, memberName!),
             };
         }
 

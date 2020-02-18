@@ -14,8 +14,8 @@ namespace Khooversoft.Toolbox.Standard
             {
                 MessageId = message.MessageId,
                 EventDate = message.EventDate,
-                Cv = message.WorkContext.Cv,
-                Tag = message.WorkContext.Tag,
+                ActivityId = message.WorkContext.ActivityId,
+                ParentActivityId = message.WorkContext.ParentActivityId,
                 TelemetryType = message.TelemetryType,
                 EventSourceName = message.EventSourceName,
                 EventName = message.EventName,
@@ -38,14 +38,13 @@ namespace Khooversoft.Toolbox.Standard
                 return null;
             }
 
-            //var md = JsonSerializer.Deserialize<TelemetryMessageModel>(jsonMessage);
             var md = JsonConvert.DeserializeObject<TelemetryMessageModel>(jsonMessage);
             md.Verify(nameof(md)).IsNotNull();
 
             IWorkContext context = new WorkContextBuilder()
             {
-                Cv = md.Cv != null ? new CorrelationVector(md.Cv) : new CorrelationVector(),
-                Tag = md.Tag != null ? StringVector.Parse(md.Tag) : StringVector.Empty,
+                ActivityId = md.ActivityId,
+                ParentActivityId = md.ParentActivityId,
             }.Build();
 
             return new TelemetryMessage(md, context);

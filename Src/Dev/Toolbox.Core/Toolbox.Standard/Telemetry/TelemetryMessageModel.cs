@@ -13,9 +13,9 @@ namespace Khooversoft.Toolbox.Standard
 
         public DateTimeOffset EventDate { get; set; }
 
-        public string? Cv { get; set; }
+        public Guid ActivityId { get; set; }
 
-        public string? Tag { get; set; }
+        public Guid ParentActivityId { get; set; }
 
         public TelemetryType TelemetryType { get; set; }
 

@@ -122,7 +122,7 @@ namespace KHooversoft.Toolbox.Graph
         private async Task RunJobGraph(IWorkContext context)
         {
             context.Telemetry.Verbose(context, $"Enter-{nameof(RunJobGraph)}");
-            IWorkContext nodeContext = context.WithNewCv();
+            IWorkContext nodeContext = context.WithActivity();
 
             while (true)
             {
@@ -166,9 +166,9 @@ namespace KHooversoft.Toolbox.Graph
 
                     nodeContext = nodeContext
                         .WithCreateLogger(node.Key.ToString())
-                        .WithIncrement();
+                        .WithActivity();
 
-                    context.Telemetry.Verbose(context, $"{nameof(RunJobGraph)} Starting job for node {node.Key}, node's cv={nodeContext.Cv}");
+                    context.Telemetry.Verbose(context, $"{nameof(RunJobGraph)} Starting job for node {node.Key}, node's activity={nodeContext.ActivityId}");
 
                     jobId = await _jobHost.StartJob(nodeContext, node, UpdateCompletionList);
 

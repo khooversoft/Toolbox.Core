@@ -16,7 +16,6 @@ namespace Khooversoft.Toolbox.Actor
     public class ActorTypeManager
     {
         private readonly ConcurrentDictionary<Type, ActorTypeRegistration> _actorRegistration = new ConcurrentDictionary<Type, ActorTypeRegistration>();
-        private readonly StringVector _tag = new StringVector(nameof(ActorManager));
 
         public ActorTypeManager()
         {
@@ -33,13 +32,12 @@ namespace Khooversoft.Toolbox.Actor
         {
             context.Verify(nameof(context)).IsNotNull();
             typeof(T).IsInterface.Verify().Assert(x => x = true, $"{typeof(T).FullName} must be an interface");
-            context = context.With(_tag);
 
             IActor create(IWorkContext c) => createImplementation(c);
 
             _actorRegistration.AddOrUpdate(typeof(T), x => new ActorTypeRegistration(x, create), (x, r) => r);
 
-            context.Telemetry.Verbose(context.With(_tag), $"lambda registered for type:{typeof(T)}");
+            context.Telemetry.Verbose(context, $"lambda registered for type:{typeof(T)}");
             return this;
         }
 
@@ -54,11 +52,10 @@ namespace Khooversoft.Toolbox.Actor
             context.Verify(nameof(context)).IsNotNull();
             actorTypeRegistration.Verify(nameof(actorTypeRegistration)).IsNotNull();
             actorTypeRegistration.InterfaceType.IsInterface.Verify().Assert(x => x = true, $"{actorTypeRegistration.InterfaceType.FullName} must be an interface");
-            context = context.With(_tag);
 
             _actorRegistration.AddOrUpdate(actorTypeRegistration.InterfaceType, actorTypeRegistration, (_, __) => actorTypeRegistration);
 
-            context.Telemetry.Verbose(context.With(_tag), $"lambda registered for type:{actorTypeRegistration.InterfaceType.Name}");
+            context.Telemetry.Verbose(context, $"lambda registered for type:{actorTypeRegistration.InterfaceType.Name}");
             return this;
         }
 
@@ -75,9 +72,9 @@ namespace Khooversoft.Toolbox.Actor
             context.Verify(nameof(context)).IsNotNull();
             actorKey.Verify(nameof(actorKey)).IsNotNull();
             manager.Verify(nameof(manager)).IsNotNull();
+            context = context.WithActivity();
 
             typeof(T).IsInterface.Verify().Assert(x => x == true, $"{typeof(T)} must be an interface");
-            context = context.With(_tag);
 
             Type actorType = typeof(T);
 
@@ -86,7 +83,7 @@ namespace Khooversoft.Toolbox.Actor
             if (typeRegistration == null)
             {
                 var ex = new KeyNotFoundException($"Registration for {actorType.FullName} was not found");
-                context.Telemetry.Error(context.With(_tag), "create failure", ex);
+                context.Telemetry.Error(context, "create failure", ex);
                 throw ex;
             }
 
@@ -97,7 +94,7 @@ namespace Khooversoft.Toolbox.Actor
             if( actorBase == null)
             {
                 string failureMsg = $"Created actor type {actorObject.GetType()} does not derive from ActorBase";
-                context.Telemetry.Error(context.With(_tag), failureMsg);
+                context.Telemetry.Error(context, failureMsg);
                 throw new InvalidOperationException(failureMsg);
             }
 
