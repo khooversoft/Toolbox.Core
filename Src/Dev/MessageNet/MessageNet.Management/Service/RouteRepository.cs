@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Management
 {
-    public class RouteManager : IRouteManager
+    public class RouteRepository : IRouteRepository
     {
         private readonly IActorManager _actorManager;
 
-        public RouteManager(IActorManager actorManager)
+        public RouteRepository(IActorManager actorManager)
         {
             actorManager.Verify(nameof(actorManager)).IsNotNull();
             _actorManager = actorManager;
@@ -28,26 +28,24 @@ namespace Khooversoft.MessageNet.Management
         /// <param name="context">context</param>
         /// <param name="request">request</param>
         /// <returns>response</returns>
-        public async Task<RouteRegistrationResponse> Register(IWorkContext context, RouteRegistrationRequest request)
+        public async Task<QueueId> Register(IWorkContext context, RouteRequest request)
         {
-            request.Verify(nameof(request)).IsNotNull();
-            request.NodeId.Verify(nameof(request.NodeId)).IsNotNull();
+            request.Verify(nameof(request)).Assert(x => x.IsValid(), "Route request is invalid");
 
-            await _actorManager.GetActor<INodeRegistrationActor>(request.NodeId!)
-                .Set(context, request.ConvertTo(request.NodeId!));
+            var actorKey = request.ToActorKey();
+
+            NodeRegistration nodeRegistration = await _actorManager.GetActor<INodeRegistrationActor>(actorKey)
+                .Set(context);
 
             QueueDefinition queueDefinition = new QueueDefinition
             {
-                QueueName = request.NodeId,
+                QueueName = actorKey.ToString(),
             };
 
-            await _actorManager.GetActor<IQueueManagementActor>(request.NodeId!)
+            await _actorManager.GetActor<IQueueManagementActor>(actorKey)
                 .Set(context, queueDefinition);
 
-            return new RouteRegistrationResponse
-            {
-                InputQueueUri = request.NodeId,
-            };
+            return nodeRegistration;
         }
 
         /// <summary>
@@ -56,15 +54,16 @@ namespace Khooversoft.MessageNet.Management
         /// <param name="context">context</param>
         /// <param name="nodeId">node id</param>
         /// <returns>task</returns>
-        public async Task Unregister(IWorkContext context, RouteRegistrationRequest routeRegistrationRequest)
+        public async Task Unregister(IWorkContext context, RouteRequest request)
         {
-            routeRegistrationRequest.Verify(nameof(routeRegistrationRequest)).IsNotNull();
-            routeRegistrationRequest.NodeId.Verify(nameof(routeRegistrationRequest.NodeId)).IsNotNull();
+            request.Verify(nameof(request)).IsNotNull();
 
-            await _actorManager.GetActor<INodeRegistrationActor>(routeRegistrationRequest.NodeId!)
+            var actorKey = request.ToActorKey();
+
+            await _actorManager.GetActor<INodeRegistrationActor>(actorKey)
                 .Remove(context);
 
-            await _actorManager.GetActor<IQueueManagementActor>(routeRegistrationRequest.NodeId!)
+            await _actorManager.GetActor<IQueueManagementActor>(actorKey)
                 .Remove(context);
         }
 
@@ -74,20 +73,12 @@ namespace Khooversoft.MessageNet.Management
         /// <param name="context"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<IReadOnlyList<RouteLookupResponse>> Search(IWorkContext context, RouteLookupRequest request)
+        public async Task<IReadOnlyList<QueueId>> Search(IWorkContext context, RouteRequest request)
         {
             request.Verify(nameof(request)).IsNotNull();
 
-            IReadOnlyList<NodeRegistrationModel> registrations = await _actorManager.GetActor<INodeRegistrationManagementActor>("default")
+            return await _actorManager.GetActor<INodeRegistrationManagementActor>("default")
                 .List(context, request.NodeId!);
-
-            return registrations
-                .Select(x => new RouteLookupResponse
-                {
-                    NodeId = x.NodeId,
-                    InputUri = x.InputQueueUri,
-                })
-                .ToList();
         }
 
         /// <summary>

@@ -10,8 +10,8 @@ namespace Khooversoft.MessageNet.Host
 {
     internal interface INodeRouteActor : IActor
     {
-        Task<NodeRegistrationModel?> Lookup(IWorkContext context);
+        Task<NodeRegistration?> Lookup(IWorkContext context);
 
-        Task<NodeRegistrationModel> Register(IWorkContext context);
+        Task<NodeRegistration> Register(IWorkContext context);
     }
 }

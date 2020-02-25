@@ -15,11 +15,10 @@ namespace EventHubPerformanceTest
     {
         private readonly IWorkContext _context;
         private readonly MetricSampler _sampler;
-        private static readonly StringVector _tag = new StringVector(nameof(EventProcessor));
 
         public EventProcessor(IWorkContext context, MetricSampler sampler)
         {
-            _context = context.With(_tag);
+            _context = context;
             _sampler = sampler;
         }
 
@@ -48,7 +47,7 @@ namespace EventHubPerformanceTest
 
             foreach (var eventData in messages)
             {
-                var data = Encoding.UTF8.GetString(eventData.Body.Array!, eventData.Body.Offset, eventData.Body.Count);
+                _ = Encoding.UTF8.GetString(eventData.Body.Array!, eventData.Body.Offset, eventData.Body.Count);
                 _sampler.Add(1);
             }
 

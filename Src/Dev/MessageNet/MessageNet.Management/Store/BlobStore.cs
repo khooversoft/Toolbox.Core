@@ -25,11 +25,11 @@ namespace Khooversoft.MessageNet.Management
             _createContainer = new Deferred(x => _blobRepository.CreateContainer(x));
         }
 
-        public Task Set(IWorkContext context, string path, NodeRegistrationModel nodeRegistrationModel)
+        public Task Set(IWorkContext context, string path, NodeRegistration nodeRegistrationModel)
         {
             _createContainer.Execute(context);
 
-            string data = JsonConvert.SerializeObject(nodeRegistrationModel);
+            string data = JsonConvert.SerializeObject(nodeRegistrationModel.ConvertTo());
             return _blobRepository.Set(context, path, data);
         }
 
@@ -40,22 +40,26 @@ namespace Khooversoft.MessageNet.Management
             return _blobRepository.Delete(context, path);
         }
 
-        public async Task<NodeRegistrationModel?> Get(IWorkContext context, string path)
+        public async Task<QueueId?> Get(IWorkContext context, string path)
         {
             _createContainer.Execute(context);
 
             string? data = await _blobRepository.Get(context, path);
 
-            return data == null ? null : JsonConvert.DeserializeObject<NodeRegistrationModel>(data);
+            return data switch
+            {
+                null => null,
+                _ => JsonConvert.DeserializeObject<NodeRegistrationStoreModel>(data).ConvertTo(),
+            };
         }
 
-        public async Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context, string search)
+        public async Task<IReadOnlyList<QueueId>> List(IWorkContext context, string search)
         {
             _createContainer.Execute(context);
 
             IReadOnlyList<string> list = await _blobRepository.List(context, search);
 
-            NodeRegistrationModel[] result = await list
+            QueueId[] result = await list
                 .Select(x => Get(context, x))
                 .Where(x => x != null)
                 .WhenAll();

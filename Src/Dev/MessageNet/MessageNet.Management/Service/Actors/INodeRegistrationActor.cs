@@ -10,10 +10,10 @@ namespace Khooversoft.MessageNet.Management
 {
     public interface INodeRegistrationActor : IActor
     {
-        Task Set(IWorkContext context, NodeRegistrationModel nodeRegistrationModel);
+        Task<NodeRegistration> Set(IWorkContext context);
 
         Task Remove(IWorkContext context);
 
-        Task<NodeRegistrationModel?> Get(IWorkContext context);
+        Task<NodeRegistration?> Get(IWorkContext context);
     }
 }

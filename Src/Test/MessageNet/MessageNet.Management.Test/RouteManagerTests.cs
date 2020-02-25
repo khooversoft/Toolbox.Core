@@ -33,95 +33,96 @@ namespace MessageNet.Management.Test.RouteManagement
                     .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
                     .Build();
 
-                RouteManager manager = container.Resolve<RouteManager>();
+                RouteRepository repository = container.Resolve<RouteRepository>();
 
-                const string nodeId = "Need/Customer";
+                var queueId = new QueueId("development", "Need.Customer");
+                RouteRequest request = new RouteRequest { NetworkId = queueId.NetworkId, NodeId = queueId.NodeId };
 
-                RouteRegistrationRequest request = new RouteRegistrationRequest { NetworkId = "development", NodeId = nodeId };
-
-                RouteRegistrationResponse response = await manager.Register(_workContext, request);
+                NodeRegistration response = await repository.Register(_workContext, request);
                 response.Should().NotBeNull();
 
-                response.InputQueueUri.Should().NotBeNullOrEmpty();
-                response.InputQueueUri.Should().Be(nodeId);
+                response.QueueId.NetworkId.Should().Be(queueId.NetworkId);
+                response.QueueId.NodeId.Should().Be(queueId.NodeId);
 
-                RouteLookupRequest routeLookupRequest = new RouteLookupRequest
+                RouteRequest routeRequest = new RouteRequest
                 {
-                    NodeId = nodeId,
+                    NetworkId = queueId.NetworkId,
+                    NodeId = queueId.NodeId,
                 };
 
-                IReadOnlyList<RouteLookupResponse>? routeLookupResponses = await manager.Search(_workContext, routeLookupRequest);
+                IReadOnlyList<NodeRegistration>? routeLookupResponses = await repository.Search(_workContext, routeRequest);
                 routeLookupResponses.Should().NotBeNull();
                 routeLookupResponses.Count.Should().Be(1);
-                routeLookupResponses[0].NodeId.Should().Be(nodeId);
-                routeLookupResponses[0].InputUri.Should().Be(nodeId);
+                routeLookupResponses[0].Namespace.Should().NotBeNullOrWhiteSpace();
+                routeLookupResponses[0].QueueId.NetworkId.Should().Be(queueId.NetworkId);
+                routeLookupResponses[0].QueueId.NodeId.Should().Be(queueId.NodeId);
 
-                await manager.Unregister(_workContext, request);
+                await repository.Unregister(_workContext, request);
 
-                routeLookupResponses = await manager.Search(_workContext, routeLookupRequest);
+                routeLookupResponses = await repository.Search(_workContext, routeRequest);
                 routeLookupResponses.Should().NotBeNull();
                 routeLookupResponses.Count.Should().Be(0);
             }
         }
 
         [Fact]
-        public async Task GivenThreeNode_WhenRegisterAndUnregistered_ShouldPass()
-        {
-            const int max = 1;
-            IContainer rootContainer = CreateContainer();
+        //public async Task GivenThreeNode_WhenRegisterAndUnregistered_ShouldPass()
+        //{
+        //    const int max = 1;
+        //    IContainer rootContainer = CreateContainer();
 
-            using (ILifetimeScope container = rootContainer.BeginLifetimeScope())
-            {
-                _workContext = new WorkContextBuilder()
-                    .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
-                    .Build();
+        //    using (ILifetimeScope container = rootContainer.BeginLifetimeScope())
+        //    {
+        //        _workContext = new WorkContextBuilder()
+        //            .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
+        //            .Build();
 
-                RouteManager manager = container.Resolve<RouteManager>();
+        //        RouteManager manager = container.Resolve<RouteManager>();
 
-                // Generate route request and expected URI
-                Func<int, string> generateName = x => $"Need/Client_{x}";
+        //        // Generate route request and expected URI
+        //        Func<int, string> generateName = x => $"Need/Client_{x}";
 
-                var routeRegistrations = Enumerable.Range(0, max)
-                    .Select(x => new
-                    {
-                        NodeRigistration = new RouteRegistrationRequest { NodeId = generateName(x) },
-                        NodeId = generateName(x)
-                    })
-                    .ToList();
+        //        var routeRegistrations = Enumerable.Range(0, max)
+        //            .Select(x => new
+        //            {
+        //                NodeRigistration = RouteRegistrationRequest.Test(generateName(x)),
+        //                NodeId = generateName(x)
+        //            })
+        //            .ToList();
 
-                RouteRegistrationResponse[] responses = await routeRegistrations
-                    .Select(x => manager.Register(_workContext, x.NodeRigistration))
-                    .WhenAll();
+        //        RouteRegistrationResponse[] responses = await routeRegistrations
+        //            .Select(x => manager.Register(_workContext, x.NodeRigistration))
+        //            .WhenAll();
 
-                // Verify responses
-                responses.Should().NotBeNull();
-                responses.Length.Should().Be(max);
+        //        // Verify responses
+        //        responses.Should().NotBeNull();
+        //        responses.Length.Should().Be(max);
 
-                responses.OrderBy(x => x.InputQueueUri)
-                    .Zip(routeRegistrations.OrderBy(x => x.NodeId), (o, i) => (o, i))
-                    .All(x => x.o.InputQueueUri == x.i.NodeId)
-                    .Should().BeTrue();
+        //        responses.OrderBy(x => x.InputQueueUri)
+        //            .Zip(routeRegistrations.OrderBy(x => x.), (o, i) => (o, i))
+        //            .All(x => x.o.InputQueueUri == x.i.NodeId)
+        //            .Should().BeTrue();
 
-                // Search for all nodes
-                IReadOnlyList<RouteLookupResponse> routeLookupResponse = await manager.Search(_workContext, new RouteLookupRequest { NodeId = "*" });
-                routeLookupResponse.Should().NotBeNull();
-                routeLookupResponse.Count.Should().Be(max);
+        //        // Search for all nodes
+        //        IReadOnlyList<RouteLookupResponse> routeLookupResponse = await manager.Search(_workContext, new RouteLookupRequest { NodeId = "*" });
+        //        routeLookupResponse.Should().NotBeNull();
+        //        routeLookupResponse.Count.Should().Be(max);
 
-                routeLookupResponse.OrderBy(x => x.InputUri)
-                    .Zip(routeRegistrations.OrderBy(x => x.NodeId), (o, i) => (o, i))
-                    .All(x => x.o.InputUri == x.i.NodeId)
-                    .Should().BeTrue();
+        //        routeLookupResponse.OrderBy(x => x.InputUri)
+        //            .Zip(routeRegistrations.OrderBy(x => x.NodeId), (o, i) => (o, i))
+        //            .All(x => x.o.InputUri == x.i.NodeId)
+        //            .Should().BeTrue();
 
-                // Unregister
-                await routeRegistrations
-                    .Select(x => manager.Unregister(_workContext, x.NodeRigistration))
-                    .WhenAll();
+        //        // Unregister
+        //        await routeRegistrations
+        //            .Select(x => manager.Unregister(_workContext, x.NodeRigistration))
+        //            .WhenAll();
 
-                routeLookupResponse = await manager.Search(_workContext, new RouteLookupRequest { NodeId = "*" });
-                routeLookupResponse.Should().NotBeNull();
-                routeLookupResponse.Count.Should().Be(0);
-            }
-        }
+        //        routeLookupResponse = await manager.Search(_workContext, new RouteLookupRequest { NodeId = "*" });
+        //        routeLookupResponse.Should().NotBeNull();
+        //        routeLookupResponse.Count.Should().Be(0);
+        //    }
+        //}
 
         private IContainer CreateContainer()
         {
@@ -138,7 +139,7 @@ namespace MessageNet.Management.Test.RouteManagement
             builder.Register(x => new ActorConfigurationBuilder().Set(_workContext!).Build()).As<ActorConfiguration>().InstancePerLifetimeScope();
 
             builder.RegisterType<ActorManager>().As<IActorManager>().InstancePerLifetimeScope();
-            builder.RegisterType<RouteManager>().As<RouteManager>().InstancePerLifetimeScope();
+            builder.RegisterType<RouteRepository>().As<RouteRepository>().InstancePerLifetimeScope();
 
             builder.Register(x => new BlobStoreConnection("Default", "ConnectionString")).As<BlobStoreConnection>().InstancePerLifetimeScope();
             builder.Register(x => new ServiceBusConnection("Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={key};TransportType=Amqp")).As<ServiceBusConnection>().InstancePerLifetimeScope();

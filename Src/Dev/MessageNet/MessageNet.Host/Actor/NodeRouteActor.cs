@@ -12,44 +12,38 @@ namespace Khooversoft.MessageNet.Host
     internal class NodeRouteActor : ActorBase, INodeRouteActor
     {
         private readonly INameServerClient _nameServer;
-        private readonly CacheObject<NodeRegistrationModel> _cache = new CacheObject<NodeRegistrationModel>(TimeSpan.FromHours(1));
-        private readonly string _networkId;
-        private readonly string _nodeId;
+        private readonly CacheObject<NodeRegistration> _cache = new CacheObject<NodeRegistration>(TimeSpan.FromHours(1));
+        private readonly QueueId _queueId;
 
         public NodeRouteActor(INameServerClient nameServer)
         {
             _nameServer = nameServer;
-
-            var netMessageUri = MessageUriBuilder.Parse(base.ActorKey.VectorKey).Build();
-
-            _networkId = netMessageUri.NetworkId;
-            _nodeId = netMessageUri.NodeId;
+            _queueId = QueueId.Parse(ActorKey.VectorKey);
         }
 
-        public async Task<NodeRegistrationModel?> Lookup(IWorkContext context)
+        public async Task<NodeRegistration?> Lookup(IWorkContext context)
         {
-            if (_cache.TryGetValue(out NodeRegistrationModel cachedValue)) return cachedValue;
+            if (_cache.TryGetValue(out NodeRegistration cachedValue)) return cachedValue;
 
-            RouteLookupResponse? lookup = await _nameServer.Lookup(context, new RouteLookupRequest { NetworkId = _networkId, NodeId = _nodeId });
+            RouteResponse? lookup = await _nameServer.Lookup(context, new RouteRequest { NetworkId = _queueId.NetworkId, NodeId = _queueId.NodeId });
             if (lookup == null) return null;
 
-            NodeRegistrationModel lookupModel = lookup.ConvertTo();
+            NodeRegistration lookupModel = lookup.ConvertTo();
 
             _cache.Set(lookupModel);
             return lookupModel;
         }
 
-        public async Task<NodeRegistrationModel> Register(IWorkContext context)
+        public async Task<NodeRegistration> Register(IWorkContext context)
         {
             _cache.Clear();
 
-            var request = new RouteRegistrationRequest { NetworkId = _networkId, NodeId = _nodeId };
+            var request = new RouteRequest { NetworkId = _queueId.NetworkId, NodeId = _queueId.NodeId };
 
-            RouteRegistrationResponse response = await _nameServer.Register(context, request);
-            response.Verify().IsNotNull($"Registration failed with name server");
-            response.InputQueueUri!.Verify().IsNotEmpty("Name server's response did not include input queue URI");
+            RouteResponse response = await _nameServer.Register(context, request);
+            response.Verify().IsNotNull("Registration failed with name server");
 
-            NodeRegistrationModel nodeRegistrationModel = response.ConvertTo();
+            NodeRegistration nodeRegistrationModel = response.ConvertTo();
             _cache.Set(nodeRegistrationModel);
 
             return nodeRegistrationModel;

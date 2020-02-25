@@ -27,18 +27,18 @@ namespace MessageHub.NameServer.Test.Registration
         {
             await _fixture.NameServerClient.ClearAll(_workContext);
 
-            var request = new RouteRegistrationRequest { NodeId = "test/Node1" };
+            var request = RouteRequest.Test("test/Node1");
             var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
 
             var httpResponse = await _fixture.Client
-                .PostAsync("api/Registgration", content);
+                .PostAsync("api/Registration", content);
 
             httpResponse.EnsureSuccessStatusCode();
 
             var responseString = await httpResponse.Content.ReadAsStringAsync();
-            RouteRegistrationResponse response = JsonConvert.DeserializeObject<RouteRegistrationResponse>(responseString);
+            RouteResponse response = JsonConvert.DeserializeObject<RouteResponse>(responseString);
 
-            response.InputQueueUri.Should().Be("test/Node1");
+            response.Should().Be("test/Node1");
         }
 
         [Fact]
@@ -46,11 +46,13 @@ namespace MessageHub.NameServer.Test.Registration
         {
             await _fixture.NameServerClient.ClearAll(_workContext);
 
-            var request = new RouteRegistrationRequest { NodeId = "test/Node1" };
+            var request = RouteRequest.Test("test/Node1");
 
-            RouteRegistrationResponse response = await _fixture.NameServerClient.Register(_workContext, request);
+            RouteResponse response = await _fixture.NameServerClient.Register(_workContext, request);
 
-            response.InputQueueUri.Should().Be("test/Node1");
+            response.Namespace.Should().NotBeEmpty();
+            response.NetworkId.Should().Be("test");
+            response.NodeId.Should().Be("Node1");
         }
 
         [Fact]
@@ -58,9 +60,9 @@ namespace MessageHub.NameServer.Test.Registration
         {
             await _fixture.NameServerClient.ClearAll(_workContext);
 
-            var request = new RouteLookupRequest { NodeId = "test/Node1" };
+            var request = new RouteRequest { NodeId = "test/Node1" };
 
-            RouteLookupResponse? response = await _fixture.NameServerClient.Lookup(_workContext, request);
+            RouteResponse? response = await _fixture.NameServerClient.Lookup(_workContext, request);
             response.Should().BeNull();
         }
 
@@ -69,13 +71,13 @@ namespace MessageHub.NameServer.Test.Registration
         {
             await _fixture.NameServerClient.ClearAll(_workContext);
 
-            var request = new RouteRegistrationRequest { NodeId = "test/Node1" };
+            var request = RouteRequest.Test("test/Node1");
 
-            RouteRegistrationResponse response = await _fixture.NameServerClient.Register(_workContext, request);
+            RouteResponse response = await _fixture.NameServerClient.Register(_workContext, request);
 
-            var lookupRequest = new RouteLookupRequest { NodeId = request.NodeId };
+            var lookupRequest = new RouteRequest { NodeId = request.NodeId };
 
-            RouteLookupResponse? lookupResponse = await _fixture.NameServerClient.Lookup(_workContext, lookupRequest);
+            RouteResponse? lookupResponse = await _fixture.NameServerClient.Lookup(_workContext, lookupRequest);
             lookupResponse.Should().NotBeNull();
             lookupResponse!.NodeId.Should().Be(request.NodeId);
 

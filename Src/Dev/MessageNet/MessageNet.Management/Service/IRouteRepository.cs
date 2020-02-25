@@ -8,13 +8,13 @@ using Khooversoft.Toolbox.Standard;
 
 namespace Khooversoft.MessageNet.Management
 {
-    public interface IRouteManager
+    public interface IRouteRepository
     {
-        Task<RouteRegistrationResponse> Register(IWorkContext context, RouteRegistrationRequest request);
+        Task<QueueId> Register(IWorkContext context, RouteRequest request);
 
-        Task<IReadOnlyList<RouteLookupResponse>> Search(IWorkContext context, RouteLookupRequest request);
+        Task<IReadOnlyList<QueueId>> Search(IWorkContext context, RouteRequest request);
 
-        Task Unregister(IWorkContext context, RouteRegistrationRequest routeRegistrationRequest);
+        Task Unregister(IWorkContext context, RouteRequest routeRegistrationRequest);
 
         Task Clear(IWorkContext workContext);
     }

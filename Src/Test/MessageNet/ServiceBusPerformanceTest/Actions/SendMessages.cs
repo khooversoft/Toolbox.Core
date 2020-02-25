@@ -16,7 +16,6 @@ namespace ServiceBusPerformanceTest
     {
         private readonly IOption _option;
         private readonly IMessageClient _client;
-        private static readonly StringVector _tag = new StringVector(nameof(SendMessages));
         private int _messageCount;
 
         public SendMessages(IOption option, IMessageClient client)
@@ -30,7 +29,7 @@ namespace ServiceBusPerformanceTest
             context.Verify(nameof(context)).IsNotNull();
             context = context
                 .WithCreateLogger(nameof(SendMessages))
-                .With(_tag);
+                .WithActivity();
 
             context.Telemetry.Info(context, $"Sending messages, Task Count:{_option.TaskCount}, ...");
 

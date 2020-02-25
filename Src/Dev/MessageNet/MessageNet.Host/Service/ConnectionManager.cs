@@ -20,11 +20,11 @@ namespace Khooversoft.MessageNet.Host
         public ConnectionManager Add(params ConnectionRegistration[] connectionRegistrations)
         {
             connectionRegistrations
-                .ForEach(x => this[x.NetworkId] = x);
+                .ForEach(x => this[x.Namespace] = x);
 
             return this;
         }
 
-        public string GetConnection(string networkId) => this[networkId].ConnectionString;
+        public string GetConnection(string nameSpace) => this[nameSpace].ConnectionString;
     }
 }

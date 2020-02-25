@@ -12,7 +12,7 @@ namespace Khooversoft.MessageNet.Management
 {
     public interface INodeRegistrationManagementActor : IActor
     {
-        Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context, string search);
+        Task<IReadOnlyList<QueueId>> List(IWorkContext context, string search);
 
         Task ClearRegistery(IWorkContext context);
     }

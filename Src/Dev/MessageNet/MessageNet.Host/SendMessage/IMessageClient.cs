@@ -18,6 +18,6 @@ namespace Khooversoft.MessageNet.Host
 
         Task Send(IWorkContext context, NetMessage message);
 
-        Task RegisterForMessageCallBack(Guid messageId);
+        Task WaitForResponse(Guid messageId);
     }
 }

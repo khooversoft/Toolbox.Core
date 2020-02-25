@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 
-namespace Khooversoft.MessageNet.Host
+namespace Khooversoft.MessageNet.Interface
 {
     public interface INameServerClient
     {
@@ -13,10 +13,10 @@ namespace Khooversoft.MessageNet.Host
         
         Task ClearAll(IWorkContext context);
 
-        Task<RouteLookupResponse?> Lookup(IWorkContext context, RouteLookupRequest request);
+        Task<RouteResponse?> Lookup(IWorkContext context, RouteRequest request);
 
-        Task<RouteRegistrationResponse> Register(IWorkContext context, RouteRegistrationRequest request);
+        Task<RouteResponse> Register(IWorkContext context, RouteRequest request);
 
-        Task Unregister(IWorkContext context, RouteRegistrationRequest request);
+        Task Unregister(IWorkContext context, RouteRequest request);
     }
 }

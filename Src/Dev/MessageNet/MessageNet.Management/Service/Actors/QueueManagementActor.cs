@@ -11,6 +11,12 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Management
 {
+    /// <summary>
+    /// Responsible for creating, removing, and getting details for a specific queue
+    /// 
+    /// Key = Queue name "networkId/nodeId"
+    /// 
+    /// </summary>
     public class QueueManagementActor : ActorBase, IQueueManagementActor
     {
         private readonly IQueueManagement _queueManagement;

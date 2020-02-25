@@ -33,6 +33,14 @@ namespace Khooversoft.Toolbox.Standard
         {
         }
 
+        /// <summary>
+        /// Default empty
+        /// </summary>
+        public StringVector(bool hasRoot)
+            : this(Enumerable.Empty<string>(), "/", hasRoot)
+        {
+        }
+
         public StringVector(string value, string delimiter)
         {
             value.Verify(nameof(value)).IsNotEmpty();
@@ -66,6 +74,8 @@ namespace Khooversoft.Toolbox.Standard
         /// Empty path with root
         /// </summary>
         public static StringVector Empty { get; } = new StringVector();
+
+        public static StringVector EmptyNoRoot { get; } = new StringVector(false);
 
         public string this[int index] => _parts[index];
 

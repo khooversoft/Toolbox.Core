@@ -21,6 +21,8 @@ namespace Khooversoft.MessageNet.Host
     /// </summary>
     public class MessageNetHost : IMessageNetHost
     {
+        private const string hostIdFormat = "{namespace}/{networkId}/{nodeId}";
+
         private static readonly HttpClient _httpClient = new HttpClient();
         private readonly IWorkContext _workContext;
         private readonly Uri _nameServerUri;
@@ -56,7 +58,7 @@ namespace Khooversoft.MessageNet.Host
                 .Value;
 
             _nodeRegistrations
-                .GroupBy(x => x.Uri)
+                .GroupBy(x => x.MessageUri.ToString(hostIdFormat))
                 .Where(x => x.Count() > 1)
                 .Verify().Assert(x => x.Count() == 0, x => $"Duplicate routes have been detected: {string.Join(", ", x)}");
 
@@ -68,7 +70,7 @@ namespace Khooversoft.MessageNet.Host
         {
             _receivers.Verify().IsNotNull("Host is already running");
 
-            context.Telemetry.Info(context, "Starting Message Net Host");
+            context.Telemetry.Info(context, "Starting message net host");
 
             StartReceivers();
 
@@ -80,29 +82,27 @@ namespace Khooversoft.MessageNet.Host
             List<ReceiverHost>? receivers = Interlocked.Exchange(ref _receivers, null!);
             if (receivers != null)
             {
-                context.Telemetry.Info(context, "Stopping Message Net Host");
+                context.Telemetry.Info(context, "Starting message net host");
 
                 await _receivers
                     .ForEachAsync(async x => await x.Actor.Stop(_workContext));
             }
         }
 
-        public async Task<NodeRegistrationModel?> LookupNode(IWorkContext context, string networkId, string nodeId)
+        public async Task<NodeRegistration?> LookupNode(IWorkContext context, QueueId queueId)
         {
-            networkId.Verify(nameof(networkId)).IsNotEmpty();
-            nodeId.Verify(nameof(nodeId)).IsNotEmpty();
+            queueId.Verify(nameof(queueId)).IsNotNull();
 
-            string queueName = networkId + "/" + nodeId;
+            var actorKey = queueId.ToActorKey();
 
-            return await _actorManager.GetActor<INodeRouteActor>(new ActorKey(queueName))
+            return await _actorManager.GetActor<INodeRouteActor>(actorKey)
                 .Lookup(context);
         }
 
-        public Task<IMessageClient> GetMessageClient(IWorkContext context, NodeRegistrationModel nodeRegistrationModel)
+        public Task<IMessageClient> GetMessageClient(IWorkContext context, NodeRegistration nodeRegistration)
         {
-            var uri = new Uri(nodeRegistrationModel!.InputQueueUri);
-            string connectionString = _connectionManager.GetConnection(uri.Host);
-            string queueName = uri.QueueName();
+            string connectionString = _connectionManager.GetConnection(nodeRegistration.Namespace);
+            string queueName = nodeRegistration.QueueId.ToString();
 
             return Task.FromResult<IMessageClient>(new MessageClient(connectionString, queueName, _awaiterManager));
         }
@@ -120,7 +120,7 @@ namespace Khooversoft.MessageNet.Host
         private void StartReceivers()
         {
             _receivers = _nodeRegistrations
-                .GroupBy(x => x.QueueName)
+                .GroupBy(x => x.MessageUri.ToString(hostIdFormat))
                 .Select(x => (NodeRegistrations: x, Actor: _actorManager.GetActor<INodeHostActor>(new ActorKey(x.Key))))
                 .Select(x => new ReceiverHost(x.Actor, x.Actor.Run(_workContext, x.NodeRegistrations)))
                 .ToList();

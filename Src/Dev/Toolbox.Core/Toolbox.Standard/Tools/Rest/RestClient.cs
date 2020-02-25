@@ -41,7 +41,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <summary>
         /// Path elements
         /// </summary>
-        public StringVector PathItems { get; private set; } = StringVector.Empty;
+        public StringVector PathItems { get; private set; } = StringVector.EmptyNoRoot;
 
         /// <summary>
         /// Query items
@@ -259,7 +259,7 @@ namespace Khooversoft.Toolbox.Standard
         {
             var builder = BaseAddress != null ? new UriBuilder(BaseAddress) : new UriBuilder();
 
-            builder.Path = (builder.Path?.Split("/") ?? new string[0])
+            builder.Path = (builder.Path?.Split("/", StringSplitOptions.RemoveEmptyEntries) ?? new string[0])
                 .Concat(PathItems)
                 .Do(x => string.Join("/", x));
 

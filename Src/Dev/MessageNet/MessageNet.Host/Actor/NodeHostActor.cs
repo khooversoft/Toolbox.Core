@@ -15,6 +15,7 @@ namespace Khooversoft.MessageNet.Host
     internal class NodeHostActor : ActorBase, INodeHostActor
     {
         private readonly IConnectionManager _connectionManager;
+        private readonly QueueId _queueId;
         private IList<NodeHostRegistration>? _nodeRegistrations;
         private MessageQueueReceiveProcessor? _messageProcessor;
 
@@ -23,6 +24,7 @@ namespace Khooversoft.MessageNet.Host
             connectionManager.Verify(nameof(connectionManager)).IsNotNull();
 
             _connectionManager = connectionManager;
+            _queueId = ActorKey.ToQueueId();
         }
 
         public async Task Run(IWorkContext context, IEnumerable<NodeHostRegistration> nodeRegistrations)
@@ -31,21 +33,18 @@ namespace Khooversoft.MessageNet.Host
             nodeRegistrations.Verify().Assert(x => x.Count() > 0, "Node registration list is empty");
             _messageProcessor.Verify().Assert(x => x == null, "Node host is already running");
 
-            MessageUri msgUri = MessageUriBuilder.Parse(ActorKey.ToString()).Build();
-
             _nodeRegistrations
-                .All(x => x.NetworkId == msgUri.NetworkId && x.NodeId == msgUri.NodeId)
+                .All(x => x.MessageUri.NetworkId == _queueId.NetworkId && x.MessageUri.NodeId == _queueId.NodeId)
                 .Verify()
                 .Assert(x => x == true, "One or more node registration does not match network id and/or node id for the actor key");
 
             _nodeRegistrations = nodeRegistrations.ToList();
 
-            string connectionString = await RegisterReceiverQueue(context, msgUri);
+            string connectionString = await RegisterReceiverQueue(context);
 
 
-            context.Telemetry.Info(context, $"Starting node host for {msgUri}");
-            _messageProcessor = new MessageQueueReceiveProcessor(connectionString, msgUri.GetQueueName());
-
+            context.Telemetry.Info(context, $"Starting node host for {_queueId.ToString()}");
+            _messageProcessor = new MessageQueueReceiveProcessor(connectionString, _queueId.ToString());
 
             Func<IWorkContext, NetMessage, Task> pipeline = CreatePipeline();
             await _messageProcessor.Start(context, x => pipeline(context, x));
@@ -67,26 +66,21 @@ namespace Khooversoft.MessageNet.Host
             return Stop(context);
         }
 
-        private async Task<string> RegisterReceiverQueue(IWorkContext context, MessageUri msgUri)
+        private async Task<string> RegisterReceiverQueue(IWorkContext context)
         {
             context.Telemetry.Info(context, $"Register node's host for {ActorKey}");
             await ActorManager.GetActor<INodeRouteActor>(ActorKey).Register(context);
 
-            return _connectionManager.GetConnection(msgUri.NetworkId);
+            return _connectionManager.GetConnection(_queueId.NetworkId);
         }
 
         private Func<IWorkContext, NetMessage, Task> CreatePipeline()
         {
             var pipelineBuilder = new PipelineBuilder<NetMessage>();
 
-            foreach(var item in _nodeRegistrations!)
+            foreach (var item in _nodeRegistrations!)
             {
-                NodeHostRegistration nodeHostRegistration = item;
-
-                pipelineBuilder.Map(
-                    x => x.Header.ToUri.Equals(nodeHostRegistration.Uri, StringComparison.OrdinalIgnoreCase),
-                    (context, message) => nodeHostRegistration.Receiver(message)
-                    );
+                pipelineBuilder.Map(x => x.Header.ToUri.ToMessageUri().ToQueueId() == _queueId, (context, message) => item.Receiver(message));
             }
 
             return pipelineBuilder.Build();

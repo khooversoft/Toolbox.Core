@@ -17,7 +17,6 @@ namespace EventHubPerformanceTest
     {
         private readonly IOption _option;
         private readonly Owned<ISendEvent> _sendEvent;
-        private static readonly StringVector _tag = new StringVector(nameof(SendEvents));
         private int _messageCount;
 
         public SendEvents(IOption option, Owned<ISendEvent> eventSend)
@@ -31,7 +30,7 @@ namespace EventHubPerformanceTest
             context.Verify(nameof(context)).IsNotNull();
             context = context
                 .WithCreateLogger(nameof(SendEvents))
-                .With(_tag);
+                .WithActivity();
 
             context.Telemetry.Info(context, $"Sending events, Task Count:{_option.TaskCount}, ...");
 

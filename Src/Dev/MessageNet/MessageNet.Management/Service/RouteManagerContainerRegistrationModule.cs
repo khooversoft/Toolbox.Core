@@ -16,7 +16,7 @@ namespace Khooversoft.MessageNet.Management
             Add(typeof(NodeRegistrationActor), typeof(INodeRegistrationActor));
             Add(typeof(QueueManagementActor), typeof(IQueueManagementActor));
             Add(typeof(NodeRegistrationManagementActor), typeof(INodeRegistrationManagementActor));
-            Add(typeof(RouteManager), typeof(IRouteManager));
+            Add(typeof(RouteRepository), typeof(IRouteRepository));
 
             Add(typeof(ActorManager), typeof(IActorManager));
         }

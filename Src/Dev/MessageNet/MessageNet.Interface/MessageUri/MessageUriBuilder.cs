@@ -18,12 +18,17 @@ namespace Khooversoft.MessageNet.Interface
         /// <summary>
         /// Protocol, default to "MS"
         /// </summary>
-        public string Protocol { get; set; } = "msgnet";
+        public string? Protocol { get; set; }
+
+        /// <summary>
+        /// Name space
+        /// </summary>
+        public string? Namespace { get; set; }
 
         /// <summary>
         /// Network ID
         /// </summary>
-        public string? NetworkId { get; set; } = "default";
+        public string? NetworkId { get; set; }
 
         /// <summary>
         /// Network ID
@@ -43,6 +48,17 @@ namespace Khooversoft.MessageNet.Interface
         public MessageUriBuilder SetProtocol(string protocol)
         {
             Protocol = protocol;
+            return this;
+        }
+
+        /// <summary>
+        /// Set network ID
+        /// </summary>
+        /// <param name="nameSpace">network id</param>
+        /// <returns>this</returns>
+        public MessageUriBuilder SetNamespace(string nameSpace)
+        {
+            Namespace = nameSpace;
             return this;
         }
 
@@ -138,7 +154,7 @@ namespace Khooversoft.MessageNet.Interface
         /// <returns>message URI</returns>
         public MessageUri Build()
         {
-            return new MessageUri(Protocol, NetworkId!, NodeId!, Route?.Build()?.ToString());
+            return new MessageUri(Protocol, Namespace, NetworkId!, NodeId!, Route?.Build()?.ToString());
         }
     }
 }

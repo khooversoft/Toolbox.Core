@@ -2,7 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using FluentAssertions;
-using Khooversoft.MessageNet.Host;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using System.Threading.Tasks;
 using Xunit;

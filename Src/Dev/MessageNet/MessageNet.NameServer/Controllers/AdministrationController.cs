@@ -17,19 +17,19 @@ namespace MessageHub.NameServer.Controllers
     public class AdministrationController : ControllerBase
     {
         private readonly IWorkContext _workContext;
-        private readonly IRouteManager _routeManager;
+        private readonly IRouteRepository _routeRepository;
 
-        public AdministrationController(IWorkContext workContext, IRouteManager routeManager)
+        public AdministrationController(IWorkContext workContext, IRouteRepository routeRepository)
         {
             _workContext = workContext;
-            _routeManager = routeManager;
+            _routeRepository = routeRepository;
         }
 
         [HttpPost("clear")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ClearAll()
         {
-            await _routeManager.Clear(_workContext);
+            await _routeRepository.Clear(_workContext);
             return StatusCode(StatusCodes.Status200OK, new { Ok = true });
         }
     }

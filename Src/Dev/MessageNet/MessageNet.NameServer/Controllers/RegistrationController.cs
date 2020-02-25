@@ -16,37 +16,37 @@ namespace MessageHub.NameServer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RegistgrationController : ControllerBase
+    public class RegistrationController : ControllerBase
     {
-        private readonly IRouteManager _routeManager;
+        private readonly IRouteRepository _routeRepository;
         private readonly IWorkContext _workContext;
 
-        public RegistgrationController(IWorkContext workContext, IRouteManager routeManager)
+        public RegistrationController(IWorkContext workContext, IRouteRepository routeManager)
         {
             _workContext = workContext;
-            _routeManager = routeManager;
+            _routeRepository = routeManager;
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Register([FromBody] RouteRegistrationRequest routeRegistrationRequest)
+        public async Task<IActionResult> Register([FromBody] RouteRequest routeRequest)
         {
-            if (routeRegistrationRequest == null) return StatusCode(StatusCodes.Status400BadRequest);
+            if (routeRequest == null) return StatusCode(StatusCodes.Status400BadRequest);
 
-            RouteRegistrationResponse response = await _routeManager.Register(_workContext, routeRegistrationRequest);
+            NodeRegistration response = await _routeRepository.Register(_workContext, routeRequest);
 
-            return StatusCode(StatusCodes.Status201Created, response);
+            return StatusCode(StatusCodes.Status201Created, response.ConvertTo());
         }
 
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Unregister([FromBody] RouteRegistrationRequest routeRegistrationRequest)
+        public async Task<IActionResult> Unregister([FromBody] RouteRequest routeRequest)
         {
-            if (routeRegistrationRequest == null) return StatusCode(StatusCodes.Status400BadRequest);
+            if (routeRequest == null) return StatusCode(StatusCodes.Status400BadRequest);
 
-            await _routeManager.Unregister(_workContext, routeRegistrationRequest);
+            await _routeRepository.Unregister(_workContext, routeRequest);
 
             return StatusCode(StatusCodes.Status200OK);
         }
@@ -55,14 +55,14 @@ namespace MessageHub.NameServer.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Lookup([FromBody] RouteLookupRequest routeLookupRequest)
+        public async Task<IActionResult> Lookup([FromBody] RouteRequest routeRequest)
         {
-            if (routeLookupRequest == null || routeLookupRequest.NodeId.IsEmpty()) return StatusCode(StatusCodes.Status400BadRequest);
+            if (routeRequest == null || routeRequest.NodeId.IsEmpty()) return StatusCode(StatusCodes.Status400BadRequest);
 
-            IReadOnlyList<RouteLookupResponse> response = await _routeManager.Search(_workContext, routeLookupRequest);
+            IReadOnlyList<NodeRegistration> response = await _routeRepository.Search(_workContext, routeRequest);
             if (response == null || response.Count != 1) return StatusCode(StatusCodes.Status404NotFound);
 
-            return Ok(response[0]);
+            return Ok(response[0].ConvertTo());
         }
     }
 }

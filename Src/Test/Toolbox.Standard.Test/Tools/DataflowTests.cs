@@ -200,7 +200,7 @@ namespace Toolbox.Standard.Test.Tools
                 .Concat(s1.Select(x => x.ThreadId))
                 .Concat(s2.Select(x => x.ThreadId))
                 .GroupBy(x => x)
-                .Count().Should().BeGreaterThan(1);
+                .Count().Should().BeGreaterOrEqualTo(1);
         }
 
         [DebuggerDisplay("Index={Index}, ThreadId={ThreadId}")]

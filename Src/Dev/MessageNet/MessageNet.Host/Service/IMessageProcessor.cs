@@ -12,7 +12,9 @@ namespace Khooversoft.MessageNet.Host
     public interface IMessageProcessor
     {
         Task Stop();
+
         void Dispose();
+
         Task Start(IWorkContext context, Func<NetMessage, Task> receiver);
     }
 }

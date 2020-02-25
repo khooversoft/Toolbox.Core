@@ -12,37 +12,17 @@ namespace Khooversoft.MessageNet.Host
 {
     public class NodeHostRegistration
     {
-        public NodeHostRegistration(string networkId, string nodeId, string? route, Func<NetMessage, Task> receiver)
+        public NodeHostRegistration(MessageUri messageUri, Func<NetMessage, Task> receiver)
         {
-            networkId.Verify(nameof(networkId)).IsNotEmpty();
-            nodeId.Verify(nameof(nodeId)).IsNotEmpty();
+            messageUri.Verify(nameof(messageUri)).IsNotNull();
             receiver.Verify(nameof(receiver)).IsNotNull();
 
-            NetworkId = networkId;
-            NodeId = nodeId;
-            Route = route;
+            MessageUri = messageUri;
             Receiver = receiver;
-
-            Uri = new MessageUriBuilder()
-                .SetNetworkId(NetworkId)
-                .SetNodeId(NodeId)
-                .SetRoute(Route)
-                .Build()
-                .ToString();
-
-            QueueName = NetworkId + "/" + NodeId;
         }
 
-        public string NetworkId { get; }
-
-        public string NodeId { get; }
-
-        public string? Route { get; }
+        public MessageUri MessageUri { get; }
 
         public Func<NetMessage, Task> Receiver { get; }
-
-        public string Uri { get; }
-
-        public string QueueName { get; }
     }
 }

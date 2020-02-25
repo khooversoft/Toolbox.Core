@@ -16,7 +16,7 @@ namespace Khooversoft.MessageNet.Host
 
         public IConnectionManager? ConnectionManager { get; set; }
 
-        public IList<NodeHostRegistration>? NodeRegistrations { get; set; }
+        public IList<NodeHostRegistration>? NodeRegistrations { get; set; } = new List<NodeHostRegistration>();
 
         public MessageNetHostBuilder SetNameServerUri(Uri nameServerUri)
         {

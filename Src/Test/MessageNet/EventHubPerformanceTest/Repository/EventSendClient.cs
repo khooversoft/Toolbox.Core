@@ -14,7 +14,6 @@ namespace EventHubPerformanceTest
     {
         private readonly EventHubClient _client;
         private readonly EventHubsConnectionStringBuilder _conntectionString;
-        private static readonly StringVector _tag = new StringVector(nameof(EventSendClient));
 
         public EventSendClient(IOption option)
         {
@@ -24,8 +23,6 @@ namespace EventHubPerformanceTest
 
         public Task CloseAsync(IWorkContext context)
         {
-            context = context.With(_tag);
-
             context.Telemetry.Verbose(context, $"Closing event hub client for {_conntectionString.EntityPath}");
             return _client.CloseAsync();
         }

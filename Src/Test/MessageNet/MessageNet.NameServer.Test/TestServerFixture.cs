@@ -2,7 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Autofac.Extensions.DependencyInjection;
-using Khooversoft.MessageNet.Host;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.MessageNet.Management;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;

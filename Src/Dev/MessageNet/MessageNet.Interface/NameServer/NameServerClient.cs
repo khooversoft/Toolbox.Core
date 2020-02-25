@@ -12,7 +12,7 @@ using Khooversoft.Toolbox.Standard;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Khooversoft.MessageNet.Host
+namespace Khooversoft.MessageNet.Interface
 {
     public class NameServerClient : INameServerClient
     {
@@ -48,38 +48,38 @@ namespace Khooversoft.MessageNet.Host
             return (bool)jobj["ok"]! == true;
         }
 
-        public Task<RouteRegistrationResponse> Register(IWorkContext context, RouteRegistrationRequest request)
+        public Task<RouteResponse> Register(IWorkContext context, RouteRequest request)
         {
             return new RestClient(_httpClient)
                 .SetBaseAddress(_nameServiceUri)
-                .AddPath("api/Registgration")
+                .AddPath("api/Registration")
                 .SetContent(request)
                 .SetEnsureSuccessStatusCode()
                 .PostAsync(context)
-                .GetContentAsync<RouteRegistrationResponse>(context);
+                .GetContentAsync<RouteResponse>(context);
         }
 
-        public Task Unregister(IWorkContext context, RouteRegistrationRequest request)
+        public Task Unregister(IWorkContext context, RouteRequest request)
         {
             return new RestClient(_httpClient)
                 .SetBaseAddress(_nameServiceUri)
-                .AddPath("api/Registgration")
+                .AddPath("api/Registration")
                 .SetContent(request)
                 .SetEnsureSuccessStatusCode()
                 .DeleteAsync(context)
                 .GetResponseAsync(context);
         }
 
-        public async Task<RouteLookupResponse?> Lookup(IWorkContext context, RouteLookupRequest request)
+        public async Task<RouteResponse?> Lookup(IWorkContext context, RouteRequest request)
         {
-            RestResponse<RouteLookupResponse> response = await new RestClient(_httpClient)
+            RestResponse<RouteResponse> response = await new RestClient(_httpClient)
                 .SetBaseAddress(_nameServiceUri)
-                .AddPath("api/Registgration")
+                .AddPath("api/Registration")
                 .SetContent(request)
                 .SetValidHttpStatusCodes(HttpStatusCode.NotFound)
                 .SetEnsureSuccessStatusCode()
                 .GetAsync(context)
-                .GetResponseAsync<RouteLookupResponse>(context);
+                .GetResponseAsync<RouteResponse>(context);
 
             if (response.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound) return null;
             return response.Content;

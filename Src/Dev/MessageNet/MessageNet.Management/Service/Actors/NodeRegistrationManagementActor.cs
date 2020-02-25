@@ -12,6 +12,11 @@ using Khooversoft.MessageNet.Interface;
 
 namespace Khooversoft.MessageNet.Management
 {
+    /// <summary>
+    /// Node registration management
+    /// 
+    /// Clearing register will deactivate all actors and clear registry.
+    /// </summary>
     public class NodeRegistrationManagementActor : ActorBase, INodeRegistrationManagementActor
     {
         private readonly IRegisterStore _registerStore;
@@ -23,7 +28,7 @@ namespace Khooversoft.MessageNet.Management
             _registerStore = registerStore;
         }
 
-        public Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context, string search)
+        public Task<IReadOnlyList<QueueId>> List(IWorkContext context, string search)
         {
             return _registerStore.List(context, search);
         }

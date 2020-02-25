@@ -18,7 +18,6 @@ namespace ServiceBusPerformanceTest
         private readonly IMessageClient _client;
         private readonly MetricSampler _sampler = new MetricSampler(TimeSpan.FromSeconds(1));
         private int _messageCount;
-        private static readonly StringVector _tag = new StringVector(nameof(ReceiveMessages));
 
         public ReceiveMessages(IOption option, IMessageClient client)
         {
@@ -31,7 +30,7 @@ namespace ServiceBusPerformanceTest
             context.Verify(nameof(context)).IsNotNull();
             context = context
                 .WithCreateLogger(nameof(ReceiveMessages))
-                .With(_tag);
+                .WithActivity();
 
             context.Telemetry.Info(context, "Receiving events...");
             _messageCount = 0;
@@ -67,7 +66,6 @@ namespace ServiceBusPerformanceTest
 
         private void MetricsOutput(IWorkContext context)
         {
-            context = context.WithMethodName();
             IReadOnlyList<MetricSample> samples = _sampler.GetMetrics(true);
 
             if (samples.Count == 0)

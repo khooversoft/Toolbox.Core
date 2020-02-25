@@ -8,18 +8,14 @@ using System.Text;
 namespace Khooversoft.MessageNet.Interface
 {
     /// <summary>
-    /// Route lookup request for a node
+    /// Node registration response to a request
     /// </summary>
-    public class RouteLookupRequest
+    public class RouteResponse
     {
-        /// <summary>
-        /// Network ID to lookup
-        /// </summary>
+        public string? Namespace { get; set; }
+
         public string? NetworkId { get; set; }
 
-        /// <summary>
-        /// Node ID to lookup
-        /// </summary>
         public string? NodeId { get; set; }
     }
 }

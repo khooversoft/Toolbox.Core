@@ -15,9 +15,9 @@ namespace Khooversoft.MessageNet.Host
         private MessageSender _messageSender;
         private readonly string _connectionString;
         private readonly string _queueName;
-        private readonly AwaiterManager _awaiterManager;
+        private readonly IAwaiterManager _awaiterManager;
 
-        public MessageClient(string connectionString, string queueName, AwaiterManager awaiterManager)
+        public MessageClient(string connectionString, string queueName, IAwaiterManager awaiterManager)
         {
             connectionString.Verify(nameof(connectionString)).IsNotEmpty();
             queueName.Verify(nameof(queueName)).IsNotEmpty();
@@ -29,6 +29,12 @@ namespace Khooversoft.MessageNet.Host
             _messageSender = new MessageSender(_connectionString, _queueName);
         }
 
+        /// <summary>
+        /// Send message, fire and forget
+        /// </summary>
+        /// <param name="context">context</param>
+        /// <param name="message">message</param>
+        /// <returns>task</returns>
         public async Task Send(IWorkContext context, NetMessage message)
         {
             if (_messageSender == null || _messageSender?.IsClosedOrClosing == true) return;
@@ -40,7 +46,32 @@ namespace Khooversoft.MessageNet.Host
             await _messageSender!.SendAsync(message.ConvertTo());
         }
 
-        public Task RegisterForMessageCallBack(Guid messageId)
+        /// <summary>
+        /// Send message and wait for response
+        /// </summary>
+        /// <param name="context">context</param>
+        /// <param name="message">message</param>
+        /// <returns>task</returns>
+        public async Task Call(IWorkContext context, NetMessage message)
+        {
+            if (_messageSender == null || _messageSender?.IsClosedOrClosing == true) return;
+
+            // Write the body of the message to the console
+            context.Telemetry.Verbose(context, $"Calling message: {message}");
+
+            // Send the message to the queue
+            await _messageSender!.SendAsync(message.ConvertTo());
+
+            // Wait for response
+            await WaitForResponse(message.Header.MessageId);
+        }
+
+        /// <summary>
+        /// Wait for response from message that was sent
+        /// </summary>
+        /// <param name="messageId">message id to wait for</param>
+        /// <returns>task</returns>
+        public Task WaitForResponse(Guid messageId)
         {
             var tcs = new TaskCompletionSource<NetMessage>();
             _awaiterManager.Add(messageId, tcs);
@@ -48,6 +79,10 @@ namespace Khooversoft.MessageNet.Host
             return tcs.Task;
         }
 
+        /// <summary>
+        /// Close client
+        /// </summary>
+        /// <returns>task</returns>
         public async Task Close()
         {
             MessageSender messsageSender = Interlocked.Exchange(ref _messageSender, null!);

@@ -19,7 +19,6 @@ namespace EventHubPerformanceTest
         private readonly IEventReceiverHost _eventReceiverHost;
         private readonly MetricSampler _sampler = new MetricSampler(TimeSpan.FromSeconds(1));
         private int _messageCount;
-        private static readonly StringVector _tag = new StringVector(nameof(ReceiveEvents));
 
         public ReceiveEvents(IOption option, IEventReceiverHost eventReceiverHost)
         {
@@ -33,7 +32,7 @@ namespace EventHubPerformanceTest
             context.Verify(nameof(context)).IsNotNull();
             context = context
                 .WithCreateLogger(nameof(ReceiveEvents))
-                .With(_tag);
+                .WithActivity();
 
             context.Telemetry.Info(context, "Receiving events...");
             _messageCount = 0;
@@ -76,7 +75,6 @@ namespace EventHubPerformanceTest
 
         private void MetricsOutput(IWorkContext context)
         {
-            context = context.WithMethodName();
             IReadOnlyList<MetricSample> samples = _sampler.GetMetrics(true);
 
             if (samples.Count == 0)

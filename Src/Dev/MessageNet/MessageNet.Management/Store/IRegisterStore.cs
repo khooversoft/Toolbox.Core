@@ -10,13 +10,13 @@ namespace Khooversoft.MessageNet.Management
 {
     public interface IRegisterStore
     {
-        Task Set(IWorkContext context, string path, NodeRegistrationModel nodeRegistrationModel);
+        Task Set(IWorkContext context, string path, NodeRegistration nodeRegistrationModel);
 
         Task Remove(IWorkContext context, string path);
 
-        Task<NodeRegistrationModel?> Get(IWorkContext context, string path);
+        Task<QueueId?> Get(IWorkContext context, string path);
 
-        Task<IReadOnlyList<NodeRegistrationModel>> List(IWorkContext context, string search);
+        Task<IReadOnlyList<QueueId>> List(IWorkContext context, string search);
 
         Task ClearAll(IWorkContext context);
     }
