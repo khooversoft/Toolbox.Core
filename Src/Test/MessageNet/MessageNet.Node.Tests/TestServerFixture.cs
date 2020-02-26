@@ -2,8 +2,9 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Autofac.Extensions.DependencyInjection;
-using Khooversoft.MessageNet.Host;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.MessageNet.Management;
+using Khooversoft.Toolbox.Azure;
 using MessageHub.NameServer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -40,8 +41,7 @@ namespace MessageNet.Node.Tests
                 {
                     services
                         .AddSingleton<IBlobRepository, BlobRepository>()
-                        .AddSingleton<IQueueManagement, QueueManagement>()
-                        .AddSingleton<IRegisterStore, BlobStore>();
+                        .AddSingleton<IQueueManagement, QueueManagement>();
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

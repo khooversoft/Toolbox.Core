@@ -29,6 +29,8 @@ namespace Khooversoft.MessageNet.Interface
 
         public override string ToString() => Namespace + "/" + NetworkId + "/" + NodeId;
 
+        public string GetQueueName() => NetworkId + "/" + NodeId;
+
         public override bool Equals(object obj) => obj switch
         {
             QueueId queueId => Namespace.Equals(queueId.NetworkId, StringComparison.OrdinalIgnoreCase) &&

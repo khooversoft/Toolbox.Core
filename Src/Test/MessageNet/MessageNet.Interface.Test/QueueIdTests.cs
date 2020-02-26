@@ -15,7 +15,7 @@ namespace MessageNet.Interface.Test
         [InlineData("a123")]
         public void GivenNetworkId_WhenQueueIdIsCreated_ShouldMatch(string id)
         {
-            Action act = () => new QueueId(id, "nodeId");
+            Action act = () => new QueueId("main", id, "nodeId");
             act.Should().NotThrow();
         }
 
@@ -28,7 +28,7 @@ namespace MessageNet.Interface.Test
         [InlineData("a1/23")]
         public void GivenNetworkId_WhenQueueIdIsCreated_ShouldNotMatch(string id)
         {
-            Action act = () => new QueueId(id, "nodeId");
+            Action act = () => new QueueId("main", id, "nodeId");
             act.Should().Throw<ArgumentException>();
         }
 
@@ -40,7 +40,7 @@ namespace MessageNet.Interface.Test
         [InlineData("a123.ABCD.this")]
         public void GivenNodeId_WhenQueueIdIsCreated_ShouldMatch(string id)
         {
-            Action act = () => new QueueId("networkId", id);
+            Action act = () => new QueueId("main", "networkId", id);
             act.Should().NotThrow();
         }
 
@@ -54,7 +54,7 @@ namespace MessageNet.Interface.Test
         [InlineData("+a123")]
         public void GivenNodekId_WhenQueueIdIsCreated_ShouldNotMatch(string id)
         {
-            Action act = () => new QueueId("networkId", id);
+            Action act = () => new QueueId("main", "networkId", id);
             act.Should().Throw<ArgumentException>();
         }
     }

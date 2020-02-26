@@ -2,7 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Autofac.Extensions.DependencyInjection;
-using Khooversoft.MessageNet.Management;
+using Khooversoft.Toolbox.Azure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,8 +29,7 @@ namespace MessageHub.NameServer
                 {
                     services
                         .AddSingleton<IBlobRepository, BlobRepository>()
-                        .AddSingleton<IQueueManagement, QueueManagement>()
-                        .AddSingleton<IRegisterStore, BlobStore>();
+                        .AddSingleton<IQueueManagement, QueueManagement>();
                 })                    
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

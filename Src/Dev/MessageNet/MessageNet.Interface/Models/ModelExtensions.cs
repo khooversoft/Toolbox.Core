@@ -8,32 +8,23 @@ namespace Khooversoft.MessageNet.Interface
 {
     public static class ModelExtensions
     {
-        public static NodeRegistrationStoreModel ConvertTo(this NodeRegistration subject)
+        public static QueueIdStore ConvertTo(this QueueId subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new NodeRegistrationStoreModel
+            return new QueueIdStore
             {
                 Namespace = subject.Namespace,
-                NetworkId = subject.QueueId.NetworkId,
-                NodeId = subject.QueueId.NodeId,
+                NetworkId = subject.NetworkId,
+                NodeId = subject.NodeId,
             };
         }
 
-        public static QueueId ConvertTo(this NodeRegistrationStoreModel subject)
+        public static QueueId ConvertTo(this QueueIdStore subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
-            subject.Namespace!.Verify(nameof(subject.Namespace)).IsNotEmpty();
-            subject.NetworkId!.Verify(nameof(subject.NetworkId)).IsNotEmpty();
-            subject.NodeId!.Verify(nameof(subject.NodeId)).IsNotEmpty();
-
             return new QueueId(subject.Namespace!, subject.NetworkId!, subject.NodeId!);
         }
 
-        public static ActorKey ToActorKey(this QueueId subject) => new ActorKey(subject.Verify().IsNotNull().Value.ToString());
-
-        public static QueueId ToQueueId(this ActorKey subject) => QueueId.Parse(subject.VectorKey);
-
-        public static QueueId ToQueueId(this MessageUri subject) => subject.Verify().IsNotNull().Value.Do(x => new QueueId(x.NetworkId, x.NodeId));
+        public static QueueId ToQueueId(this MessageUri subject) => subject.Verify().IsNotNull().Value.Do(x => new QueueId(x.Namespace, x.NetworkId, x.NodeId));
     }
 }

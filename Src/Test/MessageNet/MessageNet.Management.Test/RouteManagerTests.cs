@@ -3,15 +3,11 @@
 
 using Autofac;
 using FluentAssertions;
+using Khooversoft.MessageNet.Host;
 using Khooversoft.MessageNet.Interface;
-using Khooversoft.MessageNet.Management;
-using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Standard;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -35,31 +31,25 @@ namespace MessageNet.Management.Test.RouteManagement
 
                 RouteRepository repository = container.Resolve<RouteRepository>();
 
-                var queueId = new QueueId("development", "Need.Customer");
+                var queueId = new QueueId("default", "development", "Need.Customer");
                 RouteRequest request = new RouteRequest { NetworkId = queueId.NetworkId, NodeId = queueId.NodeId };
 
-                NodeRegistration response = await repository.Register(_workContext, request);
+                QueueId response = await repository.Register(_workContext, request);
                 response.Should().NotBeNull();
 
-                response.QueueId.NetworkId.Should().Be(queueId.NetworkId);
-                response.QueueId.NodeId.Should().Be(queueId.NodeId);
+                response.NetworkId.Should().Be(queueId.NetworkId);
+                response.NodeId.Should().Be(queueId.NodeId);
 
-                RouteRequest routeRequest = new RouteRequest
-                {
-                    NetworkId = queueId.NetworkId,
-                    NodeId = queueId.NodeId,
-                };
-
-                IReadOnlyList<NodeRegistration>? routeLookupResponses = await repository.Search(_workContext, routeRequest);
+                IReadOnlyList<QueueId>? routeLookupResponses = await repository.Search(_workContext, "*");
                 routeLookupResponses.Should().NotBeNull();
                 routeLookupResponses.Count.Should().Be(1);
                 routeLookupResponses[0].Namespace.Should().NotBeNullOrWhiteSpace();
-                routeLookupResponses[0].QueueId.NetworkId.Should().Be(queueId.NetworkId);
-                routeLookupResponses[0].QueueId.NodeId.Should().Be(queueId.NodeId);
+                routeLookupResponses[0].NetworkId.Should().Be(queueId.NetworkId);
+                routeLookupResponses[0].NodeId.Should().Be(queueId.NodeId);
 
                 await repository.Unregister(_workContext, request);
 
-                routeLookupResponses = await repository.Search(_workContext, routeRequest);
+                routeLookupResponses = await repository.Search(_workContext, "*");
                 routeLookupResponses.Should().NotBeNull();
                 routeLookupResponses.Count.Should().Be(0);
             }

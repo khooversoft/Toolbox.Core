@@ -12,16 +12,16 @@ namespace Khooversoft.MessageNet.Host
 {
     public class NodeHostRegistration
     {
-        public NodeHostRegistration(MessageUri messageUri, Func<NetMessage, Task> receiver)
+        public NodeHostRegistration(QueueId queueId, Func<NetMessage, Task> receiver)
         {
-            messageUri.Verify(nameof(messageUri)).IsNotNull();
+            queueId.Verify(nameof(queueId)).IsNotNull();
             receiver.Verify(nameof(receiver)).IsNotNull();
 
-            MessageUri = messageUri;
+            QueueId = queueId;
             Receiver = receiver;
         }
 
-        public MessageUri MessageUri { get; }
+        public QueueId QueueId { get; }
 
         public Func<NetMessage, Task> Receiver { get; }
     }

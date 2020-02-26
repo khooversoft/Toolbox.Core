@@ -5,6 +5,7 @@ using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Khooversoft.Toolbox.Standard;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +18,6 @@ namespace Khooversoft.Toolbox.Azure
     public class BlobRepository : IBlobRepository
     {
         private readonly BlobStoreConnection _blobStoreConnection;
-        private readonly BlobServiceClient _blobServiceClient;
         private readonly BlobContainerClient _containerClient;
 
         public BlobRepository(BlobStoreConnection blobStoreConnection)
@@ -25,8 +25,8 @@ namespace Khooversoft.Toolbox.Azure
             blobStoreConnection.Verify(nameof(blobStoreConnection)).IsNotNull();
 
             _blobStoreConnection = blobStoreConnection;
-            _blobServiceClient = new BlobServiceClient(_blobStoreConnection.ConnectionString);
-            _containerClient = _blobServiceClient.GetBlobContainerClient(_blobStoreConnection.ContainerName);
+            var client = new BlobServiceClient(_blobStoreConnection.ConnectionString);
+            _containerClient = client.GetBlobContainerClient(_blobStoreConnection.ContainerName);
         }
 
         public async Task CreateContainer(IWorkContext context)
@@ -63,40 +63,25 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task Set(IWorkContext context, string path, string data)
         {
+            context.Verify(nameof(context)).IsNotNull();
+            path.Verify(nameof(path)).IsNotEmpty();
             data.Verify(nameof(data)).IsNotEmpty();
 
-            using Stream content = new MemoryStream(Encoding.UTF8.GetBytes(data));
-            await Upload(context, path, content);
+            using (Stream content = new MemoryStream(Encoding.UTF8.GetBytes(data)))
+            {
+                await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
+            }
         }
 
-        public async Task Upload(IWorkContext context, string path, IEnumerable<byte> content)
+        public Task Set<T>(IWorkContext context, string path, T data) where T : class
         {
-            context.Verify(nameof(context)).IsNotNull();
-            path.Verify(nameof(path)).IsNotEmpty();
-            content.Verify(nameof(content)).IsNotNull();
+            data.Verify(nameof(data)).IsNotNull();
 
-            using var memoryBuffer = new MemoryStream(content.ToArray());
-            await _containerClient.UploadBlobAsync(path, memoryBuffer, context.CancellationToken);
+            string subject = JsonConvert.SerializeObject(data);
+            return Set(context, path, subject);
         }
 
-        public async Task Upload(IWorkContext context, string path, Stream content)
-        {
-            context.Verify(nameof(context)).IsNotNull();
-            path.Verify(nameof(path)).IsNotEmpty();
-            content.Verify(nameof(content)).IsNotNull();
-
-            await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
-        }
-
-        public async Task<string> Get(IWorkContext context, string path)
-        {
-            path.Verify(nameof(path)).IsNotEmpty();
-
-            IReadOnlyList<byte> blob = await Download(context, path);
-            return Encoding.UTF8.GetString(blob.ToArray(), 0, blob.Count);
-        }
-
-        public async Task<IReadOnlyList<byte>> Download(IWorkContext context, string path)
+        public async Task<string?> Get(IWorkContext context, string path)
         {
             context.Verify(nameof(context)).IsNotNull();
             path.Verify(nameof(path)).IsNotEmpty();
@@ -104,14 +89,29 @@ namespace Khooversoft.Toolbox.Azure
             BlobClient blobClient = _containerClient.GetBlobClient(path);
             BlobDownloadInfo download = await blobClient.DownloadAsync();
 
-            using MemoryStream memory = new MemoryStream();
-            using var writer = new StreamWriter(memory);
+            using (MemoryStream memory = new MemoryStream())
+            using (var writer = new StreamWriter(memory))
+            {
+                await download.Content.CopyToAsync(memory);
+                writer.Flush();
+                memory.Position = 0;
 
-            await download.Content.CopyToAsync(memory);
-            writer.Flush();
-            memory.Position = 0;
+                using (StreamReader reader = new StreamReader(memory))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
 
-            return memory.ToArray();
+        public async Task<T?> Get<T>(IWorkContext context, string path) where T : class
+        {
+            string? data = await Get(context, path);
+
+            return data switch
+            {
+                null => null,
+                _ => JsonConvert.DeserializeObject<T>(data),
+            };
         }
 
         public Task Delete(IWorkContext context, string path)

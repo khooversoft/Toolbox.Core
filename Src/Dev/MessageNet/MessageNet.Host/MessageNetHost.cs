@@ -58,11 +58,11 @@ namespace Khooversoft.MessageNet.Host
                 .Value;
 
             _nodeRegistrations
-                .GroupBy(x => x.MessageUri.ToString(hostIdFormat))
+                .GroupBy(x => x.QueueId.ToString(hostIdFormat))
                 .Where(x => x.Count() > 1)
                 .Verify().Assert(x => x.Count() == 0, x => $"Duplicate routes have been detected: {string.Join(", ", x)}");
 
-            _actorManager.Register<INodeHostActor>(x => new NodeHostActor(_connectionManager));
+            _actorManager.Register<INodeHost>(x => new NodeHost(_connectionManager));
             _actorManager.Register<INodeRouteActor>(x => new NodeRouteActor(_nameServerClient));
         }
 
@@ -120,21 +120,21 @@ namespace Khooversoft.MessageNet.Host
         private void StartReceivers()
         {
             _receivers = _nodeRegistrations
-                .GroupBy(x => x.MessageUri.ToString(hostIdFormat))
-                .Select(x => (NodeRegistrations: x, Actor: _actorManager.GetActor<INodeHostActor>(new ActorKey(x.Key))))
+                .GroupBy(x => x.QueueId.ToString(hostIdFormat))
+                .Select(x => (NodeRegistrations: x, Actor: _actorManager.GetActor<INodeHost>(new ActorKey(x.Key))))
                 .Select(x => new ReceiverHost(x.Actor, x.Actor.Run(_workContext, x.NodeRegistrations)))
                 .ToList();
         }
 
         private struct ReceiverHost
         {
-            public ReceiverHost(INodeHostActor actor, Task task)
+            public ReceiverHost(INodeHost actor, Task task)
             {
                 Actor = actor;
                 Task = task;
             }
 
-            public INodeHostActor Actor { get; }
+            public INodeHost Actor { get; }
 
             public Task Task { get; }
         }

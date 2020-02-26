@@ -1,16 +1,14 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Khooversoft.MessageNet.Host;
 using Khooversoft.MessageNet.Interface;
-using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MessageHub.NameServer.Controllers
 {
@@ -34,9 +32,16 @@ namespace MessageHub.NameServer.Controllers
         {
             if (routeRequest == null) return StatusCode(StatusCodes.Status400BadRequest);
 
-            NodeRegistration response = await _routeRepository.Register(_workContext, routeRequest);
+            QueueId response = await _routeRepository.Register(_workContext, routeRequest);
 
-            return StatusCode(StatusCodes.Status201Created, response.ConvertTo());
+            var routeResponse = new RouteResponse
+            {
+                Namespace = response.Namespace,
+                NetworkId = response.NetworkId,
+                NodeId = response.NodeId,
+            };
+
+            return StatusCode(StatusCodes.Status201Created, routeResponse);
         }
 
         [HttpDelete]
@@ -51,18 +56,24 @@ namespace MessageHub.NameServer.Controllers
             return StatusCode(StatusCodes.Status200OK);
         }
 
-        [HttpGet]
+        [HttpGet("{search}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Lookup([FromBody] RouteRequest routeRequest)
+        public async Task<IActionResult> Lookup(string search)
         {
-            if (routeRequest == null || routeRequest.NodeId.IsEmpty()) return StatusCode(StatusCodes.Status400BadRequest);
+            IReadOnlyList<QueueId> responses = await _routeRepository.Search(_workContext, search);
 
-            IReadOnlyList<NodeRegistration> response = await _routeRepository.Search(_workContext, routeRequest);
-            if (response == null || response.Count != 1) return StatusCode(StatusCodes.Status404NotFound);
+            var list = responses
+                .Select(x => new RouteResponse
+                {
+                    Namespace = x.Namespace,
+                    NetworkId = x.NetworkId,
+                    NodeId = x.NodeId,
+                })
+                .ToList();
 
-            return Ok(response[0].ConvertTo());
+            return Ok(list);
         }
     }
 }

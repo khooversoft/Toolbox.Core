@@ -29,11 +29,6 @@ namespace Khooversoft.MessageNet.Interface
 
             QueueId.Verify(nameSpace, networkId, nodeId);
 
-            Func<string, string, string> verifyValid = (x, name) => x.Verify(name)
-                .IsNotEmpty()
-                .Assert(x => _pattern.Match(x).Success, $"{name} is not valid, regex={_regexPattern}")
-                .Value;
-
             Protocol = protocol.Verify(nameof(protocol)).Assert(x => _pattern.Match(x).Success, $"Is not valid, regex={_protocolPatternText}").Value;
             Namespace = nameSpace;
             NetworkId = networkId;

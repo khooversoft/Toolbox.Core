@@ -4,9 +4,9 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Khooversoft.MessageNet.Interface;
-using Khooversoft.MessageNet.Management;
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Autofac;
+using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.AspNetCore.Builder;
@@ -50,9 +50,9 @@ namespace MessageHub.NameServer
                 .As<IWorkContext>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterContainerModule(new RouteManagerContainerRegistrationModule());
+            //builder.RegisterContainerModule(new RouteManagerContainerRegistrationModule());
 
-            builder.RegisterType<BlobStore>().As<IRegisterStore>().InstancePerLifetimeScope();
+            //builder.RegisterType<BlobStore>().As<IRegisterStore>().InstancePerLifetimeScope();
 
             builder.Register(x => new ActorConfigurationBuilder().Set(x.Resolve<IWorkContext>()).Build()).As<ActorConfiguration>().InstancePerLifetimeScope();
 

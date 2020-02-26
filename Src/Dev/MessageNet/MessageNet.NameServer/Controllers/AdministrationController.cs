@@ -1,14 +1,11 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Khooversoft.MessageNet.Management;
+using Khooversoft.MessageNet.Host;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace MessageHub.NameServer.Controllers
 {
