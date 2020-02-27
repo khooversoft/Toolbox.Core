@@ -12,7 +12,7 @@ namespace Khooversoft.MessageNet.Host
 {
     internal interface INodeHost : IActor
     {
-        Task Run(IWorkContext context, IEnumerable<NodeHostRegistration> nodeRegistrations);
+        Task Run(IWorkContext context);
 
         Task Stop(IWorkContext context);
     }

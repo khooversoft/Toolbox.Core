@@ -36,24 +36,27 @@ namespace MessageNet.Interface.Test
             uri.NodeId.Should().Be(builder.NodeId);
 
             uri.ToString().Should().NotBeNullOrWhiteSpace();
-            uri.ToString().Should().Be("protocol://networkId/nodeId");
+            uri.ToString().Should().Be("protocol://default/networkId/nodeId");
         }
 
         [Fact]
         public void GivenMessageUriBuilder_WhenCreatedWithRoute_ShouldBuild()
         {
             const string protocol = "protocol";
+            const string nameSpace = "namespace";
             const string networkId = "networkId";
             const string nodeId = "nodeId";
             const string route = "route1/route2";
 
             var builder = new MessageUriBuilder()
                 .SetProtocol(protocol)
+                .SetNamespace(nameSpace)
                 .SetNetworkId(networkId)
                 .SetNodeId(nodeId)
                 .SetRoute(route);
 
             builder.Protocol.Should().Be(protocol);
+            builder.Namespace.Should().Be(nameSpace);
             builder.NetworkId.Should().Be(networkId);
             builder.NodeId.Should().Be(nodeId);
             builder.Route.Build().ToString().Should().Be(route);
@@ -64,10 +67,11 @@ namespace MessageNet.Interface.Test
             var uri = builder.Build();
 
             uri.Protocol.Should().Be(builder.Protocol);
+            uri.Namespace.Should().Be(builder.Namespace);
             uri.NetworkId.Should().Be(builder.NetworkId);
             uri.NodeId.Should().Be(builder.NodeId);
             uri.Route.Should().Be(route);
-            uri.ToString().Should().Be("protocol://networkId/nodeId/route1/route2");
+            uri.ToString().Should().Be("protocol://namespace/networkId/nodeId/route1/route2");
         }
 
         [Theory]
@@ -90,7 +94,6 @@ namespace MessageNet.Interface.Test
         [InlineData("msgnet://network1/node1", "network1", "node1", "")]
         [InlineData("msgnet://network1/node1/route", "network1", "node1", "route")]
         [InlineData("msgnet://network1/node1/route1/route2", "network1", "node1", "route1/route2")]
-        [InlineData("network1/node1/route1/route2", "network1", "node1", "route1/route2")]
         [InlineData("msgnet://networkId/node1/", "networkId", "node1", "")]
         public void GivenUri_WhenParsed_ShouldVerify(string uri, string networkId, string nodeId, string route)
         {

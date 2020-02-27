@@ -1,9 +1,5 @@
-﻿// Copyright (c) KhooverSoft. All rights reserved.
-// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
-
-using FluentAssertions;
-using Khooversoft.MessageNet.Interface;
-using Khooversoft.MessageNet.Management;
+﻿using FluentAssertions;
+using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
@@ -12,29 +8,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using ServiceBusConnection = Khooversoft.MessageNet.Interface.ServiceBusConnection;
 
-namespace MessageNet.Management.Test
+namespace MessageNet.Host.Tests.General
 {
     [Collection("QueueTests")]
     public class QueueManagementTests : IClassFixture<ApplicationFixture>
     {
         private const string _connectionString = "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=TestAccess;SharedAccessKey={messagehub.accesskey};TransportType=Amqp";
-        private readonly ServiceBusConnection _serviceBusConnection;
         private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly QueueManagement _queueManagement;
-
-        private readonly QueueDefinition _queueDefinition = new QueueDefinition
-        {
-            QueueName = "Unit1_TestQueue1",
-        };
+        private readonly QueueDefinition _queueDefinition = new QueueDefinition("Unit1_TestQueue1");
 
         public QueueManagementTests(ApplicationFixture application)
         {
-            string? connectionString = _connectionString.Resolve(application.PropertyResolver);
+            string connectionString = _connectionString.Resolve(application.PropertyResolver);
 
-            _serviceBusConnection = new ServiceBusConnection(connectionString!);
-            _queueManagement = new QueueManagement(_serviceBusConnection);
+            _queueManagement = new QueueManagement(connectionString);
         }
 
         [Fact]
@@ -51,7 +40,7 @@ namespace MessageNet.Management.Test
 
             await act.Should().ThrowAsync<MessagingEntityNotFoundException>();
         }
-        
+
         [Fact]
         public async Task GivenQueueDoesNotExist_WhenSearched_ShouldReturnEmptyList()
         {

@@ -3,27 +3,26 @@
 
 using Azure;
 using FluentAssertions;
-using Khooversoft.MessageNet.Management;
+using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace MessageNet.Management.Test
+namespace MessageNet.Host.Tests.General
 {
     [Collection("QueueTests")]
     public class BlobRegistorStoreTests : IClassFixture<ApplicationFixture>
     {
         private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey={blob.storage.connection};EndpointSuffix=core.windows.net";
-        private readonly BlobStoreConnection _blobStore;
         private readonly IWorkContext _workContext = WorkContextBuilder.Default;
+        private BlobStoreConnection _blobStore;
 
         public BlobRegistorStoreTests(ApplicationFixture application)
         {
-            string? connectionString = _connectionString.Resolve(application.PropertyResolver);
+            string connectionString = _connectionString.Resolve(application.PropertyResolver);
 
             _blobStore = new BlobStoreConnection("blob-storage-test", connectionString!);
         }
@@ -71,7 +70,7 @@ namespace MessageNet.Management.Test
             filePaths.Count.Should().Be(1);
             filePaths[0].Should().Be(filePath);
 
-            string? readData = await container.Get(_workContext, filePath);
+            string readData = await container.Get(_workContext, filePath);
             readData.Should().NotBeNullOrWhiteSpace();
             readData.Should().Be(data);
 

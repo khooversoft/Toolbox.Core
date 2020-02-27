@@ -134,6 +134,43 @@ namespace Khooversoft.Toolbox.Azure
             return list;
         }
 
+        public async Task Upload(IWorkContext context, string path, IEnumerable<byte> content)
+        {
+            context.Verify(nameof(context)).IsNotNull();
+            path.Verify(nameof(path)).IsNotEmpty();
+            content.Verify(nameof(content)).IsNotNull();
+
+            using var memoryBuffer = new MemoryStream(content.ToArray());
+            await _containerClient.UploadBlobAsync(path, memoryBuffer, context.CancellationToken);
+        }
+
+        public async Task Upload(IWorkContext context, string path, Stream content)
+        {
+            context.Verify(nameof(context)).IsNotNull();
+            path.Verify(nameof(path)).IsNotEmpty();
+            content.Verify(nameof(content)).IsNotNull();
+
+            await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
+        }
+
+        public async Task<IReadOnlyList<byte>> Download(IWorkContext context, string path)
+        {
+            context.Verify(nameof(context)).IsNotNull();
+            path.Verify(nameof(path)).IsNotEmpty();
+
+            BlobClient blobClient = _containerClient.GetBlobClient(path);
+            BlobDownloadInfo download = await blobClient.DownloadAsync();
+
+            using MemoryStream memory = new MemoryStream();
+            using var writer = new StreamWriter(memory);
+
+            await download.Content.CopyToAsync(memory);
+            writer.Flush();
+            memory.Position = 0;
+
+            return memory.ToArray();
+        }
+
         public async Task ClearAll(IWorkContext context)
         {
             var list = await List(context, "*");

@@ -16,6 +16,6 @@ namespace Khooversoft.MessageNet.Host
 
         Task Stop(IWorkContext context);
 
-        Task<NodeRegistration?> LookupNode(IWorkContext context, QueueId queueId);
+        Task<IMessageClient> GetMessageClient(IWorkContext context, QueueId queueId);
     }
 }

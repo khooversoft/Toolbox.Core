@@ -15,9 +15,10 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GvenCorrectParameter_WhenMessageUriConstructed_ShouldPass()
         {
-            var uri = new MessageUri("protocol", "networkId", "nodeId");
+            var uri = new MessageUri("protocol", "namespace", "networkId", "nodeId");
 
             uri.Protocol.Should().Be("protocol");
+            uri.Namespace.Should().Be("namespace");
             uri.NetworkId.Should().Be("networkId");
             uri.NodeId.Should().Be("nodeId");
         }
@@ -25,50 +26,41 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GvenCorrectAndRouteParameter_WhenMessageUriConstructed_ShouldPass()
         {
-            var uri = new MessageUri("protocol", "networkId", "nodeId", "route1/route2");
+            var uri = new MessageUri("protocol", "namespace", "networkId", "nodeId", "route1/route2");
 
             uri.Protocol.Should().Be("protocol");
             uri.NetworkId.Should().Be("networkId");
             uri.NodeId.Should().Be("nodeId");
             uri.Route.Should().Be("route1/route2");
 
-            uri.ToString().Should().Be("protocol://networkId/nodeId/route1/route2");
+            uri.ToString().Should().Be("protocol://namespace/networkId/nodeId/route1/route2");
         }
 
         [Theory]
-        [InlineData(null, "networkId", "nodeId")]
-        [InlineData("protocol", null, "nodeId")]
-        [InlineData("protocol", "networkId", null)]
-        [InlineData("protocol/", "networkId", "nodeId")]
-        [InlineData("protocol", "netw//orkId", "nodeId")]
-        [InlineData("protocol", "networkId", "no/de/Id")]
-        [InlineData("proto&col", "networkId", "nodeId")]
-        [InlineData("protocol", "netw*orkId", "nodeId")]
-        [InlineData("protocol", "networkId", "nod(eId")]
-        public void GvenMissingParameter_WhenMessageUriConstructed_ShouldThrowException(string protocol, string networkId, string nodeId)
+        [InlineData("protocol", null, null, null)]
+        [InlineData("protocol/", "namespace", "networkId", "nodeId")]
+        [InlineData("protocol", "names-pace", "networkId", "nodeId")]
+        [InlineData("protocol", "namespace", "netw//orkId", "nodeId")]
+        [InlineData("protocol", "namespace", "networkId", "no/de/Id")]
+        [InlineData("proto&col", "namespace", "networkId", "nodeId")]
+        [InlineData("protocol", "namespace", "netw*orkId", "nodeId")]
+        [InlineData("protocol", "namespace", "networkId", "nod(eId")]
+        [InlineData("protocol.1", "namespace", "networkId-2", "nodeId-3.first")]
+        [InlineData("protocol1234", "namespace", "NETWORKID-2", "NODEID-3.FIRST")]
+        public void GvenMissingParameter_WhenMessageUriConstructed_ShouldThrowException(string protocol, string nameSpace, string networkId, string nodeId)
         {
-            Action act = () => new MessageUri(protocol, networkId, nodeId);
+            Action act = () => new MessageUri(protocol, nameSpace, networkId, nodeId);
 
             act.Should().Throw<ArgumentException>();
         }
 
         [Theory]
-        [InlineData("protocol.1", "networkId-2", "nodeId-3.first")]
-        [InlineData("protocol1234", "NETWORKID-2", "NODEID-3.FIRST")]
-        public void GvenValidParameter_WhenMessageUriConstructed_ShouldNotThrowException(string protocol, string networkId, string nodeId)
-        {
-            Action act = () => new MessageUri(protocol, networkId, nodeId);
-
-            act.Should().NotThrow();
-        }
-
-        [Theory]
-        [InlineData("", "protocol://networkId/nodeId")]
-        [InlineData("route1", "protocol://networkId/nodeId/route1")]
-        [InlineData("route1/route2/route3", "protocol://networkId/nodeId/route1/route2/route3")]
+        [InlineData("", "protocol://default/networkId/nodeId")]
+        [InlineData("route1", "protocol://default/networkId/nodeId/route1")]
+        [InlineData("route1/route2/route3", "protocol://default/networkId/nodeId/route1/route2/route3")]
         public void GvenRouteParameter_WhenMessageUriConstructed_ShouldThrowException(string route, string expectedUri)
         {
-            var uri = new MessageUri("protocol", "networkId", "nodeId", route);
+            var uri = new MessageUri("protocol", "default", "networkId", "nodeId", route);
 
             uri.Protocol.Should().Be("protocol");
             uri.NetworkId.Should().Be("networkId");

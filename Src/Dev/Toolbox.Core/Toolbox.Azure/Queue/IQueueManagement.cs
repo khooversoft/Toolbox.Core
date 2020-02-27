@@ -9,6 +9,8 @@ namespace Khooversoft.Toolbox.Azure
 {
     public interface IQueueManagement
     {
+        string ConnectionString { get; }
+
         Task<QueueDefinition> CreateQueue(IWorkContext context, QueueDefinition queueDefinition);
 
         Task DeleteQueue(IWorkContext context, string queueName);

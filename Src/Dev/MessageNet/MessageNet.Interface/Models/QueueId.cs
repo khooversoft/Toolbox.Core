@@ -8,9 +8,8 @@ namespace Khooversoft.MessageNet.Interface
 {
     public class QueueId
     {
-        private static readonly Regex _idVerify = new Regex(@"^[a-zA-Z][a-zA-Z0-9]+$", RegexOptions.Compiled);
-
-        private static readonly Regex _nodeIdVerify = new Regex(@"^[a-zA-Z][a-zA-Z0-9\.]+$", RegexOptions.Compiled);
+        private static readonly Regex _idVerify = new Regex(@"^[a-zA-Z][a-zA-Z0-9]*$", RegexOptions.Compiled);
+        private static readonly Regex _nodeIdVerify = new Regex(@"^[a-zA-Z][a-zA-Z0-9\.]*$", RegexOptions.Compiled);
 
         public QueueId(string nameSpace, string networkId, string nodeId)
         {
@@ -27,9 +26,9 @@ namespace Khooversoft.MessageNet.Interface
 
         public string NodeId { get; }
 
-        public override string ToString() => Namespace + "/" + NetworkId + "/" + NodeId;
-
         public string GetQueueName() => NetworkId + "/" + NodeId;
+
+        public override string ToString() => Namespace + "/" + NetworkId + "/" + NodeId;
 
         public override bool Equals(object obj) => obj switch
         {

@@ -1,36 +1,25 @@
-// Copyright (c) KhooverSoft. All rights reserved.
-// Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
-
-using FluentAssertions;
-using Khooversoft.MessageNet.Interface;
-using Khooversoft.MessageNet.Management;
+﻿using FluentAssertions;
+using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.Standard;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace MessageNet.Management.Test
+namespace MessageNet.Host.Tests.General
 {
     [Collection("QueueTests")]
     public class GeneralQueueRegistrationTests : IClassFixture<ApplicationFixture>
     {
         private const string _connectionString = "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=TestAccess;SharedAccessKey={messagehub.accesskey};TransportType=Amqp";
-        private readonly ServiceBusConnection _serviceBusConnection;
         private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly QueueManagement _queueManagement;
-
-        private readonly QueueDefinition _queueDefinition = new QueueDefinition
-        {
-            QueueName = "Unit2_TestQueue2",
-        };
+        private readonly QueueDefinition _queueDefinition = new QueueDefinition("Unit2_TestQueue2");
 
         public GeneralQueueRegistrationTests(ApplicationFixture application)
         {
-            string? connectionString = _connectionString.Resolve(application.PropertyResolver);
+            string connectionString = _connectionString.Resolve(application.PropertyResolver);
 
-            _serviceBusConnection = new ServiceBusConnection(connectionString!);
-            _queueManagement = new QueueManagement(_serviceBusConnection);
+            _queueManagement = new QueueManagement(connectionString);
         }
 
         [Fact]
@@ -80,10 +69,7 @@ namespace MessageNet.Management.Test
                 await _queueManagement.DeleteQueue(_workContext, item.QueueName!);
             }
 
-            QueueDefinition testDefinition = new QueueDefinition
-            {
-                QueueName = nodeId,
-            };
+            var testDefinition = new QueueDefinition(nodeId);
 
             bool exist = await _queueManagement.QueueExists(_workContext, testDefinition.QueueName);
             if (exist)

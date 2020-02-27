@@ -3,7 +3,9 @@
 
 using Autofac;
 using Khooversoft.MessageNet.Host;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Autofac;
+using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System;
@@ -110,7 +112,7 @@ namespace ServiceBusPerformanceTest
             builder.RegisterType<ReceiveMessages>().InstancePerLifetimeScope();
 
             //builder.RegisterType<MessageClientService>().As<IMessageClient>();
-            builder.RegisterType<MessageQueueReceiveProcessor>().As<IMessageProcessor>();
+            builder.RegisterType<QueueReceiver<NetMessage>>().As<IMessageProcessor>();
 
             BuildTelemetry(option, builder);
 

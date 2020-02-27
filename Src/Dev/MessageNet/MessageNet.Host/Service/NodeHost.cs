@@ -3,6 +3,7 @@
 
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Actor;
+using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
@@ -14,70 +15,37 @@ namespace Khooversoft.MessageNet.Host
 {
     internal class NodeHost : INodeHost
     {
-        private readonly IMessageNetConfig _messageNetConfig;
-        private readonly NodeHostRegistration _nodeRegistration
-            ;
+        private readonly NodeHostRegistration _nodeRegistration;
         private readonly IRouteRepository _routeRepository;
-        private MessageQueueReceiveProcessor? _messageProcessor;
+        private QueueReceiver<NetMessage>? _receiver;
 
-        public NodeHost(IMessageNetConfig messageNetConfig, NodeHostRegistration nodeRegistration, IRouteRepository routeRepository)
+        public NodeHost(NodeHostRegistration nodeRegistration, IRouteRepository routeRepository)
         {
-            messageNetConfig.Verify(nameof(messageNetConfig)).IsNotNull();
             nodeRegistration.Verify(nameof(nodeRegistration)).IsNotNull();
+            routeRepository.Verify(nameof(routeRepository)).IsNotNull();
 
-            _messageNetConfig = messageNetConfig;
             _nodeRegistration = nodeRegistration;
             _routeRepository = routeRepository;
         }
 
         public async Task Run(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            _messageProcessor.Verify().Assert(x => x == null, "Node host is already running");
-
-            string connectionString = await RegisterReceiverQueue(context);
-
-
-            context.Telemetry.Info(context, $"Starting node host for {_nodeRegistration.QueueId.ToString()}");
-            _messageProcessor = new MessageQueueReceiveProcessor(connectionString, _nodeRegistration.QueueId.GetQueueName());
-
-            Func<IWorkContext, NetMessage, Task> pipeline = CreatePipeline();
-            await _messageProcessor.Start(context, x => pipeline(context, x));
-        }
-
-        public async Task Stop(IWorkContext context)
-        {
+            _receiver.Verify().Assert(x => x == null, "Cannot run because receiver is already running");
             context.Verify(nameof(context)).IsNotNull();
 
-            MessageQueueReceiveProcessor? messageQueueReceiveProcessor = Interlocked.Exchange(ref _messageProcessor, null!);
-            if (messageQueueReceiveProcessor == null) return;
+            context.Telemetry.Info(context, $"Starting node host for {_nodeRegistration.QueueId}");
+            _receiver = await _routeRepository.Register(context, _nodeRegistration.QueueId);
 
-            context.Telemetry.Info(context, $"Stopping node's host for {ActorKey}");
-            await messageQueueReceiveProcessor!.Stop();
+            await _receiver.Start(context, x => _nodeRegistration.Receiver(x));
         }
 
-        private async Task<string> RegisterReceiverQueue(IWorkContext context)
+        public Task Stop(IWorkContext context)
         {
-            string connectionString = _messageNetConfig.NamespaceRegistrations[_nodeRegistration.QueueId.Namespace].ConnectionString;
+            _receiver.Verify().Assert(x => x != null, "Cannot stop because receiver is not running");
+            context.Verify(nameof(context)).IsNotNull();
 
-            _routeRepository.Register(context, )
-
-            context.Telemetry.Info(context, $"Register node's host for {ActorKey}");
-            await ActorManager.GetActor<INodeRouteActor>(ActorKey).Register(context);
-
-            return _connectionManager.GetConnection(_queueId.NetworkId);
-        }
-
-        private Func<IWorkContext, NetMessage, Task> CreatePipeline()
-        {
-            var pipelineBuilder = new PipelineBuilder<NetMessage>();
-
-            foreach (var item in _nodeRegistrations!)
-            {
-                pipelineBuilder.Map(x => x.Header.ToUri.ToMessageUri().ToQueueId() == _queueId, (context, message) => item.Receiver(message));
-            }
-
-            return pipelineBuilder.Build();
+            context.Telemetry.Info(context, $"Stopping node's host for {_nodeRegistration.QueueId}");
+            return _receiver!.Stop();
         }
     }
 }

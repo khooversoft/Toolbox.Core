@@ -31,7 +31,7 @@ namespace Khooversoft.MessageNet.Host
         /// <param name="context">context</param>
         /// <param name="request">request</param>
         /// <returns>response</returns>
-        public Task Register(IWorkContext context, QueueId queueId)
+        public async Task<QueueReceiver<NetMessage>> Register(IWorkContext context, QueueId queueId)
         {
             string queueName = queueId.GetQueueName();
 
@@ -39,10 +39,12 @@ namespace Khooversoft.MessageNet.Host
 
             QueueDefinition queueDefinition = new QueueDefinition(queueName);
 
-            return new StateManagerBuilder()
+            await new StateManagerBuilder()
                 .Add(new CreateQueueState(queueManagement, queueDefinition))
                 .Build()
                 .Set(context);
+
+            return new QueueReceiver<NetMessage>(queueManagement.ConnectionString, queueId.ToString());
         }
 
         /// <summary>

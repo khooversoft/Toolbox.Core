@@ -20,7 +20,10 @@ namespace Khooversoft.Toolbox.Azure
             connectionString.Verify(nameof(connectionString)).IsNotEmpty();
 
             _managementClient = new ManagementClient(connectionString);
+            ConnectionString = connectionString;
         }
+
+        public string ConnectionString { get; }
 
         public Task<bool> QueueExists(IWorkContext context, string queueName)
         {
