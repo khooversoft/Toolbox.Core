@@ -61,27 +61,33 @@ namespace Khooversoft.Toolbox.Azure
             return _containerClient.DeleteIfExistsAsync(cancellationToken: context.CancellationToken);
         }
 
+        public async Task<bool> Exists(IWorkContext context)
+        {
+            context.Verify(nameof(context)).IsNotNull();
+
+            return (await _containerClient.ExistsAsync(context.CancellationToken)).Value;
+        }
+
         public async Task Set(IWorkContext context, string path, string data)
         {
             context.Verify(nameof(context)).IsNotNull();
             path.Verify(nameof(path)).IsNotEmpty();
             data.Verify(nameof(data)).IsNotEmpty();
 
-            using (Stream content = new MemoryStream(Encoding.UTF8.GetBytes(data)))
-            {
-                await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
-            }
+            using Stream content = new MemoryStream(Encoding.UTF8.GetBytes(data));
+            await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
         }
 
         public Task Set<T>(IWorkContext context, string path, T data) where T : class
         {
+            path.Verify(nameof(path)).IsNotNull();
             data.Verify(nameof(data)).IsNotNull();
 
             string subject = JsonConvert.SerializeObject(data);
             return Set(context, path, subject);
         }
 
-        public async Task<string?> Get(IWorkContext context, string path)
+        public async Task<string> Get(IWorkContext context, string path)
         {
             context.Verify(nameof(context)).IsNotNull();
             path.Verify(nameof(path)).IsNotEmpty();
@@ -96,22 +102,15 @@ namespace Khooversoft.Toolbox.Azure
                 writer.Flush();
                 memory.Position = 0;
 
-                using (StreamReader reader = new StreamReader(memory))
-                {
-                    return reader.ReadToEnd();
-                }
+                using StreamReader reader = new StreamReader(memory);
+                return reader.ReadToEnd();
             }
         }
 
-        public async Task<T?> Get<T>(IWorkContext context, string path) where T : class
+        public async Task<T> Get<T>(IWorkContext context, string path) where T : class
         {
-            string? data = await Get(context, path);
-
-            return data switch
-            {
-                null => null,
-                _ => JsonConvert.DeserializeObject<T>(data),
-            };
+            string data = await Get(context, path);
+            return JsonConvert.DeserializeObject<T>(data);
         }
 
         public Task Delete(IWorkContext context, string path)

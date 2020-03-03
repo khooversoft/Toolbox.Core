@@ -23,6 +23,18 @@ namespace MessageNet.Interface.Test
 
             (subject == null!).Should().BeFalse();
         }
+        
+        [Fact]
+        public void GivenHeaderWithProperties_WhenCloned_ShouldBeEqual()
+        {
+            var expected = new MessageHeader("net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key", "value"));
+            var subject = new MessageHeader(expected);
+
+            subject.Should().Be(expected);
+            (expected == subject).Should().BeTrue();
+
+            (subject == null!).Should().BeFalse();
+        }
 
         [Fact]
         public void GivenHeader_WhenDiffernt_ShouldNotBeEqual()
@@ -31,6 +43,46 @@ namespace MessageNet.Interface.Test
 
             var expected = new MessageHeader(messageId, "net1/node1", "net1/node2", "method");
             var subject = new MessageHeader(messageId, "net1/node3", "net1/node2", "method");
+
+            subject.Should().NotBe(expected);
+            (expected != subject).Should().BeTrue();
+
+            (subject != null!).Should().BeTrue();
+        }
+
+        [Fact]
+        public void GivenHeaderWithProperties_WhenSame_ShouldBeEqual()
+        {
+            Guid messageId = Guid.NewGuid();
+
+            var expected = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+            var subject = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+
+            subject.Should().Be(expected);
+            (expected == subject).Should().BeTrue();
+        }
+
+        [Fact]
+        public void GivenHeaderWithProperties_WhenDiffernt_ShouldNotBeEqual()
+        {
+            Guid messageId = Guid.NewGuid();
+
+            var expected = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+            var subject = new MessageHeader(messageId, "net1/node3", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+
+            subject.Should().NotBe(expected);
+            (expected != subject).Should().BeTrue();
+
+            (subject != null!).Should().BeTrue();
+        }
+
+        [Fact]
+        public void GivenHeaderWithProperties_WhenDifferntProperty_ShouldNotBeEqual()
+        {
+            Guid messageId = Guid.NewGuid();
+
+            var expected = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+            var subject = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key3", "value2"));
 
             subject.Should().NotBe(expected);
             (expected != subject).Should().BeTrue();

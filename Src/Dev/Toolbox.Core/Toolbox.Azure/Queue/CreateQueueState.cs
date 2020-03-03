@@ -36,25 +36,14 @@ namespace Khooversoft.Toolbox.Azure
         {
             if (await Test(context)) return true;
 
-            if (await _managementClient.QueueExists(context, _queueDefinition.QueueName!))
-            {
-                // Queue exist, so update it
-                await _managementClient.UpdateQueue(context, _queueDefinition);
-
-                (await Test(context)).Verify().Assert<bool, InvalidOperationException>(x => x, "Test did not verify update");
-                return true;
-            }
-
             await _managementClient.CreateQueue(context, _queueDefinition);
             return true;
         }
 
         public async Task<bool> Test(IWorkContext context)
         {
-            if ((await _managementClient.QueueExists(context, _queueDefinition.QueueName!) == false)) return false;
-
-            QueueDefinition subject = await _managementClient.GetQueue(context, _queueDefinition.QueueName!);
-            return (_queueDefinition == subject);
+            bool state = await _managementClient.QueueExists(context, Name);
+            return state;
         }
     }
 }

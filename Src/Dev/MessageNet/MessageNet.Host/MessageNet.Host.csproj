@@ -13,8 +13,4 @@
     <ProjectReference Include="..\MessageNet.Interface\MessageNet.Interface.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Actor\" />
-  </ItemGroup>
-
 </Project>

@@ -16,10 +16,10 @@ namespace Khooversoft.MessageNet.Host
     internal class NodeHost : INodeHost
     {
         private readonly NodeHostRegistration _nodeRegistration;
-        private readonly IRouteRepository _routeRepository;
+        private readonly IMessageRepository _routeRepository;
         private QueueReceiver<NetMessage>? _receiver;
 
-        public NodeHost(NodeHostRegistration nodeRegistration, IRouteRepository routeRepository)
+        public NodeHost(NodeHostRegistration nodeRegistration, IMessageRepository routeRepository)
         {
             nodeRegistration.Verify(nameof(nodeRegistration)).IsNotNull();
             routeRepository.Verify(nameof(routeRepository)).IsNotNull();

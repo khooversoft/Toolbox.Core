@@ -15,7 +15,6 @@ namespace Khooversoft.Toolbox.Azure
         private Func<T, Task>? _receiver;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
         private MessageReceiver _messageReceiver;
-        private CancellationTokenSource? _cancellationTokenSource;
 
         public QueueReceiver(string connectionString, string queueName)
         {
@@ -33,17 +32,6 @@ namespace Khooversoft.Toolbox.Azure
 
             _receiver = receiver;
 
-            var doneReceiving = new TaskCompletionSource<bool>();
-
-            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
-
-            _cancellationTokenSource.Token.Register(
-                 () =>
-                 {
-                     InternalStop().GetAwaiter().GetResult();
-                     doneReceiving.SetResult(true);
-                 });
-
             // Configure the MessageHandler Options in terms of exception handling, number of concurrent messages to deliver etc.
             var messageHandlerOptions = new MessageHandlerOptions(x => ExceptionReceivedHandler(context, x))
             {
@@ -57,36 +45,23 @@ namespace Khooversoft.Toolbox.Azure
             };
 
             _messageReceiver.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
-            return doneReceiving.Task;
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Stop receiver
         /// </summary>
         /// <returns></returns>
-        public Task Stop()
-        {
-            _cancellationTokenSource.Verify().IsNotNull("Receiver is not running");
-
-            CancellationTokenSource? cancellationTokenSource = Interlocked.Exchange(ref _cancellationTokenSource, null);
-            if (cancellationTokenSource != null)
-            {
-                cancellationTokenSource.Cancel();
-            }
-
-            return Task.CompletedTask;
-        }
-
-        private async Task InternalStop()
+        public async Task Stop()
         {
             await _lock.WaitAsync();
 
             try
             {
-                MessageReceiver? receiver = Interlocked.Exchange(ref _messageReceiver, null!);
-                if (receiver != null)
+                MessageReceiver? messageReceiver = Interlocked.Exchange(ref _messageReceiver, null!);
+                if (messageReceiver != null)
                 {
-                    await receiver.CloseAsync();
+                    await messageReceiver.CloseAsync();
                 }
             }
             finally
@@ -94,6 +69,7 @@ namespace Khooversoft.Toolbox.Azure
                 _lock.Release();
             }
         }
+
         public void Dispose()
         {
             Stop().GetAwaiter().GetResult();

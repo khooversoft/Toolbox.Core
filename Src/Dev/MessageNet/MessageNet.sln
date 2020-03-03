@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Azure", "..\Toolbox
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Host.Tests", "..\..\Test\MessageNet\MessageNet.Host.Tests\MessageNet.Host.Tests.csproj", "{F8DE5086-AA99-4EEF-BE8F-5A772705189C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolBox.Azure.Test", "..\..\Test\ToolBox.Azure.Test\ToolBox.Azure.Test.csproj", "{331B06FF-E10C-4792-BF58-283FCA023F67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{F8DE5086-AA99-4EEF-BE8F-5A772705189C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8DE5086-AA99-4EEF-BE8F-5A772705189C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8DE5086-AA99-4EEF-BE8F-5A772705189C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{331B06FF-E10C-4792-BF58-283FCA023F67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{331B06FF-E10C-4792-BF58-283FCA023F67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{331B06FF-E10C-4792-BF58-283FCA023F67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{331B06FF-E10C-4792-BF58-283FCA023F67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +102,7 @@ Global
 		{696B3542-B7DE-432C-8FD3-917CE0420475} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
 		{1BE499BC-4BA1-497E-A6E3-575EDA3C14C3} = {91187767-1603-4119-A9C3-B08FDAA095CF}
 		{F8DE5086-AA99-4EEF-BE8F-5A772705189C} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
+		{331B06FF-E10C-4792-BF58-283FCA023F67} = {AF2513FD-89AA-4822-BD67-5A823E007C9A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4227659D-BED0-4F5F-ABA6-CA6CCA3575A9}

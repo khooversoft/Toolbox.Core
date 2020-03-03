@@ -9,7 +9,7 @@ using Khooversoft.Toolbox.Standard;
 
 namespace Khooversoft.MessageNet.Host
 {
-    public interface IRouteRepository
+    public interface IMessageRepository
     {
         Task<QueueReceiver<NetMessage>> Register(IWorkContext context, QueueId queueId);
 

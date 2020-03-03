@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Host
 {
-    internal interface IAwaiterManager
+    internal interface IMessageAwaiterManager
     {
-        AwaiterManager Add(Guid id, TaskCompletionSource<NetMessage> task);
+        MessageAwaiterManager Add(Guid id, TaskCompletionSource<NetMessage> task);
 
-        AwaiterManager SetResult(NetMessage? netMessage);
+        MessageAwaiterManager SetResult(NetMessage? netMessage);
     }
 }

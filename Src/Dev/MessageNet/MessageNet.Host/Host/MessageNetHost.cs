@@ -25,8 +25,8 @@ namespace Khooversoft.MessageNet.Host
         private readonly IWorkContext _workContext;
         private readonly IMessageNetConfig _messageNetConfig;
         private readonly IEnumerable<NodeHostRegistration> _nodeRegistrations;
-        private readonly AwaiterManager _awaiterManager = new AwaiterManager();
-        private readonly IRouteRepository _routeRepository;
+        private readonly MessageAwaiterManager _awaiterManager = new MessageAwaiterManager();
+        private readonly IMessageRepository _routeRepository;
         private List<NodeHost>? _receivers;
 
         public MessageNetHost(IWorkContext context, IMessageNetConfig messageNetConfig, IEnumerable<NodeHostRegistration> nodeRegistrations)
@@ -37,7 +37,7 @@ namespace Khooversoft.MessageNet.Host
 
             _workContext = context;
             _messageNetConfig = messageNetConfig;
-            _routeRepository = new RouteRepository(_messageNetConfig);
+            _routeRepository = new MessageRepository(_messageNetConfig);
 
             _nodeRegistrations = nodeRegistrations
                 .ToList()

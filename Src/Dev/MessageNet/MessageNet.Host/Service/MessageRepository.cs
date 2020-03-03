@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Host
 {
-    public class RouteRepository : IRouteRepository
+    public class MessageRepository : IMessageRepository
     {
         private readonly IReadOnlyDictionary<string, IQueueManagement> _registrations;
 
-        public RouteRepository(IMessageNetConfig messageNetConfig)
+        public MessageRepository(IMessageNetConfig messageNetConfig)
         {
             _registrations = messageNetConfig.Registrations.ToDictionary(
                 x => x.Value.Namespace,

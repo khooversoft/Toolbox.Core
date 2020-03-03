@@ -5,21 +5,18 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace MessageNet.Host.Tests.General
+namespace ToolBox.Azure.Test.Queue
 {
     [Collection("QueueTests")]
     public class GeneralQueueRegistrationTests : IClassFixture<ApplicationFixture>
     {
-        private const string _connectionString = "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=TestAccess;SharedAccessKey={messagehub.accesskey};TransportType=Amqp";
         private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly QueueManagement _queueManagement;
         private readonly QueueDefinition _queueDefinition = new QueueDefinition("Unit2_TestQueue2");
 
         public GeneralQueueRegistrationTests(ApplicationFixture application)
         {
-            string connectionString = _connectionString.Resolve(application.PropertyResolver);
-
-            _queueManagement = new QueueManagement(connectionString);
+            _queueManagement = new QueueManagement(application.ConnectionString);
         }
 
         [Fact]

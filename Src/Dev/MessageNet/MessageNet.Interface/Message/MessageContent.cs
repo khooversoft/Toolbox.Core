@@ -9,12 +9,15 @@ using System.Text;
 
 namespace Khooversoft.MessageNet.Interface
 {
-    public abstract class MessageContent : INetMessageItem
+    public class MessageContent : INetMessageItem
     {
-        protected MessageContent(string contentType, string content)
+        public MessageContent(string contentType, string content)
         {
-            ContentType = contentType.Verify(nameof(contentType)).IsNotEmpty().Value;
-            Content = content.Verify(nameof(content)).IsNotEmpty().Value;
+            contentType.Verify(nameof(contentType)).IsNotEmpty();
+            content.Verify(nameof(content)).IsNotEmpty();
+
+            ContentType = contentType;
+            Content = content;
         }
 
         public string ContentType { get; }

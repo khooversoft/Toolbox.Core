@@ -13,19 +13,21 @@ namespace Khooversoft.Toolbox.Azure
     {
         Task CreateContainer(IWorkContext context);
 
-        Task Delete(IWorkContext context, string path);
-
         Task DeleteContainer(IWorkContext context);
 
-        Task<string?> Get(IWorkContext context, string path);
-
-        Task<T?> Get<T>(IWorkContext context, string path) where T : class;
-
-        Task<IReadOnlyList<string>> List(IWorkContext context, string search);
+        Task<bool> Exists(IWorkContext context);
 
         Task Set(IWorkContext context, string path, string data);
 
         Task Set<T>(IWorkContext context, string path, T data) where T : class;
+
+        Task<string> Get(IWorkContext context, string path);
+
+        Task<T> Get<T>(IWorkContext context, string path) where T : class;
+
+        Task Delete(IWorkContext context, string path);
+
+        Task<IReadOnlyList<string>> List(IWorkContext context, string search);
 
         Task ClearAll(IWorkContext context);
     }

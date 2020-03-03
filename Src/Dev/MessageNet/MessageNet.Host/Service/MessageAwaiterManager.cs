@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Host
 {
-    internal class AwaiterManager : IAwaiterManager
+    internal class MessageAwaiterManager : IMessageAwaiterManager
     {
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<NetMessage>> _completion = new ConcurrentDictionary<Guid, TaskCompletionSource<NetMessage>>();
 
-        public AwaiterManager() { }
+        public MessageAwaiterManager() { }
 
-        public AwaiterManager Add(Guid id, TaskCompletionSource<NetMessage> task)
+        public MessageAwaiterManager Add(Guid id, TaskCompletionSource<NetMessage> task)
         {
             task.Verify(nameof(task)).IsNotNull();
 
@@ -25,7 +25,7 @@ namespace Khooversoft.MessageNet.Host
             return this;
         }
 
-        public AwaiterManager SetResult(NetMessage? netMessage)
+        public MessageAwaiterManager SetResult(NetMessage? netMessage)
         {
             if (netMessage == null!) return this;
 

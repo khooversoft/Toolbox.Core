@@ -11,6 +11,8 @@ namespace ToolBox.Azure.Test
 {
     public class ApplicationFixture
     {
+        private const string _connectionString = "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=TestAccess;SharedAccessKey={messagehub.accesskey};TransportType=Amqp";
+
         public ApplicationFixture()
         {
             IConfiguration configuration = new ConfigurationBuilder()
@@ -21,5 +23,7 @@ namespace ToolBox.Azure.Test
         }
 
         public IPropertyResolver PropertyResolver { get; }
+
+        public string ConnectionString => PropertyResolver.Resolve(_connectionString);
     }
 }

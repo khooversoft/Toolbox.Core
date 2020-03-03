@@ -30,6 +30,7 @@ namespace Khooversoft.MessageNet.Interface
         {
             messageItems.Verify(nameof(messageItems)).IsNotNull();
 
+            Version = "1.0.0.0";
             MessageItems = messageItems.ToList();
 
             Header = MessageItems
@@ -43,6 +44,11 @@ namespace Khooversoft.MessageNet.Interface
         /// Message items
         /// </summary>
         public IReadOnlyList<INetMessageItem> MessageItems { get; }
+
+        /// <summary>
+        /// Message version
+        /// </summary>
+        public string Version { get; }
 
         /// <summary>
         /// Current header
@@ -79,7 +85,7 @@ namespace Khooversoft.MessageNet.Interface
         /// </summary>
         /// <param name="netMessageItems">messages to push</param>
         /// <returns>new net message</returns>
-        public NetMessage WithPush(params INetMessageItem[] netMessageItems)
+        public NetMessage WithAddToTop(params INetMessageItem[] netMessageItems)
         {
             return new NetMessage(netMessageItems.Concat(MessageItems));
         }

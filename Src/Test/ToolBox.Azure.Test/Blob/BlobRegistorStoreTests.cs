@@ -17,7 +17,7 @@ namespace ToolBox.Azure.Test.Blob
     [Collection("QueueTests")]
     public class BlobRegistorStoreTests : IClassFixture<ApplicationFixture>
     {
-        private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey={blob-storage-test-AccountKey};EndpointSuffix=core.windows.net";
+        private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey={blob.storage.connection};EndpointSuffix=core.windows.net";
         private readonly BlobStoreConnection _blobStore;
         private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly ApplicationFixture _application;
@@ -49,7 +49,7 @@ namespace ToolBox.Azure.Test.Blob
             await container.CreateContainer(_workContext);
 
             IReadOnlyList<string> filePaths = await container.List(_workContext, "*");
-            await filePaths.ForEachAsync(x => container.Delete(_workContext, x));
+            await filePaths.ForEachAsync(async x => await container.Delete(_workContext, x));
 
             const string filePath = "testBlob";
             Func<Task> act = async () => await container.Get(_workContext, filePath);
@@ -66,7 +66,7 @@ namespace ToolBox.Azure.Test.Blob
             await container.CreateContainer(_workContext);
 
             IReadOnlyList<string> filePaths = await container.List(_workContext, "*");
-            await filePaths.ForEachAsync(x => container.Delete(_workContext, x));
+            await filePaths.ForEachAsync(async x => await container.Delete(_workContext, x));
 
             const string filePath = "testBlob";
             const string data = "This is data";
