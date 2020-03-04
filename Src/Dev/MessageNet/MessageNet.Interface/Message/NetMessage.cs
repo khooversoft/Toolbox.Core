@@ -40,6 +40,21 @@ namespace Khooversoft.MessageNet.Interface
                 .Value;
         }
 
+        public NetMessage(string version, IEnumerable<INetMessageItem> messageItems)
+        {
+            version.Verify(nameof(version)).IsNotEmpty();
+            messageItems.Verify(nameof(messageItems)).IsNotNull();
+
+            Version = version;
+            MessageItems = messageItems.ToList();
+
+            Header = MessageItems
+                .OfType<MessageHeader>()
+                .FirstOrDefault()
+                .Verify().IsNotNull("MessageHeader is not in message items")
+                .Value;
+        }
+
         /// <summary>
         /// Message items
         /// </summary>
@@ -58,27 +73,27 @@ namespace Khooversoft.MessageNet.Interface
         /// <summary>
         /// Current activity, can be null
         /// </summary>
-        public MessageActivity? Activity => _activity = _activity ??= MessageItems.OfType<MessageActivity>().FirstOrDefault();
+        public MessageActivity? Activity => _activity ??= MessageItems.OfType<MessageActivity>().FirstOrDefault();
 
         /// <summary>
         /// Current content, can be null
         /// </summary>
-        public MessageContent? Content => _content = _content ??= MessageItems.OfType<MessageContent>().FirstOrDefault();
+        public MessageContent? Content => _content ??= MessageItems.OfType<MessageContent>().FirstOrDefault();
 
         /// <summary>
         /// Enumerate all headers, current one will be first
         /// </summary>
-        public IReadOnlyList<MessageHeader> Headers => _messageHeaders = _messageHeaders ??= MessageItems.OfType<MessageHeader>().ToList();
+        public IReadOnlyList<MessageHeader> Headers => _messageHeaders ??= MessageItems.OfType<MessageHeader>().ToList();
 
         /// <summary>
         /// Enumerate all activities, current one will be first
         /// </summary>
-        public IReadOnlyList<MessageActivity> Activities => _messageActivities = _messageActivities ??= MessageItems.OfType<MessageActivity>().ToList();
+        public IReadOnlyList<MessageActivity> Activities => _messageActivities ??= MessageItems.OfType<MessageActivity>().ToList();
 
         /// <summary>
         /// Enumerate all contents, current one will be first
         /// </summary>
-        public IReadOnlyList<MessageContent> Contents => _messageContents = _messageContents ??= MessageItems.OfType<MessageContent>().ToList();
+        public IReadOnlyList<MessageContent> Contents => _messageContents ??= MessageItems.OfType<MessageContent>().ToList();
 
         /// <summary>
         /// Push new messages into current message set and create a new NetMessage
@@ -105,9 +120,7 @@ namespace Khooversoft.MessageNet.Interface
         public override int GetHashCode()
         {
             HashCode hashCode = new HashCode();
-
             MessageItems.ForEach(x => hashCode.Add(x));
-
             return hashCode.ToHashCode();
         }
 

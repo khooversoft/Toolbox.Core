@@ -150,8 +150,8 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenContent_WhenSame_ShouldBeEqual()
         {
-            var expected = new MessageContent<string>("message Content #1");
-            var subject = new MessageContent<string>("message Content #1");
+            var expected = new MessageContent("type", "message Content #1");
+            var subject = new MessageContent("type", "message Content #1");
 
             subject.Should().Be(expected);
             (expected == subject).Should().BeTrue();
@@ -162,8 +162,8 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenContent_WhenDiffernt_ShouldNotBeEqual()
         {
-            var expected = new MessageContent<string>("message Content #1");
-            var subject = new MessageContent<string>("message D Content #1");
+            var expected = new MessageContent("type", "message Content #1");
+            var subject = new MessageContent("type", "message D Content #1");
 
             subject.Should().NotBe(expected);
             (expected == subject).Should().BeFalse();

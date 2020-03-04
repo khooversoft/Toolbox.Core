@@ -4,6 +4,7 @@
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,11 +15,15 @@ namespace Khooversoft.MessageNet.Interface
     {
         public static readonly string _netMessageType = "net.message";
 
-        public static Message ConvertTo(this NetMessage subject)
+        public static Message ToMessage(this NetMessage subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return new Message(Encoding.UTF8.GetBytes(subject.ToJson()))
+            NetMessageModel netMessageModel = subject.ConvertTo();
+            string json = JsonConvert.SerializeObject(netMessageModel);
+            byte[] data = Encoding.UTF8.GetBytes(json);
+
+            return new Message(data)
             {
                 To = subject.Header.ToUri,
                 ReplyTo = subject.Header.FromUri,
@@ -28,19 +33,13 @@ namespace Khooversoft.MessageNet.Interface
             };
         }
 
-        public static bool IsNetMessage(this Message subject)
+        public static NetMessage ToNetMessage(this Message subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
 
-            return subject.ContentType == _netMessageType;
-        }
-
-        public static NetMessage ConvertTo(this Message subject)
-        {
-            subject.Verify(nameof(subject)).IsNotNull();
-            subject.IsNetMessage().Verify().Assert(x => x == true, $"MesageType is not {_netMessageType}");
-
-            return Encoding.UTF8.GetString(subject.Body).ToNetMessage();
+            string json = Encoding.UTF8.GetString(subject.Body);
+            NetMessageModel model = JsonConvert.DeserializeObject<NetMessageModel>(json);
+            return model.ConvertTo();
         }
     }
 }

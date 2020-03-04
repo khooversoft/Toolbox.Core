@@ -146,7 +146,7 @@ namespace MessageNet.Interface.Test
         {
             var header = new MessageHeader("network1/node3", "network1/node4", "post");
             var activity = new MessageActivity(Guid.NewGuid());
-            var content = new MessageContent<string>("This is the value");
+            var content = new MessageContent("type", "This is the value");
 
             NetMessage message = new NetMessageBuilder()
                 .Add(header)
@@ -190,7 +190,7 @@ namespace MessageNet.Interface.Test
         {
             var header = new MessageHeader("network1/node3", "network1/node4", "post");
             var activity = new MessageActivity(Guid.NewGuid());
-            var content = new MessageContent<string>("This is the value");
+            var content = new MessageContent("type", "This is the value");
 
             NetMessage message = new NetMessageBuilder()
                 .Add(header)

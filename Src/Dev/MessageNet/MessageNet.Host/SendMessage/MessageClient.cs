@@ -43,7 +43,7 @@ namespace Khooversoft.MessageNet.Host
             context.Telemetry.Verbose(context, $"Sending message: {message}");
 
             // Send the message to the queue
-            await _messageSender!.SendAsync(message.ConvertTo());
+            await _messageSender!.SendAsync(message.ToMessage());
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Khooversoft.MessageNet.Host
             context.Telemetry.Verbose(context, $"Calling message: {message}");
 
             // Send the message to the queue
-            await _messageSender!.SendAsync(message.ConvertTo());
+            await _messageSender!.SendAsync(message.ToMessage());
 
             // Wait for response
             await WaitForResponse(message.Header.MessageId);

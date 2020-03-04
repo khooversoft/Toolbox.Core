@@ -10,8 +10,8 @@ namespace Khooversoft.MessageNet.Interface
 
         public IList<MessageHeaderModel>? Headers { get; set; }
 
-        public IList<MessageActivityModel>? Activity { get; set; }
+        public IList<MessageActivityModel>? Activities { get; set; }
 
-        public IList<MessageContentModel>? Content { get; set; }
+        public IList<MessageContentModel>? Contents { get; set; }
     }
 }

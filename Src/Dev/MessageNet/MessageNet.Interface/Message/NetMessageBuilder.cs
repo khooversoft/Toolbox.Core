@@ -49,15 +49,7 @@ namespace Khooversoft.MessageNet.Interface
         {
             return new NetMessageBuilder()
                 .Add(new MessageHeader(toUri.ToMessageUri(), fromUri.ToMessageUri(), method))
-                .Add(content switch { string value => new MessageContent<string>(value), _ => null! })
-                .Build();
-        }
-
-        public static NetMessage Create<T>(MessageUri toUri, MessageUri fromUri, string method, T? content = null) where T : class
-        {
-            return new NetMessageBuilder()
-                .Add(new MessageHeader(toUri, fromUri, method))
-                .Add(content switch { T value => new MessageContent<T>(value), _ => null! })
+                .Add(content switch { string value => MessageContent.Create(value), _ => null! })
                 .Build();
         }
     }

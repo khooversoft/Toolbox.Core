@@ -130,6 +130,8 @@ namespace Khooversoft.MessageNet.Interface
 
                     }
                 },
+                x => builder.Namespace = x,
+                x => x.Verify().Assert(x => x == "/", syntaxError),
                 x => builder.NetworkId = x,
                 x => x.Verify().Assert(x => x == "/", syntaxError),
                 x => builder.NodeId = x,

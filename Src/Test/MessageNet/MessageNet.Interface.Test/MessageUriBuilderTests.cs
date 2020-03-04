@@ -91,15 +91,16 @@ namespace MessageNet.Interface.Test
         }
 
         [Theory]
-        [InlineData("msgnet://network1/node1", "network1", "node1", "")]
-        [InlineData("msgnet://network1/node1/route", "network1", "node1", "route")]
-        [InlineData("msgnet://network1/node1/route1/route2", "network1", "node1", "route1/route2")]
-        [InlineData("msgnet://networkId/node1/", "networkId", "node1", "")]
+        [InlineData("msgnet://namespace/network1/node1", "network1", "node1", "")]
+        [InlineData("msgnet://namespace/network1/node1/route", "network1", "node1", "route")]
+        [InlineData("msgnet://namespace/network1/node1/route1/route2", "network1", "node1", "route1/route2")]
+        [InlineData("msgnet://namespace/networkId/node1/", "networkId", "node1", "")]
         public void GivenUri_WhenParsed_ShouldVerify(string uri, string networkId, string nodeId, string route)
         {
             var builder = MessageUriBuilder.Parse(uri);
 
             builder.Protocol.Should().Be("msgnet");
+            builder.Namespace.Should().Be("namespace");
             builder.NetworkId.Should().Be(networkId);
             builder.NodeId.Should().Be(nodeId);
             builder.Route.Build().ToString().Should().Be(route);

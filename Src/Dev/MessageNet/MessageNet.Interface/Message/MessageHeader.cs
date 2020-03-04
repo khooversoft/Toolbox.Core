@@ -62,8 +62,7 @@ namespace Khooversoft.MessageNet.Interface
         {
             if (obj is MessageHeader header)
             {
-                return MessageId == header.MessageId &&
-                    ToUri == header.ToUri &&
+                return ToUri == header.ToUri &&
                     FromUri == header.FromUri &&
                     Method == header.Method &&
                     Properties.Count == header.Properties.Count &&
