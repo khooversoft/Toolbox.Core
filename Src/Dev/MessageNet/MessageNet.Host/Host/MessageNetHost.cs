@@ -24,6 +24,7 @@ namespace Khooversoft.MessageNet.Host
         private readonly IMessageNetConfig _messageNetConfig;
         private readonly IMessageAwaiterManager _awaiterManager;
         private readonly IMessageRepository _routeRepository;
+        private readonly IDictionary<string, MessageClient> _messageClients = new Dictionary<string, MessageClient>(StringComparer.OrdinalIgnoreCase);
         private List<NodeHost>? _receivers;
         private IEnumerable<NodeHostRegistration>? _nodeRegistrations;
 
@@ -78,12 +79,29 @@ namespace Khooversoft.MessageNet.Host
         {
             queueId.Verify(nameof(queueId)).IsNotNull();
 
-            if(_messageNetConfig.Registrations.TryGetValue(queueId.Namespace, out NamespaceRegistration? namespaceRegistration))
+            string queueName = queueId.GetQueueName();
+
+            if (_messageClients.TryGetValue(queueName, out MessageClient? messageClient))
             {
-                return Task.FromResult<IMessageClient>(new MessageClient(namespaceRegistration!.ConnectionString, queueId.GetQueueName(), _awaiterManager));
+                return Task.FromResult<IMessageClient>(messageClient);
+            }
+
+            if (_messageNetConfig.Registrations.TryGetValue(queueId.Namespace, out NamespaceRegistration? namespaceRegistration))
+            {
+                messageClient = new MessageClient(namespaceRegistration!.ConnectionString, queueName, _awaiterManager);
+                _messageClients[queueId.Namespace] = messageClient;
+
+                return Task.FromResult<IMessageClient>(messageClient);
             }
 
             throw new ArgumentException($"Cannot locate namespace {queueId.Namespace} in namespace registrations");
+        }
+
+        public async Task Send(IWorkContext context, NetMessage netMessage)
+        {
+            MessageUri messageUri = netMessage.Header.ToUri.ToMessageUri();
+            IMessageClient messageClient = await GetMessageClient(context, messageUri.ToQueueId());
+            await messageClient.Send(context, netMessage);
         }
 
         public void Dispose()

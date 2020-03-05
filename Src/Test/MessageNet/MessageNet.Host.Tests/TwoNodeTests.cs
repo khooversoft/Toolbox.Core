@@ -46,8 +46,6 @@ namespace MessageNet.Host.Tests
 
             IMessageNetHost netHost = container.Resolve<IMessageNetHost>();
 
-            IMessageClient toClient = await netHost.GetMessageClient(_workContext, clientQueueId);
-            IMessageClient toIdentity = await netHost.GetMessageClient(_workContext, identityQueueId);
             var clientReceiverTask = new TaskCompletionSource<NetMessage>();
 
             Func<NetMessage, Task> clientNodeReceiver = x =>
@@ -58,9 +56,8 @@ namespace MessageNet.Host.Tests
 
             Func<NetMessage, Task> identityNodeReceiver = async x =>
             {
-                NetMessage netMessage = x.WithAddToTop(new MessageHeader(x.Header.FromUri, x.Header.ToUri, "post"));
-
-                await toClient.Send(_workContext, netMessage);
+                NetMessage netMessage = x.WithReply();
+                await netHost.Send(_workContext, netMessage);
             };
 
             var nodeHostRegistrations = new NodeHostRegistration[]
@@ -71,13 +68,13 @@ namespace MessageNet.Host.Tests
 
             await netHost.Start(_workContext, nodeHostRegistrations);
 
-            var header = new MessageHeader("ns/test/toUri", "ns/test/fromUri", "post");
+            var header = new MessageHeader(identityQueueId.ToMessageUri(), clientQueueId.ToMessageUri(), "get");
 
             var message = new NetMessageBuilder()
                 .Add(header)
                 .Build();
 
-            await toIdentity.Send(_workContext, message);
+            await netHost.Send(_workContext, message);
 
             NetMessage receivedMessage = await clientReceiverTask.Task;
 

@@ -17,5 +17,7 @@ namespace Khooversoft.MessageNet.Host
         Task Stop(IWorkContext context);
 
         Task<IMessageClient> GetMessageClient(IWorkContext context, QueueId queueId);
+
+        Task Send(IWorkContext context, NetMessage netMessage);
     }
 }
