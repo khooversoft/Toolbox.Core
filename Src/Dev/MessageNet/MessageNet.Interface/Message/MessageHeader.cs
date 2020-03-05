@@ -19,10 +19,10 @@ namespace Khooversoft.MessageNet.Interface
             ToUri = subject.ToUri;
             FromUri = subject.FromUri;
             Method = subject.Method;
-            Properties = subject.Properties.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+            Claims = subject.Claims.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
         }
 
-        public MessageHeader(string toUri, string fromUri, string method, params KeyValuePair<string, string>[] properties)
+        public MessageHeader(string toUri, string fromUri, string method, params KeyValuePair<string, string>[] claims)
         {
             toUri.Verify(nameof(toUri)).IsNotEmpty();
             fromUri.Verify(nameof(fromUri)).IsNotEmpty();
@@ -31,21 +31,21 @@ namespace Khooversoft.MessageNet.Interface
             ToUri = toUri.ToMessageUri().ToString();
             FromUri = fromUri.ToMessageUri().ToString();
             Method = method;
-            Properties = properties.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+            Claims = claims.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
         }
 
-        public MessageHeader(Guid messageId, string toUri, string fromUri, string method, params KeyValuePair<string, string>[] properties)
-            : this(toUri, fromUri, method, properties)
+        public MessageHeader(Guid messageId, string toUri, string fromUri, string method, params KeyValuePair<string, string>[] claims)
+            : this(toUri, fromUri, method, claims)
         {
             MessageId = messageId;
         }
 
-        public MessageHeader(MessageUri toUri, MessageUri fromUri, string method, params KeyValuePair<string, string>[] properties)
+        public MessageHeader(MessageUri toUri, MessageUri fromUri, string method, params KeyValuePair<string, string>[] claims)
         {
             ToUri = toUri.Verify(nameof(toUri)).IsNotNull().Value.ToString();
             FromUri = fromUri.Verify(nameof(fromUri)).IsNotNull().Value.ToString();
             Method = method.Verify(nameof(method)).IsNotEmpty().Value.ToString();
-            Properties = properties.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+            Claims = claims.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
         }
 
         public Guid MessageId { get; } = Guid.NewGuid();
@@ -56,7 +56,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public string Method { get; }
 
-        public IReadOnlyDictionary<string, string> Properties { get; }
+        public IReadOnlyDictionary<string, string> Claims { get; }
 
         public override bool Equals(object obj)
         {
@@ -65,10 +65,10 @@ namespace Khooversoft.MessageNet.Interface
                 return ToUri == header.ToUri &&
                     FromUri == header.FromUri &&
                     Method == header.Method &&
-                    Properties.Count == header.Properties.Count &&
+                    Claims.Count == header.Claims.Count &&
 
-                    Properties.OrderBy(x => x.Key)
-                        .Zip(header.Properties.OrderBy(x => x.Key), (o, i) => (o, i))
+                    Claims.OrderBy(x => x.Key)
+                        .Zip(header.Claims.OrderBy(x => x.Key), (o, i) => (o, i))
                         .All(x => x.o.Key == x.i.Key && x.o.Value == x.i.Value);
             }
 

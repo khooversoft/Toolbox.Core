@@ -21,23 +21,28 @@ namespace Khooversoft.MessageNet.Host
     /// </summary>
     public class MessageNetHost : IMessageNetHost
     {
-        private static readonly HttpClient _httpClient = new HttpClient();
-        private readonly IWorkContext _workContext;
         private readonly IMessageNetConfig _messageNetConfig;
-        private readonly IEnumerable<NodeHostRegistration> _nodeRegistrations;
-        private readonly MessageAwaiterManager _awaiterManager = new MessageAwaiterManager();
+        private readonly IMessageAwaiterManager _awaiterManager;
         private readonly IMessageRepository _routeRepository;
         private List<NodeHost>? _receivers;
+        private IEnumerable<NodeHostRegistration>? _nodeRegistrations;
 
-        public MessageNetHost(IWorkContext context, IMessageNetConfig messageNetConfig, IEnumerable<NodeHostRegistration> nodeRegistrations)
+        public MessageNetHost(IMessageNetConfig messageNetConfig, IMessageRepository messageRepository, IMessageAwaiterManager messageAwaiterManager)
         {
-            context.Verify(nameof(context)).IsNotNull();
             messageNetConfig.Verify(nameof(messageNetConfig)).IsNotNull();
-            nodeRegistrations.Verify(nameof(nodeRegistrations)).IsNotNull();
+            messageRepository.Verify(nameof(messageRepository)).IsNotNull();
+            messageAwaiterManager.Verify(nameof(messageAwaiterManager)).IsNotNull();
 
-            _workContext = context;
             _messageNetConfig = messageNetConfig;
-            _routeRepository = new MessageRepository(_messageNetConfig);
+            _routeRepository = messageRepository;
+            _awaiterManager = messageAwaiterManager;
+        }
+
+        public async Task Start(IWorkContext context, IEnumerable<NodeHostRegistration> nodeRegistrations)
+        {
+            _receivers.Verify().Assert(x => x == null, "Host is already running");
+            nodeRegistrations.Verify(nameof(nodeRegistrations)).IsNotNull();
+            context.Telemetry.Info(context, "Starting message net host");
 
             _nodeRegistrations = nodeRegistrations
                 .ToList()
@@ -48,18 +53,13 @@ namespace Khooversoft.MessageNet.Host
                 .GroupBy(x => x.QueueId.ToString().ToLower())
                 .Where(x => x.Count() > 1)
                 .Verify().Assert(x => x.Count() == 0, x => $"Duplicate routes have been detected: {string.Join(", ", x)}");
-        }
-
-        public Task Run(IWorkContext context)
-        {
-            _receivers.Verify().IsNotNull("Host is already running");
-            context.Telemetry.Info(context, "Starting message net host");
 
             _receivers = _nodeRegistrations
                 .Select(x => new NodeHost(x, _routeRepository))
                 .ToList();
 
-            return Task.CompletedTask;
+            await _receivers
+                .ForEachAsync(x => x.Start(context));
         }
 
         public async Task Stop(IWorkContext context)
@@ -70,7 +70,7 @@ namespace Khooversoft.MessageNet.Host
                 context.Telemetry.Info(context, "Starting message net host");
 
                 await _receivers
-                    .ForEachAsync(async x => await x.Stop(_workContext));
+                    .ForEachAsync(async x => await x.Stop(context));
             }
         }
 
@@ -78,9 +78,12 @@ namespace Khooversoft.MessageNet.Host
         {
             queueId.Verify(nameof(queueId)).IsNotNull();
 
-            string connectionString = _messageNetConfig.Registrations[queueId.Namespace].ConnectionString;
+            if(_messageNetConfig.Registrations.TryGetValue(queueId.Namespace, out NamespaceRegistration? namespaceRegistration))
+            {
+                return Task.FromResult<IMessageClient>(new MessageClient(namespaceRegistration!.ConnectionString, queueId.GetQueueName(), _awaiterManager));
+            }
 
-            return Task.FromResult<IMessageClient>(new MessageClient(connectionString, queueId.GetQueueName(), _awaiterManager));
+            throw new ArgumentException($"Cannot locate namespace {queueId.Namespace} in namespace registrations");
         }
 
         public void Dispose()

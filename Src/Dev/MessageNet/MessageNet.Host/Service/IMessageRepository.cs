@@ -11,7 +11,7 @@ namespace Khooversoft.MessageNet.Host
 {
     public interface IMessageRepository
     {
-        Task<QueueReceiver<NetMessage>> Register(IWorkContext context, QueueId queueId);
+        Task<QueueReceiver<NetMessageModel>> Register(IWorkContext context, QueueId queueId);
 
         Task Unregister(IWorkContext context, QueueId queueId);
 

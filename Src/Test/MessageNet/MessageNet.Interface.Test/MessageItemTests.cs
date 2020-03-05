@@ -15,7 +15,7 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenHeader_WhenCloned_ShouldBeEqual()
         {
-            var expected = new MessageHeader("net1/node1", "net1/node2", "method");
+            var expected = new MessageHeader("ns/net1/node1", "ns/net1/node2", "method");
             var subject = new MessageHeader(expected);
 
             subject.Should().Be(expected);
@@ -27,7 +27,7 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenHeaderWithProperties_WhenCloned_ShouldBeEqual()
         {
-            var expected = new MessageHeader("net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key", "value"));
+            var expected = new MessageHeader("ns/net1/node1", "ns/net1/node2", "method", new KeyValuePair<string, string>("key", "value"));
             var subject = new MessageHeader(expected);
 
             subject.Should().Be(expected);
@@ -41,8 +41,8 @@ namespace MessageNet.Interface.Test
         {
             Guid messageId = Guid.NewGuid();
 
-            var expected = new MessageHeader(messageId, "net1/node1", "net1/node2", "method");
-            var subject = new MessageHeader(messageId, "net1/node3", "net1/node2", "method");
+            var expected = new MessageHeader(messageId, "ns/net1/node1", "ns/net1/node2", "method");
+            var subject = new MessageHeader(messageId, "ns/net1/node3", "ns/net1/node2", "method");
 
             subject.Should().NotBe(expected);
             (expected != subject).Should().BeTrue();
@@ -55,8 +55,8 @@ namespace MessageNet.Interface.Test
         {
             Guid messageId = Guid.NewGuid();
 
-            var expected = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
-            var subject = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+            var expected = new MessageHeader(messageId, "ns/net1/node1", "ns/net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+            var subject = new MessageHeader(messageId, "ns/net1/node1", "ns/net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
 
             subject.Should().Be(expected);
             (expected == subject).Should().BeTrue();
@@ -67,8 +67,8 @@ namespace MessageNet.Interface.Test
         {
             Guid messageId = Guid.NewGuid();
 
-            var expected = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
-            var subject = new MessageHeader(messageId, "net1/node3", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+            var expected = new MessageHeader(messageId, "ns/net1/node1", "ns/net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+            var subject = new MessageHeader(messageId, "ns/net1/node3", "ns/net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
 
             subject.Should().NotBe(expected);
             (expected != subject).Should().BeTrue();
@@ -81,8 +81,8 @@ namespace MessageNet.Interface.Test
         {
             Guid messageId = Guid.NewGuid();
 
-            var expected = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
-            var subject = new MessageHeader(messageId, "net1/node1", "net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key3", "value2"));
+            var expected = new MessageHeader(messageId, "ns/net1/node1", "ns/net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key2", "value2"));
+            var subject = new MessageHeader(messageId, "ns/net1/node1", "ns/net1/node2", "method", new KeyValuePair<string, string>("key1", "value1"), new KeyValuePair<string, string>("key3", "value2"));
 
             subject.Should().NotBe(expected);
             (expected != subject).Should().BeTrue();
@@ -94,8 +94,8 @@ namespace MessageNet.Interface.Test
         public void GivenHeader_WhenCreatedIdenticalCloned_ShouldBeEqual()
         {
             Guid messageId = Guid.NewGuid();
-            var expected = new MessageHeader(messageId, "net1/node1", "net1/node2", "method");
-            var subject = new MessageHeader(messageId, "net1/node1", "net1/node2", "method");
+            var expected = new MessageHeader(messageId, "ns/net1/node1", "ns/net1/node2", "method");
+            var subject = new MessageHeader(messageId, "ns/net1/node1", "ns/net1/node2", "method");
 
             subject.Should().Be(expected);
             (expected == subject).Should().BeTrue();

@@ -17,8 +17,8 @@ namespace MessageNet.Interface.Test
         public void GivenSimpleMessage_WhenCreatedEqual_ShouldEqual()
         {
             Guid messageId = Guid.NewGuid();
-            var header1 = new MessageHeader(messageId, "network1/node2", "network1/node1", "post");
-            var header2 = new MessageHeader(messageId, "network1/node2", "network1/node1", "post");
+            var header1 = new MessageHeader(messageId, "namespace/network1/node2", "namespace/network1/node1", "post");
+            var header2 = new MessageHeader(messageId, "namespace/network1/node2", "namespace/network1/node1", "post");
 
             NetMessage message1 = new NetMessageBuilder()
                 .Add(header1)
@@ -35,8 +35,8 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenSimpleMessage_WhenNotCreatedEqual_ShouldNotEqual()
         {
-            var header1 = new MessageHeader("network1/node2", "network1/node1", "post");
-            var header2 = new MessageHeader("network1/node9", "network1/node1", "post");
+            var header1 = new MessageHeader("namespace/network1/node2", "namespace/network1/node1", "post");
+            var header2 = new MessageHeader("namespace/network1/node9", "namespace/network1/node1", "post");
 
             NetMessage message1 = new NetMessageBuilder()
                 .Add(header1)
@@ -53,7 +53,7 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenHeaderItem_WhenBuild_ItemsShouldVerify()
         {
-            var header = new MessageHeader("network1/node2", "network1/node1", "post");
+            var header = new MessageHeader("namespace/network1/node2", "namespace/network1/node1", "post");
 
             NetMessage message = new NetMessageBuilder()
                 .Add(header)
@@ -80,8 +80,8 @@ namespace MessageNet.Interface.Test
         {
             var headers = new MessageHeader[]
             {
-                new MessageHeader("network1/node1", "network1/node2", "post"),
-                new MessageHeader("network1/node2", "network1/node1", "post"),
+                new MessageHeader("namespace/network1/node1", "namespace/network1/node2", "post"),
+                new MessageHeader("namespace/network1/node2", "namespace/network1/node1", "post"),
             };
 
             NetMessage message = new NetMessageBuilder()
@@ -107,7 +107,7 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenHeaderAndActivityItem_WhenBuild_ItemsShouldVerify()
         {
-            var header = new MessageHeader("network1/node2", "network1/node1", "post");
+            var header = new MessageHeader("namespace/network1/node2", "namespace/network1/node1", "post");
             var activity = new MessageActivity(Guid.NewGuid());
 
             NetMessage message = new NetMessageBuilder()
@@ -144,7 +144,7 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenHeaderAndActivityAndDataItem_WhenBuild_ItemsShouldVerify()
         {
-            var header = new MessageHeader("network1/node3", "network1/node4", "post");
+            var header = new MessageHeader("namespace/network1/node3", "namespace/network1/node4", "post");
             var activity = new MessageActivity(Guid.NewGuid());
             var content = new MessageContent("type", "This is the value");
 
@@ -188,7 +188,7 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenCustomMessageItem_WhenBuild_ItemsShouldVerify()
         {
-            var header = new MessageHeader("network1/node3", "network1/node4", "post");
+            var header = new MessageHeader("namespace/network1/node3", "namespace/network1/node4", "post");
             var activity = new MessageActivity(Guid.NewGuid());
             var content = new MessageContent("type", "This is the value");
 

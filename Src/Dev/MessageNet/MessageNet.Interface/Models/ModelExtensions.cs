@@ -45,7 +45,7 @@ namespace Khooversoft.MessageNet.Interface
                 ToUri = subject.ToUri,
                 FromUri = subject.FromUri,
                 Method = subject.Method,
-                Properties = subject.Properties.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase),
+                Properties = subject.Claims.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase),
             };
         }
 

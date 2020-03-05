@@ -15,6 +15,7 @@ namespace Khooversoft.Toolbox.Azure
             queueName.Verify(nameof(queueName)).IsNotEmpty();
 
             QueueName = queueName;
+            AutoDeleteOnIdle = TimeSpan.FromDays(30);
         }
 
         public string QueueName { get; }
@@ -27,7 +28,7 @@ namespace Khooversoft.Toolbox.Azure
 
         public bool RequiresSession { get; set; } = false;
 
-        public TimeSpan DefaultMessageTimeToLive { get; set; } = TimeSpan.FromDays(7);
+        public TimeSpan DefaultMessageTimeToLive { get; set; } = TimeSpan.FromMinutes(30);
 
         public TimeSpan AutoDeleteOnIdle { get; set; } = TimeSpan.MaxValue;
 

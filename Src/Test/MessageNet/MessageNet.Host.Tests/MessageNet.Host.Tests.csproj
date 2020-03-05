@@ -24,6 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.Host\MessageNet.Host.csproj" />
+    <ProjectReference Include="..\..\..\Dev\MessageNet\MessageNet.Interface\MessageNet.Interface.csproj" />
+    <ProjectReference Include="..\..\..\Dev\Toolbox.Core\Toolbox.Autofac\Toolbox.Autofac.csproj" />
     <ProjectReference Include="..\..\..\Dev\Toolbox.Core\Toolbox.Azure\Toolbox.Azure.csproj" />
     <ProjectReference Include="..\..\..\Dev\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
   </ItemGroup>

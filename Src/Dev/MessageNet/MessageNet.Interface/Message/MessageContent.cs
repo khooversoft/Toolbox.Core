@@ -20,6 +20,8 @@ namespace Khooversoft.MessageNet.Interface
             Content = content;
         }
 
+        public Guid ContentId { get; } = Guid.NewGuid();
+
         public string ContentType { get; }
 
         public string Content { get; }

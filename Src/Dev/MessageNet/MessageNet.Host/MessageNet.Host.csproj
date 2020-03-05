@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Actor\Toolbox.Actor.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Azure\Toolbox.Azure.csproj" />
     <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
     <ProjectReference Include="..\MessageNet.Interface\MessageNet.Interface.csproj" />

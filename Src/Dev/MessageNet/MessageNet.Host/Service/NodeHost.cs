@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Host
 {
-    internal class NodeHost : INodeHost
+    internal class NodeHost
     {
         private readonly NodeHostRegistration _nodeRegistration;
         private readonly IMessageRepository _routeRepository;
-        private QueueReceiver<NetMessage>? _receiver;
+        private QueueReceiver<NetMessageModel>? _receiver;
 
         public NodeHost(NodeHostRegistration nodeRegistration, IMessageRepository routeRepository)
         {
@@ -28,7 +28,7 @@ namespace Khooversoft.MessageNet.Host
             _routeRepository = routeRepository;
         }
 
-        public async Task Run(IWorkContext context)
+        public async Task Start(IWorkContext context)
         {
             _receiver.Verify().Assert(x => x == null, "Cannot run because receiver is already running");
             context.Verify(nameof(context)).IsNotNull();
@@ -36,7 +36,7 @@ namespace Khooversoft.MessageNet.Host
             context.Telemetry.Info(context, $"Starting node host for {_nodeRegistration.QueueId}");
             _receiver = await _routeRepository.Register(context, _nodeRegistration.QueueId);
 
-            await _receiver.Start(context, x => _nodeRegistration.Receiver(x));
+            await _receiver.Start(context, x => _nodeRegistration.Receiver(x.ConvertTo()));
         }
 
         public Task Stop(IWorkContext context)

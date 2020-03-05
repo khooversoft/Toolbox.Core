@@ -17,17 +17,16 @@ namespace Khooversoft.MessageNet.Host
 
         public MessageAwaiterManager() { }
 
-        public MessageAwaiterManager Add(Guid id, TaskCompletionSource<NetMessage> task)
+        public void Add(Guid id, TaskCompletionSource<NetMessage> task)
         {
             task.Verify(nameof(task)).IsNotNull();
 
             _completion[id] = task;
-            return this;
         }
 
-        public MessageAwaiterManager SetResult(NetMessage? netMessage)
+        public void SetResult(NetMessage? netMessage)
         {
-            if (netMessage == null!) return this;
+            if (netMessage == null!) return;
 
             TaskCompletionSource<NetMessage> tcs;
 
@@ -35,8 +34,6 @@ namespace Khooversoft.MessageNet.Host
             {
                 tcs.SetResult(netMessage);
             }
-
-            return this;
         }
     }
 }
