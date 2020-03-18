@@ -35,7 +35,7 @@ namespace MicroserviceHost
                 {
                     context.Telemetry.Verbose(context, $"Searching method {methodInfo.Name} in type {typeInfo.Name}");
 
-                    FunctionAttribute? functionAttribute = methodInfo.GetCustomAttribute<FunctionAttribute>();
+                    MessageFunctionAttribute? functionAttribute = methodInfo.GetCustomAttribute<MessageFunctionAttribute>();
                     if (functionAttribute != null)
                     {
                         context.Telemetry.Info(context, $"Found function {methodInfo.Name} : {functionAttribute.ToString()}");
@@ -80,7 +80,7 @@ namespace MicroserviceHost
                 .Last()
                 .Do(x => x.ParameterType)
                 .Verify()
-                .Assert(x => x.DeclaringType == typeof(RouteMessage<>), $"The second parameter type does not derived from RouteMessage<T> for function {methodName}")
+                .Assert(x => x.DeclaringType == typeof(NetMessage) || x.DeclaringType!.IsClass, $"The second parameter type is not NetMessage or a class for {methodName} ")
                 .Assert(x => x.GetConstructor(Type.EmptyTypes) != null, $"The second parameter type does not implement a parameterless constructor for function {methodName}")
                 .Value;
 

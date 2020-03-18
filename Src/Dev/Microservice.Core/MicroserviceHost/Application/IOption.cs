@@ -15,19 +15,18 @@ namespace MicroserviceHost
 
         string LoggingFolder { get; set; }
 
-        string NameServerUri { get; set; }
-
-        string NodeId { get; set; }
-
         bool Run { get; set; }
 
-        string ServiceBusConnection { get; set; }
-
         bool UnRegister { get; set; }
+
+        NamespaceConnection NamespaceConnections { get; }
+
+        public string? Namespace { get; }
+
+        public string? NetworkId { get; }
 
         IPropertyResolver Properties { get; }
 
         ITelemetrySecretManager SecretManager { get; }
-
     }
 }

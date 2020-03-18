@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Khooversoft.Toolbox.Standard
 {
@@ -12,49 +13,33 @@ namespace Khooversoft.Toolbox.Standard
     /// </summary>
     public class StateManagerBuilder : IEnumerable<IStateItem>
     {
-        public StateManagerBuilder()
+        public StateManagerBuilder() { }
+
+        public IList<IStateItem> StateItems { get; set; } = new List<IStateItem>();
+
+        public RetryPolicy? Policy { get; set; }
+
+        public StateManagerBuilder Add(params IStateItem[] item)
         {
-            StateItems = new List<IStateItem>();
-        }
-
-        public StateManagerBuilder(StateManager workPlan)
-        {
-            workPlan.Verify(nameof(workPlan)).IsNotNull();
-
-            StateItems = new List<IStateItem>(workPlan.StateItems);
-        }
-
-        public IList<IStateItem> StateItems { get; }
-
-        public StateManagerBuilder Add(IStateItem item)
-        {
-            item.Verify(nameof(item)).IsNotNull();
-
-            StateItems.Add(item);
+            item.ForEach(x => StateItems.Add(x));
             return this;
         }
 
-        public StateManagerBuilder Add(IEnumerable<IStateItem> items)
+        public StateManagerBuilder AddPolicy(RetryPolicy? policy)
         {
-            items.Verify(nameof(items)).IsNotNull();
-
-            items.ForEach(x => Add(x));
+            Policy = policy;
             return this;
         }
 
         public IStateManager Build()
         {
-            return new StateManager(this);
+            StateItems.Verify(nameof(StateItems)).IsNotNull();
+
+            return new StateManager(Policy, StateItems.ToArray());
         }
 
-        public IEnumerator<IStateItem> GetEnumerator()
-        {
-            return StateItems.GetEnumerator();
-        }
+        public IEnumerator<IStateItem> GetEnumerator() => StateItems.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return StateItems.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => StateItems.GetEnumerator();
     }
 }

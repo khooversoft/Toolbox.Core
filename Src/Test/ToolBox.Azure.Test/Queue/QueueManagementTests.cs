@@ -23,7 +23,7 @@ namespace ToolBox.Azure.Test.Queue
             _queueManagement = new QueueManagement(application.ConnectionString);
         }
 
-        [Fact]
+        [Fact(Skip = "IntegrationTests")]
         public async Task GivenQueueDoesNotExist_WhenDelete_ShouldNotRaiseException()
         {
             // Verify queue does not exist, if so delete it.
@@ -38,7 +38,7 @@ namespace ToolBox.Azure.Test.Queue
             await act.Should().ThrowAsync<MessagingEntityNotFoundException>();
         }
 
-        [Fact]
+        [Fact(Skip = "IntegrationTests")]
         public async Task GivenQueueDoesNotExist_WhenSearched_ShouldReturnEmptyList()
         {
             // Verify queue does not exist, if so delete it.
@@ -53,7 +53,7 @@ namespace ToolBox.Azure.Test.Queue
             subjects.Count.Should().Be(0);
         }
 
-        [Fact]
+        [Fact(Skip = "IntegrationTests")]
         public async Task GivenServiceQueue_WhenGetAndNotExist_ShouldThrow()
         {
             // Verify queue does not exist, if so delete it.
@@ -68,7 +68,7 @@ namespace ToolBox.Azure.Test.Queue
             await act.Should().ThrowAsync<MessagingEntityNotFoundException>();
         }
 
-        [Fact]
+        [Fact(Skip = "IntegrationTests")]
         public async Task GivenServiceQueue_WhenGetAndExist_ReturnData()
         {
             // Verify queue does not exist, if so delete it.
@@ -89,7 +89,7 @@ namespace ToolBox.Azure.Test.Queue
         }
 
 
-        [Fact]
+        [Fact(Skip = "IntegrationTests")]
         public async Task GivenServiceQueue_WhenCreatedTwice_ShouldThrow()
         {
             // Verify queue does not exist, if so delete it.
@@ -111,7 +111,7 @@ namespace ToolBox.Azure.Test.Queue
             await _queueManagement.DeleteQueue(_workContext, _queueDefinition.QueueName!);
         }
 
-        [Fact]
+        [Fact(Skip = "IntegrationTests")]
         public async Task GivenServiceExistQueue_WhenSearchedWithoutWildcard_ShouldFind()
         {
             // Verify queue does not exist, if so delete it.
@@ -131,7 +131,7 @@ namespace ToolBox.Azure.Test.Queue
             await _queueManagement.DeleteQueue(_workContext, _queueDefinition.QueueName!);
         }
 
-        [Fact]
+        [Fact(Skip = "IntegrationTests")]
         public async Task GivenServiceExistQueue_WhenSearchedWildcard_ShouldFind()
         {
             // Verify queue does not exist, if so delete it.

@@ -14,43 +14,29 @@ namespace Khooversoft.MessageNet.Interface
     /// </summary>
     public class NetMessageBuilder : IEnumerable<INetMessageItem>
     {
-        private readonly List<INetMessageItem> _messageItems = new List<INetMessageItem>();
+        private readonly IReadOnlyList<INetMessageItem>? _fromMessage;
 
         public NetMessageBuilder() { }
+
+        public NetMessageBuilder(NetMessage netMessage) => _fromMessage = netMessage.MessageItems.ToList();
+
+        public List<INetMessageItem> MessageItems = new List<INetMessageItem>();
 
         /// <summary>
         /// Add message part
         /// </summary>
         /// <param name="messageItems">message items</param>
         /// <returns>this</returns>
-        public NetMessageBuilder Add(params INetMessageItem[]? messageItems)
+        public NetMessageBuilder Add(params INetMessageItem[] messageItems)
         {
-            if (messageItems == null) return this;
-
-            _messageItems.AddRange(messageItems.Where(x => x != null));
+            MessageItems.AddRange(messageItems);
             return this;
         }
 
-        public IEnumerator<INetMessageItem> GetEnumerator() => _messageItems.GetEnumerator();
+        public IEnumerator<INetMessageItem> GetEnumerator() => MessageItems.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => _messageItems.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => MessageItems.GetEnumerator();
 
-        public NetMessage Build() => new NetMessage(_messageItems);
-
-        /// <summary>
-        /// Create net message
-        /// </summary>
-        /// <param name="toUri">to URI</param>
-        /// <param name="fromUri">from URI</param>
-        /// <param name="method">method</param>
-        /// <param name="content">content (optional)</param>
-        /// <returns>new net message</returns>
-        public static NetMessage Create(string toUri, string fromUri, string method, string? content = null)
-        {
-            return new NetMessageBuilder()
-                .Add(new MessageHeader(toUri.ToMessageUri(), fromUri.ToMessageUri(), method))
-                .Add(content switch { string value => MessageContent.Create(value), _ => null! })
-                .Build();
-        }
+        public NetMessage Build() => new NetMessage(MessageItems.Concat(_fromMessage ?? Enumerable.Empty<INetMessageItem>()));
     }
 }

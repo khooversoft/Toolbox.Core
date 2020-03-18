@@ -87,7 +87,9 @@ namespace MessageNet.Interface.Test
             NetMessage message = new NetMessageBuilder()
                 .Add(headers[0])
                 .Build()
-                .WithAddToTop(headers[1]);
+                .ToBuilder()
+                .Add(headers[1])
+                .Build();
 
             message.Should().NotBeNull();
             message.MessageItems.Should().NotBeNull();

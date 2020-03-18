@@ -12,12 +12,14 @@ namespace Khooversoft.MessageNet.Host
 {
     public interface IMessageNetHost : IDisposable
     {
-        Task Start(IWorkContext context, IEnumerable<NodeHostRegistration> nodeRegistrations);
+        Task Start(IWorkContext context);
 
         Task Stop(IWorkContext context);
 
         Task<IMessageClient> GetMessageClient(IWorkContext context, QueueId queueId);
 
         Task Send(IWorkContext context, NetMessage netMessage);
+
+        Task<NetMessage> Call(IWorkContext context, NetMessage netMessage, TimeSpan? timeout = null);
     }
 }

@@ -16,6 +16,7 @@ namespace Khooversoft.MessageNet.Host
     public class MessageRepository : IMessageRepository
     {
         private readonly IReadOnlyDictionary<string, IQueueManagement> _registrations;
+        private static readonly RetryPolicy _retryPolicy = new RetryPolicy(TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(1));
 
         public MessageRepository(IMessageNetConfig messageNetConfig)
         {
@@ -41,6 +42,7 @@ namespace Khooversoft.MessageNet.Host
 
             await new StateManagerBuilder()
                 .Add(new CreateQueueState(queueManagement, queueDefinition))
+                .AddPolicy(_retryPolicy)
                 .Build()
                 .Set(context);
 
@@ -61,6 +63,7 @@ namespace Khooversoft.MessageNet.Host
 
             return new StateManagerBuilder()
                 .Add(new RemoveQueueState(queueManagement, queueId.GetQueueName()))
+                .AddPolicy(_retryPolicy)
                 .Build()
                 .Set(context);
         }

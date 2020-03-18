@@ -8,7 +8,7 @@ namespace Khooversoft.MessageNet.Host
 {
     public class MessageNetConfig : IMessageNetConfig
     {
-        public MessageNetConfig(IEnumerable<NamespaceRegistration> namespaceRegistrations)
+        public MessageNetConfig(params NamespaceRegistration[] namespaceRegistrations)
         {
             namespaceRegistrations
                 .Verify(nameof(namespaceRegistrations))

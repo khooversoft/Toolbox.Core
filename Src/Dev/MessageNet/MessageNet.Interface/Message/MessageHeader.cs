@@ -19,10 +19,10 @@ namespace Khooversoft.MessageNet.Interface
             ToUri = subject.ToUri;
             FromUri = subject.FromUri;
             Method = subject.Method;
-            Claims = subject.Claims.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+            Claims = subject.Claims.ToList();
         }
 
-        public MessageHeader(string toUri, string fromUri, string method, params KeyValuePair<string, string>[] claims)
+        public MessageHeader(string toUri, string fromUri, string method, params MessageClaim[] claims)
         {
             toUri.Verify(nameof(toUri)).IsNotEmpty();
             fromUri.Verify(nameof(fromUri)).IsNotEmpty();
@@ -31,21 +31,21 @@ namespace Khooversoft.MessageNet.Interface
             ToUri = toUri.ToMessageUri().ToString();
             FromUri = fromUri.ToMessageUri().ToString();
             Method = method;
-            Claims = claims.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+            Claims = claims.GroupBy(x => x.Role, StringComparer.OrdinalIgnoreCase).Select(x => x.First()).ToList();
         }
 
-        public MessageHeader(Guid messageId, string toUri, string fromUri, string method, params KeyValuePair<string, string>[] claims)
+        public MessageHeader(Guid messageId, string toUri, string fromUri, string method, params MessageClaim[] claims)
             : this(toUri, fromUri, method, claims)
         {
             MessageId = messageId;
         }
 
-        public MessageHeader(MessageUri toUri, MessageUri fromUri, string method, params KeyValuePair<string, string>[] claims)
+        public MessageHeader(MessageUri toUri, MessageUri fromUri, string method, params MessageClaim[] claims)
         {
             ToUri = toUri.Verify(nameof(toUri)).IsNotNull().Value.ToString();
             FromUri = fromUri.Verify(nameof(fromUri)).IsNotNull().Value.ToString();
             Method = method.Verify(nameof(method)).IsNotEmpty().Value.ToString();
-            Claims = claims.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+            Claims = claims.GroupBy(x => x.Role, StringComparer.OrdinalIgnoreCase).Select(x => x.First()).ToList();
         }
 
         public Guid MessageId { get; } = Guid.NewGuid();
@@ -56,20 +56,21 @@ namespace Khooversoft.MessageNet.Interface
 
         public string Method { get; }
 
-        public IReadOnlyDictionary<string, string> Claims { get; }
+        public IReadOnlyList<MessageClaim> Claims { get; }
 
         public override bool Equals(object obj)
         {
             if (obj is MessageHeader header)
             {
-                return ToUri == header.ToUri &&
+                return MessageId == header.MessageId &&
+                    ToUri == header.ToUri &&
                     FromUri == header.FromUri &&
                     Method == header.Method &&
                     Claims.Count == header.Claims.Count &&
 
-                    Claims.OrderBy(x => x.Key)
-                        .Zip(header.Claims.OrderBy(x => x.Key), (o, i) => (o, i))
-                        .All(x => x.o.Key == x.i.Key && x.o.Value == x.i.Value);
+                    Claims.OrderBy(x => x.Role, StringComparer.OrdinalIgnoreCase)
+                        .Zip(header.Claims.OrderBy(x => x.Role, StringComparer.OrdinalIgnoreCase), (o, i) => (o, i))
+                        .All(x => x.o == x.i);
             }
 
             return false;
@@ -80,8 +81,8 @@ namespace Khooversoft.MessageNet.Interface
             return HashCode.Combine(MessageId, ToUri, FromUri, Method);
         }
 
-        public static bool operator ==(MessageHeader v1, MessageHeader v2) => v1?.Equals(v2) ?? false;
+        public static bool operator ==(MessageHeader v1, MessageHeader v2) => v1?.Equals(v2) == true;
 
-        public static bool operator !=(MessageHeader v1, MessageHeader v2) => !v1?.Equals(v2) ?? false;
+        public static bool operator !=(MessageHeader v1, MessageHeader v2) => !(v1 == v2);
     }
 }

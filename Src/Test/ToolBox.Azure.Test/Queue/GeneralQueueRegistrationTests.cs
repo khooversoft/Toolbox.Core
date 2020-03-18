@@ -19,7 +19,7 @@ namespace ToolBox.Azure.Test.Queue
             _queueManagement = new QueueManagement(application.ConnectionString);
         }
 
-        [Fact]
+        [Fact(Skip = "IntegrationTest")]
         public async Task GivenQueueDefinition_WhenStateChange_ShouldCreateRemoveQueue()
         {
             bool exist = await _queueManagement.QueueExists(_workContext, _queueDefinition.QueueName!);
@@ -53,7 +53,7 @@ namespace ToolBox.Azure.Test.Queue
             subjects.Count.Should().Be(0);
         }
 
-        [Theory]
+        [Theory(Skip = "IntegrationTests")]
         [InlineData("namespace")]
         [InlineData("namespace/nodeid")]
         [InlineData("namespace/service/nodeid")]

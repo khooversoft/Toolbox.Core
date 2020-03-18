@@ -1,11 +1,14 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
+using Khooversoft.MessageNet.Host;
 using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace MicroserviceHost
 {
@@ -20,17 +23,17 @@ namespace MicroserviceHost
         [Option("Unregister from the Message Net")]
         public bool UnRegister { get; set; }
 
-        [Option("Node ID for Message Net")]
-        [PropertyResolver("node.id")]
-        public string NodeId { get; set; } = string.Empty;
-
-        [Option("Service Bus connection string")]
+        [Option("Service Bus namespace connections")]
         [PropertyResolver]
-        public string ServiceBusConnection { get; set; } = string.Empty;
+        public IList<NamespaceConnection> NamespaceConnections { get; set; } = null!;
 
-        [Option("Name Server URI for registrations")]
+        [Option("Namespace for nodes")]
         [PropertyResolver]
-        public string NameServerUri { get; set; } = string.Empty;
+        public string? Namespace { get; set; }
+
+        [Option("Network id for nodes")]
+        [PropertyResolver("network.id")]
+        public string? NetworkId { get; set; }
 
         [Option("Path to assembly to run")]
         [PropertyResolver]
@@ -51,6 +54,8 @@ namespace MicroserviceHost
 
         public ITelemetrySecretManager SecretManager { get; set; } = null!;
 
+        public IMessageNetConfig MessageNetConfig { get; set; } = null!;
+
         public static IOption Build(string[] args)
         {
             Option option = new ConfigurationBuilder()
@@ -63,18 +68,22 @@ namespace MicroserviceHost
             if (option.Help) { return option; }
 
             option.Verify(nameof(option)).IsNotNull();
-            option.Run.Verify().Assert("Run or UnRegister must be specified");
-            option.NodeId.Verify().IsNotEmpty($"{nameof(option.NodeId)} is required");
-            option.ServiceBusConnection.Verify().IsNotEmpty($"{option.ServiceBusConnection} is required");
-            option.NameServerUri.Verify().IsNotEmpty($"{option.NameServerUri} is required");
+            (option.Run || option.UnRegister).Verify().Assert("Run or UnRegister must be specified");
+            option.NamespaceConnections
+                .Verify(nameof(NamespaceConnections))
+                .IsNotNull()
+                .Value
+                .Do(x => x.Verify());
 
-            option.AssemblyPath!
+            option.AssemblyPath
                 .Verify()
                 .IsNotEmpty($"{option.AssemblyPath} is required")
                 .Assert(x => File.Exists(x), $"{option.AssemblyPath} does not exist");
 
             option.Properties = option.BuildResolver();
             option.SecretManager = option.BuildSecretManager();
+
+            option.MessageNetConfig = new MessageNetConfig(option.NamespaceConnections.Select(x => new NamespaceRegistration(x.Namespace, x.ConnectionString)).ToArray());
 
             return option;
         }

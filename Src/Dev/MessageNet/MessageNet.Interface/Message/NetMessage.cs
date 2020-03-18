@@ -95,30 +95,6 @@ namespace Khooversoft.MessageNet.Interface
         /// </summary>
         public IReadOnlyList<MessageContent> Contents => _messageContents ??= MessageItems.OfType<MessageContent>().ToList();
 
-        /// <summary>
-        /// Push new messages into current message set and create a new NetMessage
-        /// </summary>
-        /// <param name="netMessageItems">messages to push</param>
-        /// <returns>new net message</returns>
-        public NetMessage WithAddToTop(params INetMessageItem[] netMessageItems)
-        {
-            return new NetMessage(netMessageItems.Concat(MessageItems));
-        }
-
-        /// <summary>
-        /// Build reply envelop
-        /// </summary>
-        /// <returns></returns>
-        public NetMessage WithReply(params INetMessageItem[] netMessageItems)
-        {
-            var items = Enumerable.Empty<INetMessageItem>()
-                .Append(new MessageHeader(Header.FromUri, Header.ToUri, "post", Header.Claims.ToArray()))
-                .Concat(netMessageItems)
-                .ToArray();
-
-            return this.WithAddToTop(items);
-        }
-
         public override bool Equals(object? obj)
         {
             if (obj is NetMessage header)

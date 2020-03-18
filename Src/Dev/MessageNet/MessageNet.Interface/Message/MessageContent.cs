@@ -28,20 +28,16 @@ namespace Khooversoft.MessageNet.Interface
 
         public override bool Equals(object obj)
         {
-            if (obj is MessageContent subject)
-            {
-                return ContentType == subject.ContentType &&
-                    Content == subject.Content;
-            }
-
-            return false;
+            return obj is MessageContent subject &&
+                ContentType == subject.ContentType &&
+                Content == subject.Content;
         }
 
         public override int GetHashCode() => HashCode.Combine(ContentType, Content);
 
         public static bool operator ==(MessageContent v1, MessageContent V2) => v1?.Equals(V2) == true;
 
-        public static bool operator !=(MessageContent v1, MessageContent v2) => !v1.Equals(v2) == false;
+        public static bool operator !=(MessageContent v1, MessageContent v2) => !(v1 == v2);
 
         public static MessageContent Create<T>(T data) where T : class => new MessageContent(typeof(T).Name, data switch { string value => value, _ => JsonConvert.SerializeObject(data) });
     }

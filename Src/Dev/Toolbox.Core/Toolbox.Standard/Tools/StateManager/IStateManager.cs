@@ -12,8 +12,6 @@ namespace Khooversoft.Toolbox.Standard
 {
     public interface IStateManager
     {
-        IReadOnlyList<IStateItem> StateItems { get; }
-
         Task<bool> Set(IWorkContext context);
 
         Task<bool> Test(IWorkContext context);

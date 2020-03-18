@@ -79,7 +79,7 @@ namespace MicroserviceHost
                 Console.WriteLine("Hit Ctrl C to quit");
                 Console.WriteLine();
 
-                //IExecutionContext executionContext = new ExecutionContext();
+                IExecutionContext executionContext = new ExecutionContext();
 
                 //await new IAction[]
                 //{
@@ -112,9 +112,10 @@ namespace MicroserviceHost
             string logType = "ServerHost";
             builder.Register(x => new FileEventLogger(option.LoggingFolder!, logType)).As<FileEventLogger>().InstancePerLifetimeScope();
 
-            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryService(x => new TelemetryMessage(x, option.SecretManager))
-                    .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
-                    .AddFileLogger(x.Resolve<FileEventLogger>());
+            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryServiceBuilder()
+                .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
+                .AddFileLogger(x.Resolve<FileEventLogger>())
+                .Build();
 
             builder.Register(x => telemetryService(x)).As<ITelemetryService>().InstancePerLifetimeScope();
         }

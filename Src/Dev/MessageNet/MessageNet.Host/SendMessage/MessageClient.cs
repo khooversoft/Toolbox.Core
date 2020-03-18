@@ -52,9 +52,9 @@ namespace Khooversoft.MessageNet.Host
         /// <param name="context">context</param>
         /// <param name="message">message</param>
         /// <returns>task</returns>
-        public async Task Call(IWorkContext context, NetMessage message)
+        public async Task<NetMessage> Call(IWorkContext context, NetMessage message, TimeSpan? timeout = null)
         {
-            if (_messageSender == null || _messageSender?.IsClosedOrClosing == true) return;
+            if (_messageSender == null || _messageSender?.IsClosedOrClosing == true) throw new InvalidOperationException("Sender has been closed or is closing");
 
             // Write the body of the message to the console
             context.Telemetry.Verbose(context, $"Calling message: {message}");
@@ -63,7 +63,7 @@ namespace Khooversoft.MessageNet.Host
             await _messageSender!.SendAsync(message.ToMessage());
 
             // Wait for response
-            await WaitForResponse(message.Header.MessageId);
+            return await WaitForResponse(message.Header.MessageId, timeout);
         }
 
         /// <summary>
@@ -71,10 +71,10 @@ namespace Khooversoft.MessageNet.Host
         /// </summary>
         /// <param name="messageId">message id to wait for</param>
         /// <returns>task</returns>
-        public Task WaitForResponse(Guid messageId)
+        private Task<NetMessage> WaitForResponse(Guid messageId, TimeSpan? timeout)
         {
             var tcs = new TaskCompletionSource<NetMessage>();
-            _awaiterManager.Add(messageId, tcs);
+            _awaiterManager.Add(messageId, tcs, timeout);
 
             return tcs.Task;
         }

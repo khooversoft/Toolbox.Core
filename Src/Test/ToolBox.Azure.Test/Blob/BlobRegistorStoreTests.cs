@@ -17,7 +17,7 @@ namespace ToolBox.Azure.Test.Blob
     [Collection("QueueTests")]
     public class BlobRegistorStoreTests : IClassFixture<ApplicationFixture>
     {
-        private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey={blob.storage.connection};EndpointSuffix=core.windows.net";
+        private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=toolboxteststorage;AccountKey={blob.storage.connection};EndpointSuffix=core.windows.net";
         private readonly BlobStoreConnection _blobStore;
         private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly ApplicationFixture _application;

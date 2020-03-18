@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Khooversoft.Toolbox.Autofac;
+using Khooversoft.MessageNet.Host;
 
 namespace MicroserviceHost
 {
@@ -23,7 +24,7 @@ namespace MicroserviceHost
 
         public IPropertyResolver? PropertyResolver { get; set; }
 
-        public IMessageNetClient? MessageNetClient { get; set; }
+        public IMessageNetConfig? MessageNetConfig { get; set; }
 
         public FunctionHostBuilder AddFunctionType(params Type[] types)
         {
@@ -46,18 +47,17 @@ namespace MicroserviceHost
             PropertyResolver = resolver;
             return this;
         }
-        public FunctionHostBuilder SetMessageNetClient(IMessageNetClient messageNetClient)
-        {
-            messageNetClient.Verify(nameof(messageNetClient)).IsNotNull();
 
-            MessageNetClient = messageNetClient;
+        public FunctionHostBuilder SetMessageNetConfig(IMessageNetConfig messageNetConfig)
+        {
+            MessageNetConfig = messageNetConfig;
             return this;
         }
 
         public FunctionHost Build(IWorkContext context)
         {
             context.Verify(nameof(context)).IsNotNull();
-            MessageNetClient.Verify(nameof(MessageNetClient)).IsNotNull("Message net client is required");
+            MessageNetConfig.Verify(nameof(MessageNetConfig)).IsNotNull();
 
             PropertyResolver ??= new PropertyResolver();
 
@@ -73,7 +73,7 @@ namespace MicroserviceHost
                 lifetimeScope = context.Container.BeginLifetimeScope(nameof(FunctionHost), functionConfigurations.Select(x => x.Function.MethodInfo.DeclaringType!));
             }
 
-            return new FunctionHost(functionConfigurations, MessageNetClient!, lifetimeScope);
+            return new FunctionHost(functionConfigurations, MessageNetConfig, lifetimeScope);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace MicroserviceHost
             types.Verify(nameof(types)).IsNotNull();
 
             List<Function> results = types
-                .SelectMany(x => x.GetMethodsWithAttribute<FunctionAttribute>())
+                .SelectMany(x => x.GetMethodsWithAttribute<MessageFunctionAttribute>())
                 .Select(x => new Function(x.MethodInfo, x.Attribute, getParameterType(x.MethodInfo)))
                 .ToList();
 
@@ -133,7 +133,6 @@ namespace MicroserviceHost
             return functions
                 .Select(x => new FunctionConfiguration(x, getMessageNetNodeId(x, resolver)))
                 .ToList();
-
 
             static string getMessageNetNodeId(Function function, IPropertyResolver resolver)
             {

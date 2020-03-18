@@ -27,7 +27,7 @@ namespace ToolBox.Azure.Test.Queue
             _queueManagement = new QueueManagement(application.ConnectionString);
         }
 
-        [Fact]
+        [Fact(Skip = "IntegrationTests")]
         public async Task GivenQueue_WhenMessageSent_ShouldReceive()
         {
             const int max = 10;
@@ -75,7 +75,7 @@ namespace ToolBox.Azure.Test.Queue
             await DeleteQueue(queueDefinition);
         }
 
-        [Fact]
+        [Fact(Skip = "IntegrationTests")]
         public async Task GivenTwoQueue_MessageRoundTrip_ShouldSuccess()
         {
             const int max = 10;

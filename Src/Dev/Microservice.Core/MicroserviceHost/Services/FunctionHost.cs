@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Khooversoft.MessageNet.Client;
+using Khooversoft.MessageNet.Host;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
@@ -12,28 +13,28 @@ namespace MicroserviceHost
     public class FunctionHost : IDisposable
     {
         private IReadOnlyList<FunctionConfiguration> _functionConfigurations;
-        private readonly IMessageNetClient _messageNetClient;
+        private readonly IMessageNetConfig _messageNetConfig;
         private ILifetimeScope? _lifetimeScope;
         private IReadOnlyList<FunctionMessageReceiver>? _functionMessageReceivers;
 
-        public FunctionHost(IEnumerable<FunctionConfiguration> functionConfigurations, IMessageNetClient messageNetClient, ILifetimeScope? lifetimeScope = null)
+        public FunctionHost(IEnumerable<FunctionConfiguration> functionConfigurations, IMessageNetConfig messageNetConfig, ILifetimeScope? lifetimeScope = null)
         {
             functionConfigurations.Verify(nameof(functionConfigurations)).IsNotNull();
-            messageNetClient.Verify(nameof(messageNetClient)).IsNotNull();
+            messageNetConfig.Verify(nameof(messageNetConfig)).IsNotNull();
 
             _functionConfigurations = functionConfigurations.ToList();
-            _messageNetClient = messageNetClient;
+            _messageNetConfig = messageNetConfig;
             _lifetimeScope = lifetimeScope;
         }
 
         public async Task Start(IWorkContext context)
         {
             _functionMessageReceivers = _functionConfigurations
-                .Select(x => new FunctionMessageReceiver(x, _messageNetClient, _lifetimeScope))
+                .Select(x => new FunctionMessageReceiver(x, _messageNetConfig, _lifetimeScope))
                 .ToList();
 
             await _functionMessageReceivers
-                .ForEachAsync(x => x.Start(context.WithNewCv()));
+                .ForEachAsync(x => x.Start(context.WithActivity()));
         }
 
         public void Stop(IWorkContext context)
@@ -45,9 +46,6 @@ namespace MicroserviceHost
             lifetimeScope?.Dispose();
         }
 
-        public void Dispose()
-        {
-            Stop(WorkContext.Empty);
-        }
+        public void Dispose() => Stop(WorkContextBuilder.Default);
     }
 }

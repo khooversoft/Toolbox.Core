@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Host
 {
-    public class NodeHostRegistration
+    public class NodeHostReceiver : INodeHostReceiver
     {
-        public NodeHostRegistration(QueueId queueId, Func<NetMessage, Task> receiver)
+        public NodeHostReceiver(QueueId queueId, Func<NetMessage, Task> receiver)
         {
             queueId.Verify(nameof(queueId)).IsNotNull();
             receiver.Verify(nameof(receiver)).IsNotNull();

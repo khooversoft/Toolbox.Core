@@ -23,10 +23,9 @@ namespace CustomerInfo.Microservice.Test
         [Fact]
         public async Task GivenFunction_AfterBind_SendSingleMessageIsReceived()
         {
-            IWorkContext workContext = WorkContext.Empty;
+            IWorkContext workContext = WorkContextBuilder.Default;
             ITestContext testContext = new TestContext();
             IAssemblyLoader assemblyLoader = new AssemblyLoader();
-            MessageNetClientFake messageNetClient = new MessageNetClientFake();
 
             string assemblyPathToLoad = @"D:\Sources\Toolbox.Core\Src\Test\Microservice.Core\CustomerInfo.MicroService\bin\Debug\netstandard2.1\CustomerInfo.MicroService.dll";
 

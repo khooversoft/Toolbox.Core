@@ -64,7 +64,11 @@ namespace ServiceBusPerformanceTest
                 try
                 {
                     var message = $"Message {i} ***";
-                    NetMessage netMessage = NetMessageBuilder.Create("net1/node2", "net1/node1", "post", message);
+                    NetMessage netMessage = new NetMessageBuilder()
+                        .Add(new MessageHeader("net1/node2", "net1/node1", "post"))
+                        .Add(MessageContent.Create(message))
+                        .Build();
+
                     await _client.Send(context, netMessage);
                     metrics.Add(1);
                     _messageCount++;

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,14 +11,19 @@ namespace Khooversoft.Toolbox.Standard
 {
     public class StateManager : IStateManager
     {
-        public StateManager(StateManagerBuilder builder)
-        {
-            builder.Verify(nameof(builder)).IsNotNull();
+        private IReadOnlyList<IStateItem> _stateItems;
+        private readonly RetryPolicy? _policy;
 
-            StateItems = new List<IStateItem>(builder.StateItems);
+        public StateManager(params IStateItem[] stateItems)
+        {
+            _stateItems = stateItems.ToList();
         }
 
-        public IReadOnlyList<IStateItem> StateItems { get; }
+        public StateManager(RetryPolicy? policy, params IStateItem[] stateItems)
+        {
+            _policy = policy;
+            _stateItems = stateItems.ToList();
+        }
 
         /// <summary>
         /// Execute Set the work item(s) in the plan
@@ -28,43 +34,18 @@ namespace Khooversoft.Toolbox.Standard
         {
             context.Verify(nameof(context)).IsNotNull();
 
-            try
+            foreach (var item in _stateItems)
             {
-                context.Telemetry.Verbose(context, "Running state plan");
-
-                foreach (var item in StateItems)
+                if (_policy == null)
                 {
-                    context.Telemetry.Verbose(context, $"Executing state plan 'Test' for item {item.Name}");
-
-                    bool testResult = await item.Test(context).ConfigureAwait(false);
-
-                    context.CancellationToken.ThrowIfCancellationRequested();
-                    context.Telemetry.Verbose(context, $"Executed state plan 'Test' for item {item.Name} with {testResult} result");
-
-                    if (!testResult)
-                    {
-                        context.Telemetry.Verbose(context, $"Executing state plan 'Set' for item {item.Name}");
-
-                        testResult = await item.Set(context).ConfigureAwait(false);
-
-                        context.CancellationToken.ThrowIfCancellationRequested();
-                        context.Telemetry.Verbose(context, $"Executed state plan 'Set' for item {item.Name} with {testResult} result");
-
-                        if (!testResult && !item.IgnoreError)
-                        {
-                            context.Telemetry.Verbose(context, $"State plan did not completed successfully, name={item.Name}");
-                            return false;
-                        }
-                    }
+                    bool state = await ExecuteState(context, item);
+                    if (!state) return state;
                 }
 
-                context.Telemetry.Verbose(context, "State plan completed successfully");
-                return true;
+                await _policy!.Execute(async () => await ExecuteState(context, item));
             }
-            finally
-            {
-                context.Telemetry.Verbose(context, "State plan exited");
-            }
+
+            return true;
         }
 
         /// <summary>
@@ -76,34 +57,37 @@ namespace Khooversoft.Toolbox.Standard
         {
             context.Verify(nameof(context)).IsNotNull();
 
-            try
+            foreach (var item in _stateItems)
             {
-                context.Telemetry.Verbose(context, "Running state plan");
+                bool result = await item.Test(context).ConfigureAwait(false);
+                context.CancellationToken.ThrowIfCancellationRequested();
 
-                foreach (var item in StateItems)
-                {
-                    context.Telemetry.Verbose(context, $"Executing state plan 'Test' for item {item.Name}");
-
-                    bool result = await item.Test(context).ConfigureAwait(false);
-
-                    context.CancellationToken.ThrowIfCancellationRequested();
-                    context.Telemetry.Verbose(context, $"Executed state plan 'Test' for item {item.Name} with {result} result");
-
-                    if (!result)  return false;
-                }
-
-                context.Telemetry.Verbose(context, "State plan completed successfully");
-                return true;
+                if (!result) return false;
             }
-            finally
-            {
-                context.Telemetry.Verbose(context, "State plan exited");
-            }
+
+            return true;
         }
 
-        public StateManagerBuilder ToBuilder()
+        /// <summary>
+        /// Execute state functions, test and set
+        /// </summary>
+        /// <param name="context">context</param>
+        /// <param name="stateItem">state item</param>
+        /// <returns>true if okay, false if not</returns>
+        private async Task<bool> ExecuteState(IWorkContext context, IStateItem stateItem)
         {
-            return new StateManagerBuilder(this);
+            context.CancellationToken.ThrowIfCancellationRequested();
+            bool testResult = await stateItem.Test(context).ConfigureAwait(false);
+
+            if (!testResult)
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+                testResult = await stateItem.Set(context).ConfigureAwait(false);
+
+                if (!testResult && !stateItem.IgnoreError) return false;
+            }
+
+            return true;
         }
     }
 }

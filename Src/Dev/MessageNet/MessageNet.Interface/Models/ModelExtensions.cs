@@ -11,28 +11,50 @@ namespace Khooversoft.MessageNet.Interface
     public static class ModelExtensions
     {
         // ========================================================================================
+        // Message claim
+        // ========================================================================================
+
+        public static MessageClaimModel ConvertTo(this MessageClaim subject)
+        {
+            subject.Verify(nameof(subject)).IsNotNull();
+
+            return new MessageClaimModel
+            {
+                Role = subject.Role,
+                Value = subject.Value,
+            };
+        }
+
+        public static MessageClaim ConvertTo(this MessageClaimModel subject)
+        {
+            subject.Verify(nameof(subject)).IsNotNull();
+
+            return new MessageClaim(subject.Role!, subject.Value!);
+        }
+
+        // ========================================================================================
         // Message Header
         // ========================================================================================
 
         public static MessageHeaderModel ConvertTo(this MessageHeader subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
-            
+
             return new MessageHeaderModel
             {
                 MessageId = subject.MessageId,
                 ToUri = subject.ToUri,
                 FromUri = subject.FromUri,
                 Method = subject.Method,
-                Properties = subject.Claims.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase),
+                Claims = subject.Claims.Select(x => x.ConvertTo()).ToList(),
             };
         }
 
         public static MessageHeader ConvertTo(this MessageHeaderModel subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
-            
-            return new MessageHeader(subject.ToUri!, subject.FromUri!, subject.Method!, subject.Properties.ToArray());
+
+            return new MessageHeader(subject.MessageId, subject.ToUri!, subject.FromUri!, subject.Method!, subject.Claims.Select(x => x.ConvertTo()).ToArray());
         }
 
         // ========================================================================================
@@ -42,7 +64,7 @@ namespace Khooversoft.MessageNet.Interface
         public static MessageActivityModel ConvertTo(this MessageActivity subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
-            
+
             return new MessageActivityModel
             {
                 ActivityId = subject.ActivityId,
@@ -53,7 +75,7 @@ namespace Khooversoft.MessageNet.Interface
         public static MessageActivity ConvertTo(this MessageActivityModel subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
-            
+
             return new MessageActivity(subject.ActivityId, subject.ParentActivityId);
         }
 
@@ -64,7 +86,7 @@ namespace Khooversoft.MessageNet.Interface
         public static MessageContentModel ConvertTo(this MessageContent subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
-            
+
             return new MessageContentModel
             {
                 ContentType = subject.ContentType,
@@ -75,7 +97,7 @@ namespace Khooversoft.MessageNet.Interface
         public static MessageContent ConvertTo(this MessageContentModel subject)
         {
             subject.Verify(nameof(subject)).IsNotNull();
-            
+
             return new MessageContent(subject.ContentType!, subject.Content!);
         }
 

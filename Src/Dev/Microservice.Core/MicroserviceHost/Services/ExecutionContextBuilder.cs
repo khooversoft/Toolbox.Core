@@ -90,7 +90,7 @@ namespace MicroserviceHost
             var list = new List<Function>();
 
             List<Function> results = types
-                .SelectMany(x => x.GetMethodsWithAttribute<FunctionAttribute>())
+                .SelectMany(x => x.GetMethodsWithAttribute<MessageFunctionAttribute>())
                 .Select(x => new Function(x.MethodInfo, x.Attribute, GetParameterType(x.MethodInfo)))
                 .ToList();
 

@@ -34,8 +34,6 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task<bool> Set(IWorkContext context)
         {
-            if (await Test(context)) return true;
-
             await _managementClient.CreateQueue(context, _queueDefinition);
             return true;
         }

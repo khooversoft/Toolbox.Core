@@ -18,6 +18,6 @@ namespace Khooversoft.MessageNet.Host
 
         Task Send(IWorkContext context, NetMessage message);
 
-        Task WaitForResponse(Guid messageId);
+        Task<NetMessage> Call(IWorkContext context, NetMessage message, TimeSpan? timeout = null);
     }
 }

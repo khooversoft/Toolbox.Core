@@ -24,7 +24,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Set(_workContext);
             result.Should().Be(true);
-            workPlan.StateItems.Count.Should().Be(1);
         }
 
         [Fact]
@@ -36,7 +35,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Set(_workContext);
             result.Should().BeTrue();
-            workPlan.StateItems.Count.Should().Be(1);
         }
 
         [Fact]
@@ -50,7 +48,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Set(_workContext);
             result.Should().BeTrue();
-            workPlan.StateItems.Count.Should().Be(3);
         }
 
         [Fact]
@@ -62,7 +59,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Set(_workContext);
             result.Should().BeFalse();
-            workPlan.StateItems.Count.Should().Be(1);
         }
 
         [Fact]
@@ -75,7 +71,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Set(_workContext);
             result.Should().BeFalse();
-            workPlan.StateItems.Count.Should().Be(2);
         }
 
         [Fact]
@@ -88,7 +83,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Set(_workContext);
             result.Should().BeFalse();
-            workPlan.StateItems.Count.Should().Be(2);
         }
 
         [Fact]
@@ -100,7 +94,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Test(_workContext);
             result.Should().BeTrue();
-            workPlan.StateItems.Count.Should().Be(1);
         }
 
         [Fact]
@@ -113,7 +106,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Set(_workContext);
             result.Should().BeTrue();
-            workPlan.StateItems.Count.Should().Be(2);
         }
 
         [Fact]
@@ -125,7 +117,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Test(_workContext);
             result.Should().BeFalse();
-            workPlan.StateItems.Count.Should().Be(1);
         }
 
         [Fact]
@@ -138,7 +129,6 @@ namespace Toolbox.Standard.Test.Tools
 
             bool result = await workPlan.Test(_workContext);
             result.Should().BeFalse();
-            workPlan.StateItems.Count.Should().Be(2);
         }
 
         private class StateItemSuccess : StateItemBase

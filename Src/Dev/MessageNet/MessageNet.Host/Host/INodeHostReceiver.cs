@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Host
 {
-    public interface IMessageAwaiterManager
+    public interface INodeHostReceiver
     {
-        void Add(Guid id, TaskCompletionSource<NetMessage> tcs, TimeSpan? timeout = null);
+        QueueId QueueId { get; }
 
-        bool SetResult(NetMessage netMessage);
-
-        void SetException(Guid id, Exception exception);
+        Func<NetMessage, Task> Receiver { get; }
     }
 }

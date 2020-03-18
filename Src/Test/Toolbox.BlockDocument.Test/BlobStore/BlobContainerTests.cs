@@ -18,7 +18,7 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
 {
     public class BlobContainerTests : IClassFixture<ApplicationFixture>
     {
-        private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=messagehubteststore;AccountKey={blob-storage-test-AccountKey};EndpointSuffix=core.windows.net";
+        private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=toolboxteststorage;AccountKey={blob-storage-test-AccountKey};EndpointSuffix=core.windows.net";
         private readonly BlobStoreConnection _blobStore;
         private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly ApplicationFixture _application;
@@ -29,7 +29,7 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
 
             string? connectionString = _connectionString.Resolve(_application.PropertyResolver);
 
-            _blobStore = new BlobStoreConnection("blob-storage-test", connectionString!);
+            _blobStore = new BlobStoreConnection("block-document-storage-test", connectionString!);
         }
 
         [Trait("Category", "LocalOnly")]

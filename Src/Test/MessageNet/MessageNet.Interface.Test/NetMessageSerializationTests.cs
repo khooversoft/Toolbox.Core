@@ -14,7 +14,7 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenMessageHeader_WhenSerialized_ShouldMatch()
         {
-            var subject = new MessageHeader("ns/netid/node", "ns/netid/node", "post", new KeyValuePair<string, string>("key1", "value1"));
+            var subject = new MessageHeader("ns/netid/node", "ns/netid/node", "post", new MessageClaim("key1", "value1"));
 
             MessageHeaderModel model = subject.ConvertTo();
             string json = JsonConvert.SerializeObject(model);
@@ -56,7 +56,7 @@ namespace MessageNet.Interface.Test
         [Fact]
         public void GivenFullMessage_WhenSerialized_ShouldDeserialize()
         {
-            var header = new MessageHeader("ns/network1/node3", "ns/network1/node4", "post", new KeyValuePair<string, string>("key1", "value1"));
+            var header = new MessageHeader("ns/network1/node3", "ns/network1/node4", "post", new MessageClaim("key1", "value1"));
             var activity = new MessageActivity(Guid.NewGuid());
             var content = new MessageContent("string", "This is the value");
             var contentBinary = new MessageContent("match", "and matches other content");

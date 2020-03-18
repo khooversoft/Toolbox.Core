@@ -14,6 +14,6 @@ namespace Khooversoft.MessageNet.Interface
 
         public string? Method { get; set; }
 
-        public IDictionary<string, string>? Properties { get; set; }
+        public IList<MessageClaimModel>? Claims { get; set; }
     }
 }

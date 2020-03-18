@@ -30,7 +30,15 @@ namespace Khooversoft.Toolbox.Standard
         /// <typeparam name="T">object to work on</typeparam>
         /// <param name="self">instance of object</param>
         /// <param name="func">function to perform work</param>
-        /// <returns></returns>
+        public static void Do<T>(this T self, Action<T> action) => action(self);
+
+        /// <summary>
+        /// Do action on any object, used for fluent patterns, acts like a F# function in a pipe
+        /// </summary>
+        /// <typeparam name="T">object to work on</typeparam>
+        /// <param name="self">instance of object</param>
+        /// <param name="func">function to perform work</param>
+        /// <returns>results</returns>
         public static TResult Do<T, TResult>(this T self, Func<T, TResult> func) => func(self);
 
         /// <summary>

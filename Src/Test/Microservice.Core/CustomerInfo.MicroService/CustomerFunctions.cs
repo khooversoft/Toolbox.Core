@@ -19,8 +19,8 @@ namespace CustomerInfo.MicroService
             _testContext = testContext;
         }
 
-        [Function("CustomerAddress", "{node.id}/{function.name}")]
-        public Task GetCustomerAddress(IWorkContext context, string /*RouteMessage<CustomerInfoRequest>*/ request)
+        [MessageFunction("CustomerAddress", "{namespace}/{network.id}/{node.id}")]
+        public Task GetCustomerInfo(IWorkContext context, CustomerInfoRequest request)
         {
             context.Verify(nameof(context)).IsNotNull();
             request.Verify(nameof(request)).IsNotNull();
@@ -30,8 +30,8 @@ namespace CustomerInfo.MicroService
             return Task.CompletedTask;
         }
 
-        [Function("CustomerAddress", "{node.id}/{function.name}")]
-        public Task GetCustomerInfo(IWorkContext context, RouteMessage<CustomerInfoRequest> request)
+        [MessageFunction("CustomerAddress", "{namespace}/{network.id}/{node.id}")]
+        public Task GetCustomerInfo(IWorkContext context, NetMessage request)
         {
             context.Verify(nameof(context)).IsNotNull();
             request.Verify(nameof(request)).IsNotNull();
