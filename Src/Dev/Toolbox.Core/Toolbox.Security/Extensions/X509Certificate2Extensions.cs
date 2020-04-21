@@ -11,7 +11,7 @@ namespace Khooversoft.Toolbox.Security
     {
         public static bool IsExpired(this X509Certificate2 self)
         {
-            self.Verify(nameof(self)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
 
             return DateTime.Now > self.NotAfter;
         }

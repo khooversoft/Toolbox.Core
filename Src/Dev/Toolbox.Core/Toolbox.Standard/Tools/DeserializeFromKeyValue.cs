@@ -22,7 +22,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public T ToObject(IEnumerable<KeyValuePair<string, object>> values)
         {
-            values.Verify(nameof(values)).IsNotNull();
+            values.VerifyNotNull(nameof(values));
 
             var order = values
                 .Select(x => new { x, Count = x.Key.Split(":", StringSplitOptions.RemoveEmptyEntries).Length })

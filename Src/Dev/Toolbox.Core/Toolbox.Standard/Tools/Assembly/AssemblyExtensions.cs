@@ -13,8 +13,8 @@ namespace Khooversoft.Toolbox.Standard
     {
         public static IEnumerable<Type> GetTypesWithAttribute(this Assembly assembly, params Type[] attributes)
         {
-            assembly.Verify(nameof(assembly)).IsNotNull();
-            attributes.ForEach(x => x.Verify().Assert(y => y.GetType() == typeof(Attribute), y => $"{y.GetType()} is not a attribute type"));
+            assembly.VerifyNotNull(nameof(assembly));
+            attributes.ForEach(x => x.VerifyAssert(y => y.GetType() == typeof(Attribute), y => $"{y.GetType()} is not a attribute type"));
 
             Func<Type, bool> testAttributes = x => x.GetCustomAttributes(true)
                 .Any(x => attributes.Any(y => y.IsAssignableFrom(x.GetType())));
@@ -33,8 +33,8 @@ namespace Khooversoft.Toolbox.Standard
 
         public static IReadOnlyList<(MethodInfo MethodInfo, object[] Attributes)> GetMethodsWithAttribute(this Type subject, params Type[] attributes)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
-            attributes.ForEach(x => x.Verify().Assert(y => y.GetType() == typeof(Attribute), y => $"{y.GetType()} is not a attribute type"));
+            subject.VerifyNotNull(nameof(subject));
+            attributes.ForEach(x => x.VerifyAssert(y => y.GetType() == typeof(Attribute), y => $"{y.GetType()} is not a attribute type"));
 
             Func<MethodInfo, object[]> getRequiredAttributes = x => x.GetCustomAttributes(true)
                 .Where(y => attributes.Any(z => z.GetType() == y.GetType()))

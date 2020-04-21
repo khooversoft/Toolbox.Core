@@ -14,7 +14,7 @@ namespace Khooversoft.Toolbox.Security
     {
         public MerkleHash(byte[] buffer)
         {
-            buffer.Verify(nameof(buffer)).IsNotNull();
+            buffer.VerifyNotNull(nameof(buffer));
 
             SHA256 sha256 = SHA256.Create();
             Value = sha256.ComputeHash(buffer);
@@ -32,43 +32,24 @@ namespace Khooversoft.Toolbox.Security
 
         public IReadOnlyList<byte> Value { get; }
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        public override int GetHashCode() => base.GetHashCode();
 
-        public override string ToString()
-        {
-            return Convert.ToBase64String(Value.ToArray());
-        }
+        public override string ToString() => Convert.ToBase64String(Value.ToArray());
 
         public override bool Equals(object obj)
         {
-            obj.Verify(nameof(obj))
-                .IsNotNull()
-                .Assert(x => x is MerkleHash, "r-value is not a MerkleHash");
+            obj.VerifyNotNull(nameof(obj))
+                .VerifyAssert(x => x is MerkleHash, "r-value is not a MerkleHash");
 
             return Equals((MerkleHash)obj);
         }
 
-        public bool Equals(byte[] hash)
-        {
-            return Value.SequenceEqual(hash);
-        }
+        public bool Equals(byte[] hash) => Value.SequenceEqual(hash);
 
-        public bool Equals(MerkleHash hash)
-        {
-            return Value.SequenceEqual(hash.Value);
-        }
+        public bool Equals(MerkleHash hash) => Value.SequenceEqual(hash.Value);
 
-        public static bool operator ==(MerkleHash h1, MerkleHash h2)
-        {
-            return h1.Equals(h2);
-        }
+        public static bool operator ==(MerkleHash h1, MerkleHash h2) => h1.Equals(h2);
 
-        public static bool operator !=(MerkleHash h1, MerkleHash h2)
-        {
-            return !h1.Equals(h2);
-        }
+        public static bool operator !=(MerkleHash h1, MerkleHash h2) => !h1.Equals(h2);
     }
 }

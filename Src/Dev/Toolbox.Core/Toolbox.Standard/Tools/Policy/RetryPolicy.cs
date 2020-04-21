@@ -10,7 +10,7 @@ namespace Khooversoft.Toolbox.Standard
     {
         public RetryPolicy(TimeSpan timeout, TimeSpan delay)
         {
-            delay.Verify(nameof(delay)).IsNotNull();
+            delay.VerifyNotNull(nameof(delay));
 
             Timeout = timeout;
             Delay = delay;
@@ -25,7 +25,7 @@ namespace Khooversoft.Toolbox.Standard
     {
         public static async Task Execute(this RetryPolicy retryPolicy, Func<Task> function)
         {
-            function.Verify(nameof(function)).IsNotNull();
+            function.VerifyNotNull(nameof(function));
 
             var startTime = DateTime.Now;
 

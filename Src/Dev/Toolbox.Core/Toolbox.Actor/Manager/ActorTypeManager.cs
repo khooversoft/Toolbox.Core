@@ -30,8 +30,8 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns>this</returns>
         public ActorTypeManager Register<T>(IWorkContext context, Func<IWorkContext, T> createImplementation) where T : IActor
         {
-            context.Verify(nameof(context)).IsNotNull();
-            typeof(T).IsInterface.Verify().Assert(x => x = true, $"{typeof(T).FullName} must be an interface");
+            context.VerifyNotNull(nameof(context));
+            typeof(T).IsInterface.VerifyAssert(x => x = true, $"{typeof(T).FullName} must be an interface");
 
             IActor create(IWorkContext c) => createImplementation(c);
 
@@ -49,9 +49,9 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns></returns>
         public ActorTypeManager Register(IWorkContext context, ActorTypeRegistration actorTypeRegistration)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            actorTypeRegistration.Verify(nameof(actorTypeRegistration)).IsNotNull();
-            actorTypeRegistration.InterfaceType.IsInterface.Verify().Assert(x => x = true, $"{actorTypeRegistration.InterfaceType.FullName} must be an interface");
+            context.VerifyNotNull(nameof(context));
+            actorTypeRegistration.VerifyNotNull(nameof(actorTypeRegistration));
+            actorTypeRegistration.InterfaceType.IsInterface.VerifyAssert(x => x = true, $"{actorTypeRegistration.InterfaceType.FullName} must be an interface");
 
             _actorRegistration.AddOrUpdate(actorTypeRegistration.InterfaceType, actorTypeRegistration, (_, __) => actorTypeRegistration);
 
@@ -69,12 +69,12 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns>instance of actor implementation</returns>
         public T Create<T>(IWorkContext context, ActorKey actorKey, IActorManager manager) where T : IActor
         {
-            context.Verify(nameof(context)).IsNotNull();
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
-            manager.Verify(nameof(manager)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            actorKey.VerifyNotNull(nameof(actorKey));
+            manager.VerifyNotNull(nameof(manager));
             context = context.WithActivity();
 
-            typeof(T).IsInterface.Verify().Assert(x => x == true, $"{typeof(T)} must be an interface");
+            typeof(T).IsInterface.VerifyAssert(x => x == true, $"{typeof(T)} must be an interface");
 
             Type actorType = typeof(T);
 
@@ -91,7 +91,7 @@ namespace Khooversoft.Toolbox.Actor
 
             // Set actor key and manager
             ActorBase? actorBase = actorObject as ActorBase;
-            if( actorBase == null)
+            if (actorBase == null)
             {
                 string failureMsg = $"Created actor type {actorObject.GetType()} does not derive from ActorBase";
                 context.Telemetry.Error(context, failureMsg);

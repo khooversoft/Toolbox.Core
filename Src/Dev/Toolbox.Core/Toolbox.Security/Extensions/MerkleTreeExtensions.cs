@@ -13,12 +13,12 @@ namespace Khooversoft.Toolbox.Security
     {
         public static string ToMerkleHash(this IEnumerable<string> hashes)
         {
-            hashes.Verify(nameof(hashes)).IsNotNull();
+            hashes.VerifyNotNull(nameof(hashes));
 
             return new MerkleTree()
                 .Append(hashes.ToArray())
                 .BuildTree().Value.ToArray()
-                .Do(Convert.ToBase64String);
+                .Func(Convert.ToBase64String);
         }
     }
 }

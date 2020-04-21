@@ -19,8 +19,8 @@ namespace MicroserviceHost
 
         public FunctionHost(IEnumerable<FunctionConfiguration> functionConfigurations, IMessageNetConfig messageNetConfig, ILifetimeScope? lifetimeScope = null)
         {
-            functionConfigurations.Verify(nameof(functionConfigurations)).IsNotNull();
-            messageNetConfig.Verify(nameof(messageNetConfig)).IsNotNull();
+            functionConfigurations.VerifyNotNull(nameof(functionConfigurations));
+            messageNetConfig.VerifyNotNull(nameof(messageNetConfig));
 
             _functionConfigurations = functionConfigurations.ToList();
             _messageNetConfig = messageNetConfig;

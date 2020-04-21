@@ -14,9 +14,9 @@ namespace Khooversoft.Toolbox.Actor
     {
         public static void ActorActivateEvent(this ActorConfiguration configuration, IWorkContext context, ActorKey actorKey, Type actorType, string? message = null)
         {
-            configuration.Verify(nameof(configuration)).IsNotNull();
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
-            actorType.Verify(nameof(actorType)).IsNotNull();
+            configuration.VerifyNotNull(nameof(configuration));
+            actorKey.VerifyNotNull(nameof(actorKey));
+            actorType.VerifyNotNull(nameof(actorType));
 
             IEventDimensions dimensions = new EventDimensionsBuilder()
                 .Add(nameof(actorKey), actorKey)
@@ -30,9 +30,9 @@ namespace Khooversoft.Toolbox.Actor
 
         public static void ActorDeactivateEvent(this ActorConfiguration configuration, IWorkContext context, ActorKey actorKey, Type actorType, string? message = null)
         {
-            configuration.Verify(nameof(configuration)).IsNotNull();
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
-            actorType.Verify(nameof(actorType)).IsNotNull();
+            configuration.VerifyNotNull(nameof(configuration));
+            actorKey.VerifyNotNull(nameof(actorKey));
+            actorType.VerifyNotNull(nameof(actorType));
 
             IEventDimensions dimensions = new EventDimensionsBuilder()
                 .Add(nameof(actorKey), actorKey)
@@ -45,8 +45,8 @@ namespace Khooversoft.Toolbox.Actor
 
         public static void ActorRegisteredEvent(this ActorConfiguration configuration, IWorkContext context, Type interfaceType, string? message = null)
         {
-            configuration.Verify(nameof(configuration)).IsNotNull();
-            interfaceType.Verify(nameof(interfaceType)).IsNotNull();
+            configuration.VerifyNotNull(nameof(configuration));
+            interfaceType.VerifyNotNull(nameof(interfaceType));
 
             IEventDimensions dimensions = new EventDimensionsBuilder()
                 .Add(nameof(interfaceType), interfaceType)
@@ -58,8 +58,8 @@ namespace Khooversoft.Toolbox.Actor
 
         public static void ActorStartTimerEvent(this ActorConfiguration configuration, IWorkContext context, ActorKey actorKey, string? message = null)
         {
-            configuration.Verify(nameof(configuration)).IsNotNull();
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
+            configuration.VerifyNotNull(nameof(configuration));
+            actorKey.VerifyNotNull(nameof(actorKey));
 
             IEventDimensions dimensions = new EventDimensionsBuilder()
                 .Add(nameof(actorKey), actorKey)
@@ -71,8 +71,8 @@ namespace Khooversoft.Toolbox.Actor
 
         public static void ActorStopTimerEvent(this ActorConfiguration configuration, IWorkContext context, ActorKey actorKey, string? message = null)
         {
-            configuration.Verify(nameof(configuration)).IsNotNull();
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
+            configuration.VerifyNotNull(nameof(configuration));
+            actorKey.VerifyNotNull(nameof(actorKey));
 
             IEventDimensions dimensions = new EventDimensionsBuilder()
                 .Add(nameof(actorKey), actorKey)

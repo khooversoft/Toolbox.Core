@@ -16,7 +16,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static MessageClaimModel ConvertTo(this MessageClaim subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new MessageClaimModel
             {
@@ -27,7 +27,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static MessageClaim ConvertTo(this MessageClaimModel subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new MessageClaim(subject.Role!, subject.Value!);
         }
@@ -38,7 +38,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static MessageHeaderModel ConvertTo(this MessageHeader subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new MessageHeaderModel
             {
@@ -52,7 +52,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static MessageHeader ConvertTo(this MessageHeaderModel subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new MessageHeader(subject.MessageId, subject.ToUri!, subject.FromUri!, subject.Method!, subject.Claims.Select(x => x.ConvertTo()).ToArray());
         }
@@ -63,7 +63,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static MessageActivityModel ConvertTo(this MessageActivity subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new MessageActivityModel
             {
@@ -74,7 +74,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static MessageActivity ConvertTo(this MessageActivityModel subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new MessageActivity(subject.ActivityId, subject.ParentActivityId);
         }
@@ -85,7 +85,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static MessageContentModel ConvertTo(this MessageContent subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new MessageContentModel
             {
@@ -96,7 +96,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static MessageContent ConvertTo(this MessageContentModel subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new MessageContent(subject.ContentType!, subject.Content!);
         }
@@ -107,7 +107,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static NetMessageModel ConvertTo(this NetMessage subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new NetMessageModel
             {
@@ -120,7 +120,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static NetMessage ConvertTo(this NetMessageModel subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             var list = subject.Headers.Select(x => x.ConvertTo()).OfType<INetMessageItem>()
                 .Concat(subject.Activities.Select(x => x.ConvertTo()).OfType<INetMessageItem>())

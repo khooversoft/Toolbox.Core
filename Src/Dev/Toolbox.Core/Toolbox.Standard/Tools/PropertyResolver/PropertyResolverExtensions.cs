@@ -24,7 +24,7 @@ namespace Khooversoft.Toolbox.Standard
                 return self ?? string.Empty;
             }
 
-            resolver.Verify(nameof(resolver)).IsNotNull();
+            resolver.VerifyNotNull(nameof(resolver));
             return resolver.Resolve(self);
         }
 
@@ -83,7 +83,7 @@ namespace Khooversoft.Toolbox.Standard
 
                     string path = x.Path.Split("/")[0..^1]
                         .Concat(attr.PropertyName.ToEnumerable())
-                        .Do(x => string.Join("/", x));
+                        .Func(x => string.Join("/", x));
 
                     return new PropertyPathValue(path, x.Value, x.PropertyInfo);
                 })

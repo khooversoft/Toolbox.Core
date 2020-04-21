@@ -14,10 +14,10 @@ namespace Khooversoft.Toolbox.BlockDocument
     {
         public TextBlock(string name, string contentType, string author, string content)
         {
-            name.Verify(nameof(name)).IsNotEmpty();
-            contentType.Verify(nameof(contentType)).IsNotEmpty();
-            author.Verify(nameof(author)).IsNotEmpty();
-            content.Verify(nameof(content)).IsNotEmpty();
+            name.VerifyNotEmpty(nameof(name));
+            contentType.VerifyNotEmpty(nameof(contentType));
+            author.VerifyNotEmpty(nameof(author));
+            content.VerifyNotEmpty(nameof(content));
 
             Name = name.Trim();
             ContentType = contentType.Trim();

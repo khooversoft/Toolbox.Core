@@ -15,7 +15,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public Assembly LoadFromAssemblyPath(string assemblyPathToLoad)
         {
-            assemblyPathToLoad.Verify(nameof(assemblyPathToLoad)).IsNotEmpty();
+            assemblyPathToLoad.VerifyNotEmpty(nameof(assemblyPathToLoad));
 
             return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPathToLoad);
         }

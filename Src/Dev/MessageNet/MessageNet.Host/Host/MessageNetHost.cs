@@ -31,10 +31,10 @@ namespace Khooversoft.MessageNet.Host
 
         public MessageNetHost(IMessageNetConfig messageNetConfig, IMessageRepository messageRepository, IMessageAwaiterManager messageAwaiterManager, IEnumerable<INodeHostReceiver> nodeReceivers)
         {
-            messageNetConfig.Verify(nameof(messageNetConfig)).IsNotNull();
-            messageRepository.Verify(nameof(messageRepository)).IsNotNull();
-            messageAwaiterManager.Verify(nameof(messageAwaiterManager)).IsNotNull();
-            nodeReceivers.Verify(nameof(nodeReceivers)).IsNotNull().Assert(x => x.Count() > 0, "Node registrations are required");
+            messageNetConfig.VerifyNotNull(nameof(messageNetConfig));
+            messageRepository.VerifyNotNull(nameof(messageRepository));
+            messageAwaiterManager.VerifyNotNull(nameof(messageAwaiterManager));
+            nodeReceivers.VerifyNotNull(nameof(nodeReceivers)).VerifyAssert(x => x.Count() > 0, "Node registrations are required");
 
             _messageNetConfig = messageNetConfig;
             _routeRepository = messageRepository;
@@ -51,12 +51,12 @@ namespace Khooversoft.MessageNet.Host
             _nodeRegistrations
                 .GroupBy(x => x.QueueId.ToString().ToLower())
                 .Where(x => x.Count() > 1)
-                .Verify().Assert(x => x.Count() == 0, x => $"Duplicate routes have been detected: {string.Join(", ", x)}");
+                .VerifyAssert(x => x.Count() == 0, x => $"Duplicate routes have been detected: {string.Join(", ", x)}");
         }
 
         public async Task Start(IWorkContext context)
         {
-            _receivers.Verify().Assert(x => x == null, "Host is already running");
+            _receivers.VerifyAssert(x => x == null, "Host is already running");
             context.Telemetry.Info(context, "Starting message net host");
 
             _receivers = _nodeRegistrations
@@ -81,7 +81,7 @@ namespace Khooversoft.MessageNet.Host
 
         public Task<IMessageClient> GetMessageClient(IWorkContext context, QueueId queueId)
         {
-            queueId.Verify(nameof(queueId)).IsNotNull();
+            queueId.VerifyNotNull(nameof(queueId));
 
             string queueName = queueId.GetQueueName();
 
@@ -110,9 +110,7 @@ namespace Khooversoft.MessageNet.Host
 
         public void Dispose()
         {
-            _receivers
-                .Verify()
-                .Assert<List<NodeHost>?, InvalidOperationException>(x => x == null, "Host has not been stopped before dispose");
+            _receivers.VerifyAssert<List<NodeHost>?, InvalidOperationException>(x => x == null, _ => "Host has not been stopped before dispose");
         }
     }
 }

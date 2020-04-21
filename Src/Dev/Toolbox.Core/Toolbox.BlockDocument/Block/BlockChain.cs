@@ -30,7 +30,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public BlockChain(IEnumerable<BlockNode> blockNodes)
         {
-            blockNodes.Verify(nameof(blockNodes)).IsNotNull();
+            blockNodes.VerifyNotNull(nameof(blockNodes));
 
             _blocks = blockNodes.ToList();
         }
@@ -65,7 +65,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             {
                 foreach (var item in dataBlocks)
                 {
-                    item.Verify().Assert(x => x.GetType() != typeof(BlockNode), "BlockNode is an invalid data block");
+                    item.VerifyAssert(x => x.GetType() != typeof(BlockNode), "BlockNode is an invalid data block");
 
                     BlockNode latestBlock = Blocks[_blocks.Count - 1];
 

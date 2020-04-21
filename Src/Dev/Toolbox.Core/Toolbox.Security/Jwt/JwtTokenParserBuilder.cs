@@ -41,7 +41,7 @@ namespace Khooversoft.Toolbox.Security
 
         public JwtTokenParserBuilder AddCertificate(params X509Certificate2[] certificate)
         {
-            certificate.Verify(nameof(certificate)).IsNotNull();
+            certificate.VerifyNotNull(nameof(certificate));
 
             certificate.ForEach(x => Certificates.Add(x.Thumbprint, x));
             return this;
@@ -49,15 +49,12 @@ namespace Khooversoft.Toolbox.Security
 
         public JwtTokenParserBuilder AddValidAudience(params string[] validAudience)
         {
-            validAudience.Verify(nameof(validAudience)).IsNotNull();
+            validAudience.VerifyNotNull(nameof(validAudience));
 
             validAudience.ForEach(x => ValidAudiences.Add(x));
             return this;
         }
 
-        public JwtTokenParser Build()
-        {
-            return new JwtTokenParser(Certificates, ValidIssuers, ValidAudiences);
-        }
+        public JwtTokenParser Build() => new JwtTokenParser(Certificates, ValidIssuers, ValidAudiences);
     }
 }

@@ -32,7 +32,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>list of property path values</returns>
         public IReadOnlyList<PropertyPathValue> ToKeyValue(T subject, Func<PropertyInfo, bool>? filter = null)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             _stack.Clear();
             _stack.Push(new PropertyPath(subject!, null));

@@ -18,8 +18,8 @@ namespace Khooversoft.Toolbox.Security
         /// <returns>byte array</returns>
         public static byte[] Encrypt(this X509Certificate2 self, byte[] data)
         {
-            self.Verify(nameof(self)).IsNotNull();
-            data.Verify(nameof(data)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
+            data.VerifyNotNull(nameof(data));
 
             // GetRSAPublicKey returns an object with an independent lifetime, so it should be
             // handled via a using statement.
@@ -39,8 +39,8 @@ namespace Khooversoft.Toolbox.Security
         /// <returns>unencrypted byte array</returns>
         public static byte[] Decrypt(this X509Certificate2 self, byte[] data)
         {
-            self.Verify(nameof(self)).IsNotNull();
-            data.Verify(nameof(data)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
+            data.VerifyNotNull(nameof(data));
 
             // GetRSAPrivateKey returns an object with an independent lifetime, so it should be
             // handled via a using statement.

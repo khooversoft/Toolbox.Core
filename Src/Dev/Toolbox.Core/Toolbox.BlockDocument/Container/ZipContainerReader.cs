@@ -18,14 +18,14 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public ZipContainerReader(ZipArchive zipArchive)
         {
-            zipArchive.Verify(nameof(zipArchive)).IsNotNull();
+            zipArchive.VerifyNotNull(nameof(zipArchive));
 
             _zipArchive = zipArchive;
         }
 
         public ZipContainerReader(string filePath)
         {
-            filePath.Verify(nameof(filePath)).IsNotEmpty();
+            filePath.VerifyNotEmpty(nameof(filePath));
 
             FilePath = filePath;
         }
@@ -34,8 +34,8 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public ZipContainerReader OpenFile(IWorkContext context)
         {
-            _zipArchive.Verify().Assert(x => x == null, "Zip archive already opened");
-            File.Exists(FilePath).Verify(nameof(FilePath)).Assert(x => x == true, $"{FilePath} does not exist");
+            _zipArchive.VerifyAssert(x => x == null, "Zip archive already opened");
+            File.Exists(FilePath).VerifyAssert(x => x == true, $"{FilePath} does not exist");
 
             context.Telemetry.Info(context, $"Reading {FilePath}");
             _zipArchive = ZipFile.Open(FilePath, ZipArchiveMode.Read);
@@ -51,7 +51,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public bool Exist(IWorkContext context, string zipPath)
         {
-            zipPath.Verify(nameof(zipPath)).IsNotEmpty();
+            zipPath.VerifyNotEmpty(nameof(zipPath));
 
             ZipArchiveEntry zipArchiveEntry = _zipArchive!.Entries
                 .Where(x => x.FullName == zipPath).FirstOrDefault();
@@ -69,13 +69,13 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public ZipContainerReader Read(IWorkContext context, string zipPath, Stream targetStream)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            zipPath.Verify(nameof(zipPath)).IsNotEmpty();
-            targetStream.Verify(nameof(targetStream)).IsNotNull();
-            _zipArchive.Verify().IsNotNull("Not opened");
+            context.VerifyNotNull(nameof(context));
+            zipPath.VerifyNotEmpty(nameof(zipPath));
+            targetStream.VerifyNotNull(nameof(targetStream));
+            _zipArchive.VerifyNotNull("Not opened");
 
             ZipArchiveEntry? entry = _zipArchive!.GetEntry(zipPath);
-            entry.Verify().IsNotNull($"{zipPath} does not exist in zip");
+            entry.VerifyNotNull($"{zipPath} does not exist in zip");
 
             using StreamReader writer = new StreamReader(entry.Open());
             writer.BaseStream.CopyTo(targetStream);
@@ -83,10 +83,6 @@ namespace Khooversoft.Toolbox.BlockDocument
             return this;
         }
 
-        public void Dispose()
-        {
-            Close();
-        }
-
+        public void Dispose() => Close();
     }
 }

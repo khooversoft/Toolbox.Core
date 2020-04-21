@@ -13,7 +13,7 @@ namespace Khooversoft.Toolbox.Actor
     {
         public static IActorManager ToActorManager(this ActorConfiguration self)
         {
-            self.Verify(nameof(self)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
 
             return new ActorManager(self);
         }

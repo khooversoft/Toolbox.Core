@@ -32,7 +32,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>true if passed, false if not</returns>
         public async Task<bool> Set(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             foreach (var item in _stateItems)
             {
@@ -55,7 +55,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>true if all pass, false if not</returns>
         public async Task<bool> Test(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             foreach (var item in _stateItems)
             {

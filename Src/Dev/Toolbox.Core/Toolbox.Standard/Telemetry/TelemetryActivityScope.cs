@@ -14,8 +14,8 @@ namespace Khooversoft.Toolbox.Standard
 
         public TelemetryActivityScope(IWorkContext context, string message)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            message.Verify(nameof(message)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            message.VerifyNotEmpty(nameof(message));
 
             _workContext = context;
             Message = message;

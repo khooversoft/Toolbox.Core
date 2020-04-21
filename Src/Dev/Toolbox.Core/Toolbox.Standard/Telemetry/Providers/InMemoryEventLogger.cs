@@ -31,7 +31,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public IReadOnlyList<TelemetryMessage> Query(Func<TelemetryMessage, bool> filter, int? firstCount = null, int? lastCount = null)
         {
-            filter.Verify(nameof(filter)).IsNotNull();
+            filter.VerifyNotNull(nameof(filter));
 
             TelemetryMessage[] data = _messages.ToArray();
 

@@ -29,8 +29,8 @@ namespace Khooversoft.Toolbox.Actor
 
         public ActorRepository(ActorConfiguration configuration)
         {
-            configuration.Verify(nameof(configuration)).IsNotNull();
-            configuration.Capacity.Verify().Assert(x => x > 0, $"Capacity {configuration.Capacity} must be greater than 0");
+            configuration.VerifyNotNull(nameof(configuration));
+            configuration.Capacity.VerifyAssert(x => x > 0, $"Capacity {configuration.Capacity} must be greater than 0");
 
             _actorRemove = new ActionBlock<IActorRegistration>(x => RetireActor(x));
             _workContext = configuration.WorkContext.WithActivity();
@@ -49,7 +49,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns></returns>
         public Task Clear(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             context.Telemetry.Verbose(context, "Clearing actor container");
             List<IActorRegistration> list;
@@ -72,7 +72,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns>task</returns>
         public void Set(IWorkContext context, IActorRegistration registration)
         {
-            registration.Verify(nameof(registration)).IsNotNull();
+            registration.VerifyNotNull(nameof(registration));
 
             context.Telemetry.Verbose(context, $"Setting actor {registration.ActorKey}");
             IActorRegistration? currentActorRegistration = null;
@@ -103,8 +103,8 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns>actor registration or null if not exist</returns>
         public IActorRegistration? Lookup(Type actorType, ActorKey actorKey)
         {
-            actorType.Verify(nameof(actorType)).IsNotNull();
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
+            actorType.VerifyNotNull(nameof(actorType));
+            actorKey.VerifyNotNull(nameof(actorKey));
 
             lock (_lock)
             {
@@ -124,8 +124,8 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns>actor registration or null if not exist</returns>
         public async Task<IActorRegistration?> Remove(IWorkContext context, Type actorType, ActorKey actorKey)
         {
-            actorType.Verify(nameof(actorType)).IsNotNull();
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
+            actorType.VerifyNotNull(nameof(actorType));
+            actorKey.VerifyNotNull(nameof(actorKey));
 
             context.Telemetry.Verbose(context, $"Removing actor {actorKey}");
 
@@ -199,7 +199,7 @@ namespace Khooversoft.Toolbox.Actor
         {
             public RegistrationKey(Type type, Guid key)
             {
-                type.Verify(nameof(type)).IsNotNull();
+                type.VerifyNotNull(nameof(type));
 
                 Type = type;
                 Key = key;

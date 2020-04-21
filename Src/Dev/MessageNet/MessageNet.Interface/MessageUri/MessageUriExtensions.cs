@@ -15,12 +15,12 @@ namespace Khooversoft.MessageNet.Interface
 
         public static MessageUri ToMessageUri(this QueueId subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new MessageUri(subject.Namespace, subject.NetworkId, subject.NodeId);
         }
 
-        public static QueueId ToQueueId(this MessageUri subject) => subject.Verify().IsNotNull().Value.Do(x => new QueueId(x.Namespace, x.NetworkId, x.NodeId));
-
+        public static QueueId ToQueueId(this MessageUri subject) => subject.VerifyNotNull(nameof(subject))
+            .Func(x => new QueueId(x.Namespace, x.NetworkId, x.NodeId));
     }
 }

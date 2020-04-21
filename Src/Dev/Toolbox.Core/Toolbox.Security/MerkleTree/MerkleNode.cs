@@ -55,9 +55,8 @@ namespace Khooversoft.Toolbox.Security
 
         public void SetLeftNode(MerkleNode node)
         {
-            node.Verify(nameof(node))
-                .IsNotNull()
-                .Assert(x => node.Hash != null, "Node hash must be initialized.");
+            node.VerifyNotNull(nameof(node))
+                .VerifyAssert(x => node.Hash != null, "Node hash must be initialized.");
 
             LeftNode = node;
             LeftNode.Parent = this;
@@ -66,9 +65,8 @@ namespace Khooversoft.Toolbox.Security
 
         public void SetRightNode(MerkleNode node)
         {
-            node.Verify(nameof(node))
-                .IsNotNull()
-                .Assert(x => node.Hash != null, "Node hash must be initialized.");
+            node.VerifyNotNull(nameof(node))
+                .VerifyAssert(x => node.Hash != null, "Node hash must be initialized.");
 
             RightNode = node;
             RightNode.Parent = this;
@@ -105,7 +103,7 @@ namespace Khooversoft.Toolbox.Security
                 return Hash.Equals(LeftNode!.Hash);
             }
 
-            LeftNode.Verify(nameof(LeftNode)).Assert(x => x != null, "Left branch must be a node if right branch is a node.");
+            LeftNode.VerifyAssert(x => x != null, "Left branch must be a node if right branch is a node.");
             MerkleHash leftRightHash = new MerkleHash(LeftNode!.Hash, RightNode.Hash);
 
             return Hash.Equals(leftRightHash);
@@ -119,23 +117,14 @@ namespace Khooversoft.Toolbox.Security
         /// <summary>
         /// If the hashes are equal, we know the entire node tree is equal.
         /// </summary>
-        public bool Equals(MerkleNode node)
-        {
-            return Hash.Equals(node.Hash);
-        }
+        public bool Equals(MerkleNode node) => Hash.Equals(node.Hash);
 
         /// <summary>
         /// Return the leaves (not all children, just leaves) under this node
         /// </summary>
-        public IEnumerable<MerkleNode> Leaves()
-        {
-            return this.Where(n => n.LeftNode == null && n.RightNode == null);
-        }
+        public IEnumerable<MerkleNode> Leaves() => this.Where(n => n.LeftNode == null && n.RightNode == null);
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public IEnumerator<MerkleNode> GetEnumerator()
         {

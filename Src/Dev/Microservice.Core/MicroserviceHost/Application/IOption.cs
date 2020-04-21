@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox.Standard;
+using System.Collections.Generic;
 
 namespace MicroserviceHost
 {
@@ -19,7 +20,7 @@ namespace MicroserviceHost
 
         bool UnRegister { get; set; }
 
-        NamespaceConnection NamespaceConnections { get; }
+        IList<NamespaceConnection> NamespaceConnections { get; }
 
         public string? Namespace { get; }
 

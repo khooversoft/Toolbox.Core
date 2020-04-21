@@ -22,7 +22,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>List of key value pairs</returns>
         public static IReadOnlyList<KeyValuePair<string, object>> ToKeyValues<T>(this T self)
         {
-            self.Verify(nameof(self)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
 
             return self!.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => x.Name != "Item" && x.CanRead)

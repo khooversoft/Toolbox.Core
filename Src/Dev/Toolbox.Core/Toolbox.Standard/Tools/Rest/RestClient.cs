@@ -28,7 +28,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="client"></param>
         public RestClient(HttpClient client)
         {
-            client.Verify(nameof(client)).IsNotNull();
+            client.VerifyNotNull(nameof(client));
 
             _client = client;
         }
@@ -105,7 +105,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>this</returns>
         public RestClient AddPath(params string[] values)
         {
-            values.Verify(nameof(values)).IsNotNull();
+            values.VerifyNotNull(nameof(values));
 
             PathItems = PathItems.With(values);
 
@@ -120,8 +120,8 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>this</returns>
         public RestClient AddQuery(string name, string value)
         {
-            name.Verify(nameof(name)).IsNotEmpty();
-            value.Verify(nameof(value)).IsNotEmpty();
+            name.VerifyNotEmpty(nameof(name));
+            value.VerifyNotEmpty(nameof(value));
 
             QueryItems.Add(name, value);
 
@@ -148,7 +148,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>this</returns>
         public RestClient SetContent<T>(T value, bool required = true)
         {
-            value.Verify(nameof(value)).Assert(x => !required || x != null, "Value is required but null");
+            value.VerifyAssert(x => !required || x != null, "Value is required but null");
 
             //string jsonString = JsonSerializer.Serialize(value);
             string jsonString = JsonConvert.SerializeObject(value);
@@ -174,7 +174,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns></returns>
         public RestClient SetValidHttpStatusCodes(params HttpStatusCode[] httpStatusCodes)
         {
-            httpStatusCodes.Verify(nameof(httpStatusCodes)).IsNotNull();
+            httpStatusCodes.VerifyNotNull(nameof(httpStatusCodes));
 
             ValidHttpStatusCodes = httpStatusCodes;
             return this;
@@ -228,8 +228,8 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>state of HTTP response</returns>
         private async Task<HttpResponseMessage> SendAsync(IWorkContext context, HttpRequestMessage requestMessage)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            requestMessage.Verify(nameof(requestMessage)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            requestMessage.VerifyNotNull(nameof(requestMessage));
 
             try
             {
@@ -261,7 +261,7 @@ namespace Khooversoft.Toolbox.Standard
 
             builder.Path = (builder.Path?.Split("/", StringSplitOptions.RemoveEmptyEntries) ?? new string[0])
                 .Concat(PathItems)
-                .Do(x => string.Join("/", x));
+                .Func(x => string.Join("/", x));
 
             if (QueryItems.Count > 0)
             {

@@ -12,12 +12,12 @@ namespace KHooversoft.Toolbox.Graph
     {
         private HashSet<TKey> _includeNodeKeys;
         private HashSet<TKey> _excludeNodeKeys;
-        private readonly IEqualityComparer<TKey> _keyCompare;
+        private readonly IEqualityComparer<TKey>? _keyCompare;
 
-        public GraphFilter(IEqualityComparer<TKey> equalityComparer = null)
+        public GraphFilter(IEqualityComparer<TKey>? equalityComparer = null)
         {
             _keyCompare = equalityComparer ??
-                ((typeof(TKey) == typeof(string)) ? (IEqualityComparer<TKey>)StringComparer.OrdinalIgnoreCase : (IEqualityComparer<TKey>)null);
+                ((typeof(TKey) == typeof(string)) ? (IEqualityComparer<TKey>)StringComparer.OrdinalIgnoreCase : (IEqualityComparer<TKey>?)null);
 
             _includeNodeKeys = new HashSet<TKey>(_keyCompare);
             _excludeNodeKeys = new HashSet<TKey>(_keyCompare);

@@ -76,7 +76,7 @@ namespace Khooversoft.MessageNet.Host
         /// <returns></returns>
         public async Task<IReadOnlyList<QueueDefinition>> Search(IWorkContext context, string search)
         {
-            search.Verify(nameof(search)).IsNotEmpty();
+            search.VerifyNotNull(nameof(search));
 
             List<Task<IReadOnlyList<QueueDefinition>>> tasks = _registrations
                 .Select(x => x.Value.Search(context, search))

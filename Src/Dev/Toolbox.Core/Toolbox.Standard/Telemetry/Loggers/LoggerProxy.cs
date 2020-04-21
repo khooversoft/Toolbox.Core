@@ -16,7 +16,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public LoggerProxy(ITelemetryLogger manager, string eventSourceName)
         {
-            manager.Verify(nameof(manager)).IsNotNull();
+            manager.VerifyNotNull(nameof(manager));
 
             _manager = manager;
             EventSourceName = eventSourceName;

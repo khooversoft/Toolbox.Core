@@ -20,7 +20,7 @@ namespace Khooversoft.Toolbox.Configuration
         /// <returns>configuration builder</returns>
         public static IConfigurationBuilder AddIncludeFiles(this IConfigurationBuilder builder, string[] args, params string[] includeFileArguments)
         {
-            includeFileArguments.Length.Verify().Assert(x => x > 0, "Include file arguments");
+            includeFileArguments.Length.VerifyAssert(x => x > 0, "Include file arguments");
 
             args.GetIncludeFiles(includeFileArguments)
                 .ForEach(x => builder.AddJsonFile(x, true));
@@ -37,7 +37,7 @@ namespace Khooversoft.Toolbox.Configuration
         public static T BuildOption<T>(this IConfiguration configuration)
             where T : class, new()
         {
-            configuration.Verify(nameof(configuration)).IsNotNull();
+            configuration.VerifyNotNull(nameof(configuration));
 
             T option = new T();
             configuration.Bind(option, x => x.BindNonPublicProperties = true);

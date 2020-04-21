@@ -27,7 +27,7 @@ namespace ServiceBusPerformanceTest
 
         public Task Run(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
             context = context
                 .WithCreateLogger(nameof(ReceiveMessages))
                 .WithActivity();

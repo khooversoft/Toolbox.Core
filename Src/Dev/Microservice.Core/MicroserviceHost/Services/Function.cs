@@ -10,9 +10,9 @@ namespace MicroserviceHost
     {
         public Function(MethodInfo method, MessageFunctionAttribute functionAttribute, Type messageType)
         {
-            method.Verify(nameof(method)).IsNotNull();
-            functionAttribute.Verify(nameof(functionAttribute)).IsNotNull();
-            messageType.Verify(nameof(messageType)).IsNotNull();
+            method.VerifyNotNull(nameof(method));
+            functionAttribute.VerifyNotNull(nameof(functionAttribute));
+            messageType.VerifyNotNull(nameof(messageType));
 
             MethodInfo = method;
             FunctionAttribute = functionAttribute;

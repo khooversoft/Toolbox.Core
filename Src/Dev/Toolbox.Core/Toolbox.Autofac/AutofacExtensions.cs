@@ -13,8 +13,8 @@ namespace Khooversoft.Toolbox.Autofac
     {
         public static void RegisterContainerModule(this ContainerBuilder containerBuilder, ContainerRegistrationModule containerRegistrationModule)
         {
-            containerBuilder.Verify(nameof(containerBuilder)).IsNotNull();
-            containerRegistrationModule.Verify(nameof(containerRegistrationModule)).IsNotNull();
+            containerBuilder.VerifyNotNull(nameof(containerBuilder));
+            containerRegistrationModule.VerifyNotNull(nameof(containerRegistrationModule));
 
             foreach (var item in containerRegistrationModule)
             {
@@ -30,7 +30,7 @@ namespace Khooversoft.Toolbox.Autofac
         {
             serviceContainer
                 .SetService(x => lifetimeScope.Resolve(x))
-                .SetServiceOptional(x => lifetimeScope.ResolveOptional(x))
+                .SetServiceOptional(x => lifetimeScope.ResolveOptional(x)!)
                 .SetCreateScope((tag, types) => lifetimeScope.BeginLifetimeScope(tag, x => types.ForEach(x => lifetimeScope.Resolve(x))));
 
             return serviceContainer;

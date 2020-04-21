@@ -49,7 +49,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns>task</returns>
         public async Task Activate(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
             context = context.WithActivity();
 
             int currentValue = Interlocked.CompareExchange(ref _running, 1, 0);
@@ -70,7 +70,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns>task</returns>
         public async Task Deactivate(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
             context = context.WithActivity();
 
             int currentValue = Interlocked.CompareExchange(ref _running, 0, 1);
@@ -118,7 +118,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="period">every period</param>
         public void SetTimer(TimeSpan dueTime, TimeSpan period)
         {
-            _timer.Verify().Assert(x => x == null, "Timer already running");
+            _timer.VerifyAssert(x => x == null, "Timer already running");
 
             _timer = new Timer(TimerCallback, null, dueTime, period);
             ActorManager.Configuration.ActorStartTimerEvent(_workContext.WithActivity(), ActorKey);

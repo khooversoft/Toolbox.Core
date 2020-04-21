@@ -20,9 +20,9 @@ namespace Khooversoft.Toolbox.Azure
 
         public CreateQueueState(IQueueManagement queueManagement, QueueDefinition queueDefinition)
         {
-            queueManagement.Verify(nameof(queueManagement)).IsNotNull();
-            queueDefinition.Verify(nameof(queueDefinition)).IsNotNull();
-            queueDefinition.QueueName.Verify(nameof(queueDefinition.QueueName)).IsNotNull();
+            queueManagement.VerifyNotNull(nameof(queueManagement));
+            queueDefinition.VerifyNotNull(nameof(queueDefinition));
+            queueDefinition.QueueName.VerifyNotNull(nameof(queueDefinition.QueueName));
 
             _queueDefinition = queueDefinition;
             _managementClient = queueManagement;

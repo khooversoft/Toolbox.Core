@@ -13,110 +13,6 @@ namespace KHooversoft.Toolbox.Graph
     public static class GraphExtensions
     {
         /// <summary>
-        /// Full default topological sort
-        /// </summary>
-        /// <returns>List of list of nodes</returns>
-        public static IList<IList<TNode>> TopologicalSort<TKey, TNode, TEdge>(this IReadOnlyGraphMap<TKey, TNode, TEdge> self)
-            where TNode : IGraphNode<TKey>
-            where TEdge : IGraphEdge<TKey>
-        {
-            return self.TopologicalSort(new GraphTopologicalContext<TKey, TEdge>(self.KeyCompare));
-        }
-
-        /// <summary>
-        /// <para>Return a list representing a topological sort based on edges is defined by a directed graph.</para>
-        /// <para>
-        /// The first item in the return list will be nodes with no edges.  The next item (if there is one)
-        /// will be nodes that only have dependencies on the previous list items, and so on.
-        /// 
-        /// Uses two list to keep track of what nodes have been processed and stopped nodes.  Stopped nodes
-        /// stop the sorting for that edge(s).
-        /// </para>
-        /// </summary>
-        /// <param name="graphContext">Graph topological context</param>
-        /// <returns>List of list of nodes</returns>
-        public static IList<IList<TNode>> TopologicalSort<TKey, TNode, TEdge>(this IReadOnlyGraphMap<TKey, TNode, TEdge> self, GraphTopologicalContext<TKey, TEdge> graphContext)
-            where TNode : IGraphNode<TKey>
-            where TEdge : IGraphEdge<TKey>
-        {
-            self.Verify(nameof(self)).IsNotNull();
-            graphContext.Verify(nameof(graphContext)).IsNotNull();
-
-            var visit = new HashSet<TKey>(graphContext.ProcessedNodeKeys, self.KeyCompare);
-            var stopNodes = new HashSet<TKey>(graphContext.StopNodeKeys, self.KeyCompare);
-            var orderList = new List<IList<TNode>>();
-
-            var nodeCounts = new List<(TNode Node, int Count)>();
-
-            IReadOnlyList<TEdge> edgesToUse = self.Edges.Values
-                .Where(x => TestEdge(graphContext.EdgeType, x))
-                .ToList();
-
-            while (true)
-            {
-                nodeCounts.Clear();
-
-                var nodesToCount = self.Nodes.Values.Where(x => !visit.Contains(x.Key) && !stopNodes.Contains(x.Key))
-                        .ToList();
-
-                if (nodesToCount.Count == 0)
-                {
-                    return orderList;
-                }
-
-                foreach (var node in nodesToCount)
-                {
-                    // Count forward (own) edges
-                    int forwardCount = edgesToUse
-                        .OfType<GraphEdge<TKey>>()
-                        .Where(x => !visit.Contains(x.FromNodeKey))
-                        .Where(x => self.KeyCompare.Equals(x.ToNodeKey, node.Key))
-                        .Count();
-
-                    int dependOnCount = edgesToUse
-                        .OfType<GraphDependOnEdge<TKey>>()
-                        .Where(x => !visit.Contains(x.ToNodeKey))
-                        .Where(x => self.KeyCompare.Equals(x.FromNodeKey, node.Key))
-                        .Count();
-
-                    var phase1 = edgesToUse
-                        .OfType<GraphDependOnEdge<TKey>>()
-                        .Where(x => self.KeyCompare.Equals(x.FromNodeKey, node.Key)).ToList();
-
-                    var phase2 = phase1
-                        .SelectMany(x => self.GetLinkedNodes(self.CreateFilter().Include(x.ToNodeKey))).ToList();
-
-                    var phase3 = phase2
-                        .Where(x => !visit.Contains(x.Key)).ToList();
-
-                    int depthDependsOnCount = phase3
-                        .Count();
-
-                    nodeCounts.Add((node, forwardCount + dependOnCount + depthDependsOnCount));
-                }
-
-                var zero = nodeCounts
-                    .Where(x => x.Count == 0)
-                    .Select(x => x.Node)
-                    .ToList();
-
-                if (zero.Count == 0)
-                {
-                    return orderList;
-                }
-
-                orderList.Add(zero);
-
-                if (orderList.Count == graphContext.MaxLevels)
-                {
-                    return orderList;
-                }
-
-                zero.ForEach(x => visit.Add(x.Key));
-            }
-        }
-
-        /// <summary>
         /// Get all the leaf children for a specific node based on edges, breadth-first traversal 
         /// </summary>
         /// <typeparam name="TKey">key type</typeparam>
@@ -126,12 +22,12 @@ namespace KHooversoft.Toolbox.Graph
         /// <param name="node">node to search from</param>
         /// <param name="notInclude">nodes to stop scanning</param>
         /// <returns>list of leaf children nodes</returns>
-        public static IReadOnlyList<TNode> GetLeafNodes<TKey, TNode, TEdge>(this IReadOnlyGraphMap<TKey, TNode, TEdge> self, TNode node, params TNode[] notInclude)
+        public static IReadOnlyList<TNode> GetLeafNodes<TKey, TNode, TEdge>(this GraphMap<TKey, TNode, TEdge> self, TNode node, params TNode[] notInclude)
             where TNode : IGraphNode<TKey>
             where TEdge : IGraphEdge<TKey>
         {
-            self.Verify(nameof(self)).IsNotNull();
-            node.Verify(nameof(node)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
+            node.VerifyNotNull(nameof(node));
 
             var leafNodes = new HashSet<TKey>(self.KeyCompare);
             var visitedNodes = new HashSet<TKey>(self.KeyCompare);
@@ -175,11 +71,11 @@ namespace KHooversoft.Toolbox.Graph
         /// <typeparam name="TEdge">edge type</typeparam>
         /// <param name="self">graph map</param>
         /// <returns>list of nodes with its edges</returns>
-        public static IReadOnlyList<KeyValuePair<TNode, IList<TEdge>>> GetNodeByEdges<TKey, TNode, TEdge>(this IReadOnlyGraphMap<TKey, TNode, TEdge> self)
+        public static IReadOnlyList<KeyValuePair<TNode, IList<TEdge>>> GetNodeByEdges<TKey, TNode, TEdge>(this GraphMap<TKey, TNode, TEdge> self)
             where TNode : IGraphNode<TKey>
             where TEdge : IGraphEdge<TKey>
         {
-            self.Verify(nameof(self)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
 
             var fromNodes = self.Nodes.Values
                 .Join(self.Edges.Values, x => x.Key, x => x.FromNodeKey, (o, i) => new { Node = o, Edge = i });
@@ -204,18 +100,52 @@ namespace KHooversoft.Toolbox.Graph
         /// <typeparam name="TEdge">edge type</typeparam>
         /// <param name="self">graph map reference</param>
         /// <returns>new graph filter</returns>
-        public static GraphFilter<TKey> CreateFilter<TKey, TNode, TEdge>(this IReadOnlyGraphMap<TKey, TNode, TEdge> self)
+        public static GraphFilter<TKey> CreateFilter<TKey, TNode, TEdge>(this GraphMap<TKey, TNode, TEdge> self)
             where TNode : IGraphNode<TKey>
             where TEdge : IGraphEdge<TKey>
         {
-            self.Verify(nameof(self)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
 
             return new GraphFilter<TKey>(self.KeyCompare);
         }
 
-        private static bool TestEdge<TEdge>(Type type, TEdge edge)
+        /// <summary>
+        /// Create a new graph based on a filter.  Only edges based on "GraphDependsOnEdge" of TEdge
+        /// will be included.
+        /// </summary>
+        /// <typeparam name="TResult">result graph</typeparam>
+        /// <param name="filter">filter to create new graph by</param>
+        /// <param name="factory">factory to create new graph, if null will use reflection to create</param>
+        /// <returns>new graph based on filter</returns>
+        public static GraphMap<TKey, TNode, TEdge> Create<TKey, TNode, TEdge>(this GraphMap<TKey, TNode, TEdge> self, IGraphFilter<TKey> filter)
+            where TNode : IGraphNode<TKey>
+            where TEdge : IGraphEdge<TKey>
         {
-            return type.IsInterface ? type.IsAssignableFrom(edge.GetType()) : edge.GetType() == type;
+            filter.VerifyNotNull(nameof(filter));
+
+            // Create new graph
+            GraphMap<TKey, TNode, TEdge> newGraph = self.Create();
+
+            // Get connected nodes
+            IReadOnlyList<TNode> childrenNodes = self.GetLinkedNodes(filter);
+
+            // Add include nodes to the list
+            var focusedNodes = filter.IncludeNodeKeys
+                .Join(self.Nodes.Values, x => x, x => x.Key, (o, i) => i, self.KeyCompare)
+                .Concat(childrenNodes)
+                .GroupBy(x => x.Key, self.KeyCompare)
+                .Select(x => x.First());
+
+            // Set nodes
+            focusedNodes.ForEach(x => newGraph.Add(x));
+
+            // Get edges for nodes
+            var focusedEdges = self.Edges.Values
+                .Where(x => newGraph.Nodes.ContainsKey(x.FromNodeKey) && newGraph.Nodes.ContainsKey(x.ToNodeKey));
+
+            focusedEdges.ForEach(x => newGraph.Add(x));
+
+            return newGraph;
         }
     }
 }

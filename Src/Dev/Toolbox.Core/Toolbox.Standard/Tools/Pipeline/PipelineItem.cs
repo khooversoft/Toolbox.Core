@@ -10,8 +10,8 @@ namespace Khooversoft.Toolbox.Standard
     {
         public PipelineItem(Func<T, bool> predicate, Func<IWorkContext, T, Func<IWorkContext, T, Task>, Task> middleware)
         {
-            predicate.Verify(nameof(predicate)).IsNotNull();
-            middleware.Verify(nameof(middleware)).IsNotNull();
+            predicate.VerifyNotNull(nameof(predicate));
+            middleware.VerifyNotNull(nameof(middleware));
 
             Predicate = predicate;
             Middleware = middleware;

@@ -26,7 +26,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public TelemetrySecretManager Add(params string[] secrets)
         {
-            secrets.Verify(nameof(secrets)).IsNotNull();
+            secrets.VerifyNotNull(nameof(secrets));
 
             _lock.EnterWriteLock();
             try

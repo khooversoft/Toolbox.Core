@@ -14,7 +14,7 @@ namespace CustomerInfo.MicroService
 
         public CustomerFunctions(ITestContext testContext)
         {
-            testContext.Verify(nameof(testContext)).IsNotNull();
+            testContext.VerifyNotNull(nameof(testContext));
 
             _testContext = testContext;
         }
@@ -22,8 +22,8 @@ namespace CustomerInfo.MicroService
         [MessageFunction("CustomerAddress", "{namespace}/{network.id}/{node.id}")]
         public Task GetCustomerInfo(IWorkContext context, CustomerInfoRequest request)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            request.Verify(nameof(request)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            request.VerifyNotNull(nameof(request));
 
             _testContext.AddMessage(request);
 
@@ -33,8 +33,8 @@ namespace CustomerInfo.MicroService
         [MessageFunction("CustomerAddress", "{namespace}/{network.id}/{node.id}")]
         public Task GetCustomerInfo(IWorkContext context, NetMessage request)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            request.Verify(nameof(request)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            request.VerifyNotNull(nameof(request));
 
             _testContext.AddMessage(request);
 

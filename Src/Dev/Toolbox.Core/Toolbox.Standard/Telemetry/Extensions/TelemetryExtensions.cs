@@ -12,8 +12,8 @@ namespace Khooversoft.Toolbox.Standard
     {
         public static IWorkContext WithCreateLogger(this IWorkContext context, string eventSourceName)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            eventSourceName.Verify(nameof(eventSourceName)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            eventSourceName.VerifyNotNull(nameof(eventSourceName));
 
             if (context.Container == null) return context;
 
@@ -30,14 +30,14 @@ namespace Khooversoft.Toolbox.Standard
 
         public static IEventDimensions ToEventDimensions(this object dimensions)
         {
-            dimensions.Verify(nameof(dimensions)).IsNotNull();
+            dimensions.VerifyNotNull(nameof(dimensions));
 
             return dimensions.ToKeyValues().ToEventDimensions();
         }
 
         public static ITelemetrySecretManager BuildSecretManager(this object optionClass)
         {
-            optionClass.Verify(nameof(optionClass)).IsNotNull();
+            optionClass.VerifyNotNull(nameof(optionClass));
 
             IReadOnlyList<PropertyPathValue> properties = optionClass.ToKeyValuesForAttribute<TelemetrySecretAttribute>();
 

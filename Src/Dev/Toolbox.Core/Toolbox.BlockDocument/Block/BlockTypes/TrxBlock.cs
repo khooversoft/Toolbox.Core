@@ -13,8 +13,8 @@ namespace Khooversoft.Toolbox.BlockDocument
     {
         public TrxBlock(string referenceId, string transactionType, MaskDecimal4 value)
         {
-            referenceId.Verify(nameof(referenceId)).IsNotEmpty();
-            transactionType.Verify(nameof(transactionType)).IsNotEmpty();
+            referenceId.VerifyNotEmpty(nameof(referenceId));
+            transactionType.VerifyNotEmpty(nameof(transactionType));
 
             ReferenceId = referenceId;
             TransactionType = transactionType;

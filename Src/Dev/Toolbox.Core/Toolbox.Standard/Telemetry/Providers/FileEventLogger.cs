@@ -17,7 +17,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public FileEventLogger(string logFileName, bool useJsonFormat = false)
         {
-            logFileName.Verify().IsNotEmpty();
+            logFileName.VerifyNotEmpty(nameof(logFileName));
 
             LogFileName = logFileName;
             UseJsonFormat = useJsonFormat;
@@ -26,8 +26,8 @@ namespace Khooversoft.Toolbox.Standard
 
         public FileEventLogger(string folderPath, string logType, bool useJsonFormat = false)
         {
-            folderPath.Verify(nameof(folderPath)).IsNotEmpty();
-            logType.Verify(nameof(logType)).IsNotEmpty();
+            folderPath.VerifyNotEmpty(nameof(folderPath));
+            logType.VerifyNotEmpty(nameof(logType));
 
             UseJsonFormat = useJsonFormat;
 

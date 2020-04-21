@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -43,8 +44,8 @@ namespace Khooversoft.Toolbox.Standard
 
         public StringVector(string value, string delimiter)
         {
-            value.Verify(nameof(value)).IsNotEmpty();
-            delimiter.Verify(nameof(delimiter)).IsNotEmpty();
+            value.VerifyNotEmpty(nameof(value));
+            delimiter.VerifyNotEmpty(nameof(delimiter));
 
             Delimiter = delimiter;
             HasRoot = value.Length > 0 && value[0] == '/' ? true : false;
@@ -61,7 +62,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="hasRoot">has root</param>
         public StringVector(IEnumerable<string> parts, string delimiter, bool hasRoot)
         {
-            delimiter.Verify(nameof(parts)).IsNotEmpty();
+            delimiter.VerifyNotNull(nameof(parts));
 
             Delimiter = delimiter;
             HasRoot = hasRoot;
@@ -91,9 +92,9 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="index">index of part</param>
         /// <param name="value">returned value</param>
         /// <returns>true if part exist, false if not</returns>
-        public bool TryGet(int index, out string value)
+        public bool TryGet(int index, [MaybeNullWhen(returnValue: false)] out string? value)
         {
-            value = string.Empty;
+            value = default!;
             if (index < 0 || index >= _parts.Length) return false;
             value = _parts[index];
             return true;
@@ -130,5 +131,21 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="hasRoot">has root</param>
         /// <returns></returns>
         public static StringVector Parse(string path, string delimiter = "/") => new StringVectorBuilder(delimiter).Parse(path).Build();
+
+        /// <summary>
+        /// Add operator, concatenate two string vectors
+        /// </summary>
+        /// <param name="subject">subject</param>
+        /// <param name="rvalue">value to concatenate</param>
+        /// <returns>new result string vector</returns>
+        public static StringVector operator +(StringVector subject, StringVector rvalue) => subject.With(rvalue);
+
+        /// <summary>
+        /// Add operator, concatenate a string to a vector
+        /// </summary>
+        /// <param name="subject">subject</param>
+        /// <param name="rvalue">value to concatenate</param>
+        /// <returns>new result string vector</returns>
+        public static StringVector operator +(StringVector subject, string rvalue) => subject.With(rvalue);
     }
 }

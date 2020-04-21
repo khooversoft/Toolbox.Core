@@ -21,8 +21,8 @@ namespace Khooversoft.MessageNet.Host
 
         public NodeHost(INodeHostReceiver nodeHostReceiver, IMessageRepository routeRepository)
         {
-            nodeHostReceiver.Verify(nameof(nodeHostReceiver)).IsNotNull();
-            routeRepository.Verify(nameof(routeRepository)).IsNotNull();
+            nodeHostReceiver.VerifyNotNull(nameof(nodeHostReceiver));
+            routeRepository.VerifyNotNull(nameof(routeRepository));
 
             _nodeHostReceiver = nodeHostReceiver;
             _routeRepository = routeRepository;
@@ -30,8 +30,8 @@ namespace Khooversoft.MessageNet.Host
 
         public async Task Start(IWorkContext context)
         {
-            _receiver.Verify().Assert(x => x == null, "Cannot run because receiver is already running");
-            context.Verify(nameof(context)).IsNotNull();
+            _receiver.VerifyAssert(x => x == null, "Cannot run because receiver is already running");
+            context.VerifyNotNull(nameof(context));
 
             context.Telemetry.Info(context, $"Starting node host for {_nodeHostReceiver.QueueId}");
             _receiver = await _routeRepository.Register(context, _nodeHostReceiver.QueueId);
@@ -41,8 +41,8 @@ namespace Khooversoft.MessageNet.Host
 
         public Task Stop(IWorkContext context)
         {
-            _receiver.Verify().Assert(x => x != null, "Cannot stop because receiver is not running");
-            context.Verify(nameof(context)).IsNotNull();
+            _receiver.VerifyAssert(x => x != null, "Cannot stop because receiver is not running");
+            context.VerifyNotNull(nameof(context));
 
             context.Telemetry.Info(context, $"Stopping node's host for {_nodeHostReceiver.QueueId}");
             return _receiver!.Stop();

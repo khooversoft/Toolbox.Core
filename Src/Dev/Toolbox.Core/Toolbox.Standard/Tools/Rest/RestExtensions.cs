@@ -40,7 +40,7 @@ namespace Khooversoft.Toolbox.Standard
         public static async Task<RestResponse<T>> GetResponseAsync<T>(this HttpResponseMessage message, IWorkContext context)
             where T : class
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             try
             {

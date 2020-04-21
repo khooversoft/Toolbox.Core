@@ -41,7 +41,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="context"></param>
         public WorkContextBuilder(IWorkContext context)
         {
-            context.Verify().IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             ActivityId = context.ActivityId;
             ParentActivityId = context.ParentActivityId;
@@ -72,7 +72,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>this</returns>
         public WorkContextBuilder Set(ITelemetry telemetry)
         {
-            telemetry.Verify().IsNotNull();
+            telemetry.VerifyNotNull(nameof(telemetry));
 
             Telemetry = telemetry;
             return this;
@@ -85,7 +85,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>this</returns>
         public WorkContextBuilder Set(IEventDimensions eventDimension)
         {
-            eventDimension.Verify().IsNotNull();
+            eventDimension.VerifyNotNull(nameof(eventDimension));
 
             Dimensions = new EventDimensions(eventDimension);
             return this;
@@ -98,7 +98,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>this</returns>
         public WorkContextBuilder Set(IServiceContainer container)
         {
-            container.Verify().IsNotNull();
+            container.VerifyNotNull(nameof(container));
 
             Container = container;
             return this;

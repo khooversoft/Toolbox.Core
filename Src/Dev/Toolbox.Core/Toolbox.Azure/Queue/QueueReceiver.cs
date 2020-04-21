@@ -18,17 +18,17 @@ namespace Khooversoft.Toolbox.Azure
 
         public QueueReceiver(string connectionString, string queueName)
         {
-            connectionString.Verify(nameof(connectionString)).IsNotEmpty();
-            queueName.Verify(nameof(queueName)).IsNotEmpty();
+            connectionString.VerifyNotEmpty(nameof(connectionString));
+            queueName.VerifyNotEmpty(nameof(queueName));
 
             _messageReceiver = new MessageReceiver(connectionString, queueName, ReceiveMode.PeekLock);
         }
 
         public Task Start(IWorkContext context, Func<T, Task> receiver)
         {
-            _messageReceiver.Verify().IsNotNull("MessageProcessor is not running");
-            context.Verify(nameof(context)).IsNotNull();
-            receiver.Verify(nameof(receiver)).IsNotNull();
+            _messageReceiver.VerifyNotNull("MessageProcessor is not running");
+            context.VerifyNotNull(nameof(context));
+            receiver.VerifyNotNull(nameof(receiver));
 
             _receiver = receiver;
 

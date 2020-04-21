@@ -21,7 +21,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public BroadcastDataflow(Func<T, bool> predicate)
         {
-            predicate.Verify(nameof(predicate)).IsNotNull();
+            predicate.VerifyNotNull(nameof(predicate));
             Predicate = predicate;
         }
 

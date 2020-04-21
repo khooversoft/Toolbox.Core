@@ -17,7 +17,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static Message ToMessage(this NetMessage subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             NetMessageModel netMessageModel = subject.ConvertTo();
             string json = JsonConvert.SerializeObject(netMessageModel);
@@ -35,7 +35,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public static NetMessage ToNetMessage(this Message subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             string json = Encoding.UTF8.GetString(subject.Body);
             NetMessageModel model = JsonConvert.DeserializeObject<NetMessageModel>(json);

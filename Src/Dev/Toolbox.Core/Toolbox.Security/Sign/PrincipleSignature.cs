@@ -12,8 +12,8 @@ namespace Khooversoft.Toolbox.Security
     {
         public PrincipleSignature(string issuer, string audience, TimeSpan validFor, RsaPublicPrivateKey publicPrivateKey)
         {
-            issuer.Verify(nameof(issuer)).IsNotEmpty();
-            publicPrivateKey.Verify(nameof(publicPrivateKey)).IsNotNull();
+            issuer.VerifyNotEmpty(nameof(issuer));
+            publicPrivateKey.VerifyNotNull(nameof(publicPrivateKey));
 
             Issuer = issuer;
             Audience = audience;

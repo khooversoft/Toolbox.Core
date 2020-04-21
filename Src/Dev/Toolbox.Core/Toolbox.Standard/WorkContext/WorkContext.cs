@@ -117,7 +117,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>new work context</returns>
         public IWorkContext With(ITelemetry eventLog)
         {
-            eventLog.Verify(nameof(eventLog)).IsNotNull();
+            eventLog.VerifyNotNull(nameof(eventLog));
 
             return new WorkContext(this)
             {
@@ -132,7 +132,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>new work context</returns>
         public IWorkContext With(IEventDimensions eventDimenensions)
         {
-            eventDimenensions.Verify(nameof(eventDimenensions)).IsNotNull();
+            eventDimenensions.VerifyNotNull(nameof(eventDimenensions));
 
             return new WorkContext(this)
             {

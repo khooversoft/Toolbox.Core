@@ -50,11 +50,11 @@ namespace ServiceBusPerformanceTest
 
             if (option.Help) { return option; }
 
-            option.Verify(nameof(option)).IsNotNull();
-            (option.Send || option.Receive).Verify().Assert("Send and/or Receive must be specified");
-            option.ServiceBusConnectionString.Verify().IsNotNull("Service bus connection string is required");
-            option.QueueName!.Verify().IsNotEmpty("Queue name is required");
-            option.Count.Verify().Assert(x => x >= 0, "Count must be greater then 0, or 0 for no limit");
+            option.VerifyNotNull(nameof(option));
+            (option.Send || option.Receive).VerifyAssert(x => x, "Send and/or Receive must be specified");
+            option.ServiceBusConnectionString.VerifyNotNull("Service bus connection string is required");
+            option.QueueName!.VerifyNotEmpty("Queue name is required");
+            option.Count.VerifyAssert(x => x >= 0, "Count must be greater then 0, or 0 for no limit");
 
             return option;
         }

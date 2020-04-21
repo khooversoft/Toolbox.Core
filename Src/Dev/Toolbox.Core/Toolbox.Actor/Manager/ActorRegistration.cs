@@ -25,10 +25,10 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="actorProxy">actor proxy</param>
         public ActorRegistration(Type actorType, ActorKey actorKey, IActorBase instance, IActor actorProxy)
         {
-            actorType.Verify(nameof(actorType)).IsNotNull();
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
-            instance.Verify(nameof(instance)).IsNotNull();
-            actorProxy.Verify(nameof(actorProxy)).IsNotNull();
+            actorType.VerifyNotNull(nameof(actorType));
+            actorKey.VerifyNotNull(nameof(actorKey));
+            instance.VerifyNotNull(nameof(instance));
+            actorProxy.VerifyNotNull(nameof(actorProxy));
 
             ActorType = actorType;
             ActorKey = actorKey;

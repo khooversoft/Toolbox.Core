@@ -35,7 +35,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public PropertyResolver(IReadOnlyDictionary<string, string> properties, IEqualityComparer<string>? comparer = null, bool strict = false)
         {
-            properties.Verify(nameof(properties)).IsNotNull();
+            properties.VerifyNotNull(nameof(properties));
 
             _comparer = comparer ?? StringComparer.OrdinalIgnoreCase;
 
@@ -46,7 +46,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public PropertyResolver(IEnumerable<KeyValuePair<string, string>> properties, IEqualityComparer<string>? comparer = null, bool strict = false)
         {
-            properties.Verify(nameof(properties)).IsNotNull();
+            properties.VerifyNotNull(nameof(properties));
 
             _comparer = comparer ?? StringComparer.OrdinalIgnoreCase;
 
@@ -105,8 +105,8 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>new property resolver</returns>
         public IPropertyResolver With(string key, string value, PropertyUpdate propertyUpdate)
         {
-            key.Verify(nameof(key)).IsNotEmpty();
-            value.Verify(nameof(value)).IsNotEmpty();
+            key.VerifyNotEmpty(nameof(key));
+            value.VerifyNotEmpty(nameof(value));
 
             return With(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>(key, value) }, propertyUpdate);
         }
@@ -119,7 +119,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>new property resolver</returns>
         public IPropertyResolver With(IEnumerable<KeyValuePair<string, string>> values, PropertyUpdate propertyUpdate)
         {
-            values.Verify(nameof(values)).IsNotNull();
+            values.VerifyNotNull(nameof(values));
 
             if (!values.Any())
             {

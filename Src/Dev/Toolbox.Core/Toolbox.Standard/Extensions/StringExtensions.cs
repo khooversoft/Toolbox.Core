@@ -44,7 +44,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>return absolution path</returns>
         public static string GetAbsolutlePath(this string self, params string[] values)
         {
-            self.Verify(nameof(self)).IsNotEmpty();
+            self.VerifyNotEmpty(nameof(self));
 
             StringVector vectorValue = StringVector.Parse(self.Trim())
                 .With(values);
@@ -59,7 +59,7 @@ namespace Khooversoft.Toolbox.Standard
             {
                 if (item == "..")
                 {
-                    stack.Count.Verify().Assert<int, FormatException>(x => x > 0, $"Relative path format error: {vectorValue}, cannot process '../'");
+                    stack.Count.VerifyAssert<int, FormatException>(x => x > 0, _ => $"Relative path format error: {vectorValue}, cannot process '../'");
 
                     // Remove the last path vector
                     stack.Pop();

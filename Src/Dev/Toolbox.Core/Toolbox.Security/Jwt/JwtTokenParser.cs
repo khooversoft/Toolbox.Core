@@ -25,9 +25,9 @@ namespace Khooversoft.Toolbox.Security
     {
         public JwtTokenParser(IEnumerable<KeyValuePair<string, X509Certificate2>> certificates, IEnumerable<string> validIssuers, IEnumerable<string> validAudiences)
         {
-            certificates.Verify(nameof(certificates)).IsNotNull();
-            validIssuers.Verify(nameof(validIssuers)).IsNotNull();
-            validAudiences.Verify(nameof(validAudiences)).IsNotNull();
+            certificates.VerifyNotNull(nameof(certificates));
+            validIssuers.VerifyNotNull(nameof(validIssuers));
+            validAudiences.VerifyNotNull(nameof(validAudiences));
 
             Certificates = certificates.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
             ValidIssuers = new List<string>(validIssuers);
@@ -36,8 +36,8 @@ namespace Khooversoft.Toolbox.Security
 
         public JwtTokenParser(IEnumerable<RsaPublicPrivateKey> rsaPublicPrivateKeys, IEnumerable<string> validIssuers, IEnumerable<string> validAudiences)
         {
-            validIssuers.Verify(nameof(validIssuers)).IsNotNull();
-            validAudiences.Verify(nameof(validAudiences)).IsNotNull();
+            validIssuers.VerifyNotNull(nameof(validIssuers));
+            validAudiences.VerifyNotNull(nameof(validAudiences));
 
             RsaPublicPrivateKey = rsaPublicPrivateKeys.ToDictionary(x => x.Kid.ToString(), x => x, StringComparer.OrdinalIgnoreCase); ;
             ValidIssuers = new List<string>(validIssuers);
@@ -76,8 +76,8 @@ namespace Khooversoft.Toolbox.Security
         /// <returns>token details or null</returns>
         public JwtTokenDetails? Parse(IWorkContext context, string token)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            token.Verify(nameof(token)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            token.VerifyNotNull(nameof(token));
 
             try
             {

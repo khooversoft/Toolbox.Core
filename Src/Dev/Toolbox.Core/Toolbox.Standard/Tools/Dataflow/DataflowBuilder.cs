@@ -30,12 +30,12 @@ namespace Khooversoft.Toolbox.Standard
             var stack = new Stack<IDataflow<T>>(_targets.Reverse());
             var rootStack = new Stack<ISourceBlock<T>>();
 
-            while(stack.TryPop(out IDataflow<T> target))
+            while (stack.TryPop(out IDataflow<T> target))
             {
                 switch (target)
                 {
                     case PopMarker popMarker:
-                        rootStack.Count.Verify().Assert<int, InvalidOperationException>(x => x > 0, "Root stack is empty");
+                        rootStack.Count.VerifyAssert<int, InvalidOperationException>(x => x > 0, _ => "Root stack is empty");
                         rootStack.Pop();
                         break;
 
@@ -43,7 +43,7 @@ namespace Khooversoft.Toolbox.Standard
                         var broadcastBlock = new BroadcastBlock<T>(x => x);
                         blockList.Add(broadcastBlock);
 
-                        if( rootStack.Count > 0) rootStack.Peek().LinkTo(broadcastBlock, option, x => broadcast.Predicate(x));
+                        if (rootStack.Count > 0) rootStack.Peek().LinkTo(broadcastBlock, option, x => broadcast.Predicate(x));
                         rootStack.Push(broadcastBlock);
 
                         stack.Push(new PopMarker());

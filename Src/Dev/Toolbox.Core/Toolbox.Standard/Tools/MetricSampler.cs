@@ -64,7 +64,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public MetricSampler Start()
         {
-            _isStopped.Verify().Assert(x => x == false, "Sampler has been stopped");
+            _isStopped.VerifyAssert(x => x == false, _ => "Sampler has been stopped");
 
             lock (_lock)
             {
@@ -80,7 +80,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public MetricSampler Add(float value)
         {
-            _isRunning.Verify().Assert(x => x == true, "Sampler is not running");
+            _isRunning.VerifyAssert(x => x == true, _ => "Sampler is not running");
 
             lock (_lock)
             {
@@ -133,8 +133,7 @@ namespace Khooversoft.Toolbox.Standard
             finally
             {
                 Interlocked.CompareExchange(ref _reduceIsRunning, 0, 1)
-                    .Verify()
-                    .Assert(x => x == 1, "Running tracking state is invalid");
+                    .VerifyAssert(x => x == 1, "Running tracking state is invalid");
             }
         }
 

@@ -13,7 +13,7 @@ namespace Khooversoft.MessageNet.Interface
     {
         public static T GetMessageContent<T>(this MessageContent subject) where T : class
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             switch (subject.ContentType)
             {

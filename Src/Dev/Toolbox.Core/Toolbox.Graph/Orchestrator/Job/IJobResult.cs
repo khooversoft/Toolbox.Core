@@ -13,9 +13,9 @@ namespace KHooversoft.Toolbox.Graph
 
         JobStatus Status { get; }
 
-        AggregateException Exception { get; }
+        AggregateException? Exception { get; }
 
-        IReadOnlyList<string> Errors { get; }
+        IReadOnlyList<string>? Errors { get; }
 
         TimeSpan? Duration { get; }
     }

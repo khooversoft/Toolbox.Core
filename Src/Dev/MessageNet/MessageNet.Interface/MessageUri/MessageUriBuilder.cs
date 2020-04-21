@@ -119,9 +119,9 @@ namespace Khooversoft.MessageNet.Interface
 
                             string token;
 
-                            stack.TryPop(out token).Verify().Assert(x => x == true && token == ":", syntaxError);
-                            stack.TryPop(out token).Verify().Assert(x => x == true && token == "/", syntaxError);
-                            stack.TryPop(out token).Verify().Assert(x => x == true && token == "/", syntaxError);
+                            stack.TryPop(out token).VerifyAssert(x => x == true && token == ":", syntaxError);
+                            stack.TryPop(out token).VerifyAssert(x => x == true && token == "/", syntaxError);
+                            stack.TryPop(out token).VerifyAssert(x => x == true && token == "/", syntaxError);
                             break;
 
                         default:
@@ -131,9 +131,9 @@ namespace Khooversoft.MessageNet.Interface
                     }
                 },
                 x => builder.Namespace = x,
-                x => x.Verify().Assert(x => x == "/", syntaxError),
+                x => x.VerifyAssert(x => x == "/", syntaxError),
                 x => builder.NetworkId = x,
-                x => x.Verify().Assert(x => x == "/", syntaxError),
+                x => x.VerifyAssert(x => x == "/", syntaxError),
                 x => builder.NodeId = x,
                 x => builder.Route = new StringVectorBuilder().Add(x.ToEnumerable().Concat(stack.Drain()).ToArray()),
             }
@@ -145,7 +145,7 @@ namespace Khooversoft.MessageNet.Interface
                 instructionStack.Pop()(stack.Pop());
             }
 
-            (stack.Count == 0 && instructionStack.Count <= 1).Verify().Assert(x => x == true, syntaxError);
+            (stack.Count == 0 && instructionStack.Count <= 1).VerifyAssert(x => x == true, syntaxError);
 
             return builder;
         }

@@ -14,7 +14,7 @@ namespace Khooversoft.Toolbox.Standard
     {
         public ActionDataflow(Action<T> action)
         {
-            action.Verify(nameof(action)).IsNotNull();
+            action.VerifyNotNull(nameof(action));
             Action = action;
             Predicate = x => true;
         }
@@ -22,7 +22,7 @@ namespace Khooversoft.Toolbox.Standard
         public ActionDataflow(Action<T> action, Func<T, bool> predicate)
             : this(action)
         {
-            predicate.Verify(nameof(predicate)).IsNotNull();
+            predicate.VerifyNotNull(nameof(predicate));
 
             Predicate = predicate;
         }

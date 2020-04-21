@@ -12,8 +12,8 @@ namespace Khooversoft.Toolbox.Azure
     {
         public BlobStoreConnection(string containerName, string connectionString)
         {
-            containerName.Verify(nameof(containerName)).IsNotEmpty();
-            connectionString.Verify(nameof(connectionString)).IsNotEmpty();
+            containerName.VerifyNotEmpty(nameof(containerName));
+            connectionString.VerifyNotEmpty(nameof(connectionString));
 
             ContainerName = containerName;
             ConnectionString = connectionString;

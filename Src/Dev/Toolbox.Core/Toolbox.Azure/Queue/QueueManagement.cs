@@ -17,7 +17,7 @@ namespace Khooversoft.Toolbox.Azure
 
         public QueueManagement(string connectionString)
         {
-            connectionString.Verify(nameof(connectionString)).IsNotEmpty();
+            connectionString.VerifyNotEmpty(nameof(connectionString));
 
             _managementClient = new ManagementClient(connectionString);
             ConnectionString = connectionString;
@@ -27,16 +27,16 @@ namespace Khooversoft.Toolbox.Azure
 
         public Task<bool> QueueExists(IWorkContext context, string queueName)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            queueName.Verify(nameof(queueName)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            queueName.VerifyNotEmpty(nameof(queueName));
 
             return _managementClient.QueueExistsAsync(queueName, context.CancellationToken);
         }
 
         public async Task<QueueDefinition> UpdateQueue(IWorkContext context, QueueDefinition queueDefinition)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            queueDefinition.Verify(nameof(queueDefinition)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            queueDefinition.VerifyNotNull(nameof(queueDefinition));
 
             QueueDescription result = await _managementClient.UpdateQueueAsync(queueDefinition.ConvertTo(), context.CancellationToken);
 
@@ -45,8 +45,8 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task<QueueDefinition> CreateQueue(IWorkContext context, QueueDefinition queueDefinition)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            queueDefinition.Verify(nameof(queueDefinition)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            queueDefinition.VerifyNotNull(nameof(queueDefinition));
 
             QueueDescription createdDescription = await _managementClient.CreateQueueAsync(queueDefinition.ConvertTo(), context.CancellationToken);
             return createdDescription.ConvertTo();
@@ -54,8 +54,8 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task<QueueDefinition> GetQueue(IWorkContext context, string queueName)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            queueName.Verify(nameof(queueName)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            queueName.VerifyNotEmpty(nameof(queueName));
 
             QueueDescription queueDescription = await _managementClient.GetQueueAsync(queueName, context.CancellationToken);
             return queueDescription.ConvertTo();
@@ -63,15 +63,15 @@ namespace Khooversoft.Toolbox.Azure
 
         public Task DeleteQueue(IWorkContext context, string queueName)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            queueName.Verify(nameof(queueName)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            queueName.VerifyNotEmpty(nameof(queueName));
 
             return _managementClient.DeleteQueueAsync(queueName, context.CancellationToken);
         }
 
         public async Task<IReadOnlyList<QueueDefinition>> Search(IWorkContext context, string? search = null, int maxSize = 100)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             List<QueueDefinition> list = new List<QueueDefinition>();
             int windowSize = 100;

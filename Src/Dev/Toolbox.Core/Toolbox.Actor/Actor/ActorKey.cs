@@ -22,7 +22,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="vectorKey"></param>
         public ActorKey(string vectorKey)
         {
-            vectorKey.Verify(nameof(vectorKey)).IsNotNull();
+            vectorKey.VerifyNotNull(nameof(vectorKey));
 
             VectorKey = vectorKey;
             Key = VectorKey.ToLowerInvariant().ToGuid();
@@ -62,7 +62,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="actorKey"></param>
         public static explicit operator string(ActorKey actorKey)
         {
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
+            actorKey.VerifyNotNull(nameof(actorKey));
 
             return actorKey.VectorKey;
         }

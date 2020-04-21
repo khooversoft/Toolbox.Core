@@ -15,20 +15,20 @@ namespace KHooversoft.Toolbox.Graph
         private readonly HashSet<TKey> _stopNodeKeys;
         private readonly object _lock = new object();
 
-        public GraphTopologicalContext(IEqualityComparer<TKey> equalityComparer = null)
+        public GraphTopologicalContext(IEqualityComparer<TKey>? equalityComparer = null)
         {
             equalityComparer = equalityComparer ??
-                ((typeof(TKey) == typeof(string)) ? (IEqualityComparer<TKey>)StringComparer.OrdinalIgnoreCase : (IEqualityComparer<TKey>)null);
+                ((typeof(TKey) == typeof(string)) ? (IEqualityComparer<TKey>)StringComparer.OrdinalIgnoreCase : (IEqualityComparer<TKey>?)null);
 
             EdgeType = typeof(TEdge);
             _processedNodeKeys = new HashSet<TKey>(equalityComparer);
             _stopNodeKeys = new HashSet<TKey>(equalityComparer);
         }
 
-        public GraphTopologicalContext(int maxLevels, IEqualityComparer<TKey> equalityComparer = null)
+        public GraphTopologicalContext(int maxLevels, IEqualityComparer<TKey>? equalityComparer = null)
             : this(equalityComparer)
         {
-            maxLevels.Verify(nameof(maxLevels)).Assert(x => x > 0, "Max levels must be greater then 0");
+            maxLevels.VerifyAssert(x => x > 0, "Max levels must be greater then 0");
 
             MaxLevels = maxLevels;
         }

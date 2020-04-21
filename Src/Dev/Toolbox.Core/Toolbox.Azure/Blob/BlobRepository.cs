@@ -22,7 +22,7 @@ namespace Khooversoft.Toolbox.Azure
 
         public BlobRepository(BlobStoreConnection blobStoreConnection)
         {
-            blobStoreConnection.Verify(nameof(blobStoreConnection)).IsNotNull();
+            blobStoreConnection.VerifyNotNull(nameof(blobStoreConnection));
 
             _blobStoreConnection = blobStoreConnection;
             var client = new BlobServiceClient(_blobStoreConnection.ConnectionString);
@@ -31,7 +31,7 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task CreateContainer(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             int count = 0;
             const int max = 10;
@@ -56,23 +56,23 @@ namespace Khooversoft.Toolbox.Azure
 
         public Task DeleteContainer(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             return _containerClient.DeleteIfExistsAsync(cancellationToken: context.CancellationToken);
         }
 
         public async Task<bool> Exists(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             return (await _containerClient.ExistsAsync(context.CancellationToken)).Value;
         }
 
         public async Task Set(IWorkContext context, string path, string data)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            path.Verify(nameof(path)).IsNotEmpty();
-            data.Verify(nameof(data)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            path.VerifyNotEmpty(nameof(path));
+            data.VerifyNotEmpty(nameof(data));
 
             using Stream content = new MemoryStream(Encoding.UTF8.GetBytes(data));
             await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
@@ -80,8 +80,8 @@ namespace Khooversoft.Toolbox.Azure
 
         public Task Set<T>(IWorkContext context, string path, T data) where T : class
         {
-            path.Verify(nameof(path)).IsNotNull();
-            data.Verify(nameof(data)).IsNotNull();
+            path.VerifyNotEmpty(nameof(path));
+            data.VerifyNotNull(nameof(data));
 
             string subject = JsonConvert.SerializeObject(data);
             return Set(context, path, subject);
@@ -89,8 +89,8 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task<string> Get(IWorkContext context, string path)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            path.Verify(nameof(path)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            path.VerifyNotEmpty(nameof(path));
 
             BlobClient blobClient = _containerClient.GetBlobClient(path);
             BlobDownloadInfo download = await blobClient.DownloadAsync();
@@ -115,8 +115,8 @@ namespace Khooversoft.Toolbox.Azure
 
         public Task Delete(IWorkContext context, string path)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            path.Verify(nameof(path)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            path.VerifyNotEmpty(nameof(path));
 
             return _containerClient.DeleteBlobIfExistsAsync(path, cancellationToken: context.CancellationToken);
         }
@@ -135,9 +135,9 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task Upload(IWorkContext context, string path, IEnumerable<byte> content)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            path.Verify(nameof(path)).IsNotEmpty();
-            content.Verify(nameof(content)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            path.VerifyNotEmpty(nameof(path));
+            content.VerifyNotNull(nameof(content));
 
             using var memoryBuffer = new MemoryStream(content.ToArray());
             await _containerClient.UploadBlobAsync(path, memoryBuffer, context.CancellationToken);
@@ -145,17 +145,17 @@ namespace Khooversoft.Toolbox.Azure
 
         public async Task Upload(IWorkContext context, string path, Stream content)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            path.Verify(nameof(path)).IsNotEmpty();
-            content.Verify(nameof(content)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            path.VerifyNotEmpty(nameof(path));
+            content.VerifyNotNull(nameof(content));
 
             await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
         }
 
         public async Task<IReadOnlyList<byte>> Download(IWorkContext context, string path)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            path.Verify(nameof(path)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            path.VerifyNotEmpty(nameof(path));
 
             BlobClient blobClient = _containerClient.GetBlobClient(path);
             BlobDownloadInfo download = await blobClient.DownloadAsync();

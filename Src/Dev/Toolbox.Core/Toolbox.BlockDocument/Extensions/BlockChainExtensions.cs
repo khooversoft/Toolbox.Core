@@ -17,8 +17,8 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public static Stream ToZipContainer(this BlockChain blockChain, IWorkContext context)
         {
-            blockChain.Verify(nameof(blockChain)).IsNotNull();
-            blockChain.IsValid().Verify().Assert(x => x == true, "Block chain is not valid");
+            blockChain.VerifyNotNull(nameof(blockChain));
+            blockChain.IsValid().VerifyAssert(x => x == true, "Block chain is not valid");
 
             var writeMemoryBuffer = new MemoryStream();
             using var writer = new ZipContainerWriter(new ZipArchive(writeMemoryBuffer, ZipArchiveMode.Create, leaveOpen: true));
@@ -36,7 +36,7 @@ namespace Khooversoft.Toolbox.BlockDocument
                 writer.Close();
             }
 
-            writeMemoryBuffer.Length.Verify().Assert(x => x > 0, "ZipContainer memory buffer length is zero");
+            writeMemoryBuffer.Length.VerifyAssert(x => x > 0, "ZipContainer memory buffer length is zero");
             writeMemoryBuffer.Seek(0, SeekOrigin.Begin);
 
             return writeMemoryBuffer;
@@ -44,7 +44,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public static BlockChain ToBlockChain(this Stream readFromStream, IWorkContext context)
         {
-            readFromStream.Verify(nameof(readFromStream)).IsNotNull();
+            readFromStream.VerifyNotNull(nameof(readFromStream));
 
             using var reader = new ZipContainerReader(new ZipArchive(readFromStream, ZipArchiveMode.Read));
 
@@ -52,10 +52,10 @@ namespace Khooversoft.Toolbox.BlockDocument
             string blockChainHash = reader.Read(context, _merkleTreeHash);
 
             BlockChain result = readJson.ToBlockChain();
-            result.IsValid().Verify().Assert(x => x == true, "Read block chain is invalid");
+            result.IsValid().VerifyAssert(x => x == true, "Read block chain is invalid");
             string resultChainHash = result.ToMerkleTree().BuildTree().ToString();
 
-            (blockChainHash == resultChainHash).Verify().Assert(x => x == true, "Merkle hash does not match, block chain is invalid");
+            (blockChainHash == resultChainHash).VerifyAssert(x => x == true, "Merkle hash does not match, block chain is invalid");
             return result;
         }
     }

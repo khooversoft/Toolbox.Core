@@ -19,8 +19,8 @@ namespace Khooversoft.Toolbox.Azure
 
         public RemoveQueueState(IQueueManagement queueManagement, string queueName)
         {
-            queueManagement.Verify(nameof(queueManagement)).IsNotNull();
-            queueName.Verify(nameof(queueName)).IsNotEmpty();
+            queueManagement.VerifyNotNull(nameof(queueManagement));
+            queueName.VerifyNotEmpty(nameof(queueName));
 
             _managementClient = queueManagement;
             Name = queueName;

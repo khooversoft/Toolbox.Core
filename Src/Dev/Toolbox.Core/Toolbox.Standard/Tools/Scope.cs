@@ -18,7 +18,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public Scope(T value, Action<T> disposeAction)
         {
-            disposeAction.Verify(nameof(disposeAction)).IsNotNull();
+            disposeAction.VerifyNotNull(nameof(disposeAction));
 
             _action = disposeAction;
             Value = value;

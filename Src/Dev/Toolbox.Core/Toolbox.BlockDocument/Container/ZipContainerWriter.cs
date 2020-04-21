@@ -17,14 +17,14 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public ZipContainerWriter(ZipArchive zipArchive)
         {
-            zipArchive.Verify(nameof(zipArchive)).IsNotNull();
+            zipArchive.VerifyNotNull(nameof(zipArchive));
 
             _zipArchive = zipArchive;
         }
 
         public ZipContainerWriter(string filePath)
         {
-            filePath.Verify(nameof(filePath)).IsNotEmpty();
+            filePath.VerifyNotEmpty(nameof(filePath));
 
             FilePath = filePath;
         }
@@ -33,7 +33,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public ZipContainerWriter OpenFile(IWorkContext context)
         {
-            _zipArchive.Verify().Assert(x => x == null, "Zip archive already opened");
+            _zipArchive.VerifyAssert(x => x == null, "Zip archive already opened");
 
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
 
@@ -57,7 +57,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public ZipContainerWriter Write(IWorkContext context, string zipPath, string data)
         {
-            data.Verify(nameof(data)).IsNotEmpty();
+            data.VerifyNotEmpty(nameof(data));
 
             using var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(data));
             return Write(context, zipPath, memoryStream);
@@ -65,10 +65,10 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public ZipContainerWriter Write(IWorkContext context, string zipPath, Stream sourceStream)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            zipPath.Verify(nameof(zipPath)).IsNotEmpty();
-            sourceStream.Verify(nameof(sourceStream)).IsNotNull();
-            _zipArchive.Verify().IsNotNull("Not opened");
+            context.VerifyNotNull(nameof(context));
+            zipPath.VerifyNotEmpty(nameof(zipPath));
+            sourceStream.VerifyNotNull(nameof(sourceStream));
+            _zipArchive.VerifyNotNull("Not opened");
 
             ZipArchiveEntry entry = _zipArchive!.CreateEntry(zipPath);
 
@@ -78,9 +78,6 @@ namespace Khooversoft.Toolbox.BlockDocument
             return this;
         }
 
-        public void Dispose()
-        {
-            Close();
-        }
+        public void Dispose() => Close();
     }
 }

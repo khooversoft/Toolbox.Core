@@ -33,18 +33,8 @@ namespace Khooversoft.Toolbox.Security
 
         public RSAParameters? PrivateKey { get; }
 
-        public RSAParameters GetPublicKey()
-        {
-            return (RSAParameters)PublicKey
-                .Verify(nameof(PublicKey)).IsNotNull("PublicKey required")
-                .Value!;
-        }
+        public RSAParameters GetPublicKey() => PublicKey ?? throw new ArgumentException("PublicKey required");
 
-        public RSAParameters GetPrivateKey()
-        {
-            return (RSAParameters)PrivateKey
-                .Verify(nameof(PrivateKey)).IsNotNull("PrivateKey required")
-                .Value!;
-        }
+        public RSAParameters GetPrivateKey() => PrivateKey ?? throw new ArgumentException("PrivateKey required");
     }
 }

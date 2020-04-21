@@ -28,10 +28,10 @@ namespace ServiceBusPerformanceTest
         /// <returns></returns>
         public Task Run(IWorkContext context, int taskCount, Func<NetMessage, Task> receiver)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            context.Container.Verify(nameof(context.Container)).IsNotNull();
-            taskCount.Verify(nameof(taskCount)).Assert(x => x >= 1, "Number of task must greater or equal to 1");
-            receiver.Verify(nameof(receiver)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            context.Container.VerifyNotNull(nameof(context.Container));
+            taskCount.VerifyAssert(x => x >= 1, "Number of task must greater or equal to 1");
+            receiver.VerifyNotNull(nameof(receiver));
 
             var tasks = Enumerable.Range(0, taskCount)
                 .Select(x =>
@@ -48,7 +48,7 @@ namespace ServiceBusPerformanceTest
 
         public async Task Close()
         {
-            while(_messageProcessors.TryTake(out IMessageProcessor? messageProcessor))
+            while (_messageProcessors.TryTake(out IMessageProcessor? messageProcessor))
             {
                 await messageProcessor.Stop();
             }

@@ -67,18 +67,15 @@ namespace MicroserviceHost
 
             if (option.Help) { return option; }
 
-            option.Verify(nameof(option)).IsNotNull();
-            (option.Run || option.UnRegister).Verify().Assert("Run or UnRegister must be specified");
+            option.VerifyNotNull(nameof(option));
+            (option.Run || option.UnRegister).VerifyAssert(x => x, "Run or UnRegister must be specified");
             option.NamespaceConnections
-                .Verify(nameof(NamespaceConnections))
-                .IsNotNull()
-                .Value
-                .Do(x => x.Verify());
+                .VerifyNotNull(nameof(NamespaceConnections))
+                .ForEach(x => x.Verify());
 
             option.AssemblyPath
-                .Verify()
-                .IsNotEmpty($"{option.AssemblyPath} is required")
-                .Assert(x => File.Exists(x), $"{option.AssemblyPath} does not exist");
+                .VerifyNotEmpty($"{option.AssemblyPath} is required")
+                .VerifyAssert(x => File.Exists(x), $"{option.AssemblyPath} does not exist");
 
             option.Properties = option.BuildResolver();
             option.SecretManager = option.BuildSecretManager();

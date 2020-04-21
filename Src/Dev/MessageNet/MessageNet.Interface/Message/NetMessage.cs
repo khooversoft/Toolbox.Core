@@ -28,7 +28,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public NetMessage(IEnumerable<INetMessageItem> messageItems)
         {
-            messageItems.Verify(nameof(messageItems)).IsNotNull();
+            messageItems.VerifyNotNull(nameof(messageItems));
 
             Version = "1.0.0.0";
             MessageItems = messageItems.ToList();
@@ -36,14 +36,13 @@ namespace Khooversoft.MessageNet.Interface
             Header = MessageItems
                 .OfType<MessageHeader>()
                 .FirstOrDefault()
-                .Verify().IsNotNull("MessageHeader is not in message items")
-                .Value;
+                .VerifyNotNull("MessageHeader is not in message items");
         }
 
         public NetMessage(string version, IEnumerable<INetMessageItem> messageItems)
         {
-            version.Verify(nameof(version)).IsNotEmpty();
-            messageItems.Verify(nameof(messageItems)).IsNotNull();
+            version.VerifyNotEmpty(nameof(version));
+            messageItems.VerifyNotNull(nameof(messageItems));
 
             Version = version;
             MessageItems = messageItems.ToList();
@@ -51,8 +50,7 @@ namespace Khooversoft.MessageNet.Interface
             Header = MessageItems
                 .OfType<MessageHeader>()
                 .FirstOrDefault()
-                .Verify().IsNotNull("MessageHeader is not in message items")
-                .Value;
+                .VerifyNotNull("MessageHeader is not in message items");
         }
 
         /// <summary>

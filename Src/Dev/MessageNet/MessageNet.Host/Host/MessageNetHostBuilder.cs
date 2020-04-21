@@ -44,7 +44,7 @@ namespace Khooversoft.MessageNet.Host
 
         public MessageNetHostBuilder AddNodeReceiver(INodeHostReceiver nodeReceiver)
         {
-            nodeReceiver.Verify(nameof(nodeReceiver)).IsNotNull();
+            nodeReceiver.VerifyNotNull(nameof(nodeReceiver));
 
             NodeReceivers ??= (IList<INodeHostReceiver>)new List<NodeHostReceiver>();
             NodeReceivers.Add(nodeReceiver);
@@ -52,9 +52,6 @@ namespace Khooversoft.MessageNet.Host
             return this;
         }
 
-        public IMessageNetHost Build()
-        {
-            return new MessageNetHost(MessageNetConfig!, MessageRepository!, MessageAwaiterManager!, NodeReceivers);
-        }
+        public IMessageNetHost Build() => new MessageNetHost(MessageNetConfig!, MessageRepository!, MessageAwaiterManager!, NodeReceivers);
     }
 }

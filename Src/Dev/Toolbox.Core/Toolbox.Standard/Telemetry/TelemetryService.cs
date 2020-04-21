@@ -21,14 +21,14 @@ namespace Khooversoft.Toolbox.Standard
 
         public ITelemetry CreateLogger(string eventSourceName)
         {
-            eventSourceName.Verify(nameof(eventSourceName)).IsNotEmpty();
+            eventSourceName.VerifyNotEmpty(nameof(eventSourceName));
 
             return new LoggerProxy(this, eventSourceName);
         }
 
         public void Write(TelemetryMessage message)
         {
-            message.Verify(nameof(message)).IsNotNull();
+            message.VerifyNotNull(nameof(message));
 
             _dataflow.Post(message);
         }

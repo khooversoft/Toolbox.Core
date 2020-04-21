@@ -26,7 +26,7 @@ namespace Khooversoft.MessageNet.Interface
 
         public bool IsRole(string role)
         {
-            role.Verify(nameof(role)).IsNotEmpty();
+            role.VerifyNotEmpty(nameof(role));
 
             return Role.Equals(role, StringComparison.OrdinalIgnoreCase);
         }

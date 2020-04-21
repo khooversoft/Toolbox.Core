@@ -19,9 +19,9 @@ namespace Khooversoft.Toolbox.Azure
 
         public CreateBlobContainerState(IBlobRepository blobRepository, BlobStoreConnection blobStoreConnection)
         {
-            blobRepository.Verify(nameof(blobRepository)).IsNotNull();
-            blobStoreConnection.Verify(nameof(blobStoreConnection)).IsNotNull();
-            blobStoreConnection.ContainerName.Verify(nameof(blobStoreConnection.ContainerName)).IsNotNull();
+            blobRepository.VerifyNotNull(nameof(blobRepository));
+            blobStoreConnection.VerifyNotNull(nameof(blobStoreConnection));
+            blobStoreConnection.ContainerName.VerifyNotNull(nameof(blobStoreConnection.ContainerName));
 
             _blobStoreConnection = blobStoreConnection;
             _blobRepository = blobRepository;

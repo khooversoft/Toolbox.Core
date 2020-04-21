@@ -23,8 +23,8 @@ namespace Toolbox.Standard.Test.Collections
             cursor.Index.Should().Be(-1);
             cursor.Current.Should().Be(default);
             cursor.IsCursorAtEnd.Should().BeTrue();
-            cursor.TryNext(out int value1).Should().BeFalse();
-            cursor.TryPeek(out int value2).Should().BeFalse();
+            cursor.TryNextValue(out int value1).Should().BeFalse();
+            cursor.TryPeekValue(out int value2).Should().BeFalse();
         }
 
         [Fact]
@@ -38,15 +38,15 @@ namespace Toolbox.Standard.Test.Collections
             cursor.Index.Should().Be(-1);
             cursor.Current.Should().Be(default);
             cursor.IsCursorAtEnd.Should().BeTrue();
-            cursor.TryPeek(out int value2).Should().BeTrue();
+            cursor.TryPeekValue(out int value2).Should().BeTrue();
 
-            cursor.TryNext(out int value1).Should().BeTrue();
+            cursor.TryNextValue(out int value1).Should().BeTrue();
             value1.Should().Be(0);
             cursor.Index.Should().Be(0);
             cursor.Current.Should().Be(0);
             cursor.IsCursorAtEnd.Should().BeFalse();
 
-            cursor.TryNext(out int value3).Should().BeFalse();
+            cursor.TryNextValue(out int value3).Should().BeFalse();
             cursor.IsCursorAtEnd.Should().BeTrue();
         }
 
@@ -63,7 +63,7 @@ namespace Toolbox.Standard.Test.Collections
             cursor.IsCursorAtEnd.Should().BeTrue();
 
             int expectedValue = 0;
-            while(cursor.TryNext(out int value))
+            while(cursor.TryNextValue(out int value))
             {
                 value.Should().Be(expectedValue);
 
@@ -77,7 +77,7 @@ namespace Toolbox.Standard.Test.Collections
 
             cursor.Reset();
             expectedValue = 0;
-            while (cursor.TryNext(out int value))
+            while (cursor.TryNextValue(out int value))
             {
                 value.Should().Be(expectedValue);
 

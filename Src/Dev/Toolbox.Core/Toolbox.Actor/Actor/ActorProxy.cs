@@ -34,9 +34,9 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns>proxy</returns>
         public static T Create(IWorkContext context, IActorBase instance, IActorManager manager)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            instance.Verify(nameof(instance)).IsNotNull();
-            manager.Verify(nameof(manager)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            instance.VerifyNotNull(nameof(instance));
+            manager.VerifyNotNull(nameof(manager));
 
             object proxyObject = Create<T, ActorProxy<T>>();
 

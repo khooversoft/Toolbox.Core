@@ -24,8 +24,8 @@ namespace Khooversoft.Toolbox.Standard
 
         public ContainerRegistrationModule Add(Type objectType, Type interfaceType, bool instancePerLifetimeScope = false)
         {
-            objectType.Verify(nameof(objectType)).IsNotNull();
-            interfaceType.Verify(nameof(interfaceType)).IsNotNull();
+            objectType.VerifyNotNull(nameof(objectType));
+            interfaceType.VerifyNotNull(nameof(interfaceType));
 
             _list.Add(new ModuleTypeRegistration(objectType, interfaceType, instancePerLifetimeScope));
             return this;
@@ -33,7 +33,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public ContainerRegistrationModule Add(params ModuleTypeRegistration[] keyValuePairs)
         {
-            keyValuePairs.Verify(nameof(keyValuePairs)).IsNotNull();
+            keyValuePairs.VerifyNotNull(nameof(keyValuePairs));
 
             _list.AddRange(keyValuePairs);
             return this;

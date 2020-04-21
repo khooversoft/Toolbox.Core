@@ -12,8 +12,8 @@ namespace Khooversoft.MessageNet.Host
     {
         public NamespaceRegistration(string nameSpace, string connectionString)
         {
-            nameSpace.Verify(nameof(nameSpace)).IsNotEmpty();
-            connectionString.Verify(nameof(connectionString)).IsNotEmpty();
+            nameSpace.VerifyNotEmpty(nameof(nameSpace));
+            connectionString.VerifyNotEmpty(nameof(connectionString));
 
             Namespace = nameSpace;
             ConnectionString = connectionString;

@@ -39,7 +39,7 @@ namespace Khooversoft.Toolbox.Standard
             }
 
             var md = JsonConvert.DeserializeObject<TelemetryMessageModel>(jsonMessage);
-            md.Verify(nameof(md)).IsNotNull();
+            md.VerifyNotNull(nameof(md));
 
             IWorkContext context = new WorkContextBuilder()
             {

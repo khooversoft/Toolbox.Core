@@ -31,7 +31,7 @@ namespace Khooversoft.Toolbox.Configuration
             // Add json file using the order of 'includeArgumentNames' as precedent
             var files = arguments
                 .Join(searchForKeys, x => x.Key, x => x, (arg, key) => arg, StringComparer.OrdinalIgnoreCase)
-                .Select(x => x.Value.Do(Path.GetFullPath))
+                .Select(x => x.Value.Func(Path.GetFullPath))
                 .ToList();
 
             var filesToSearch = files
@@ -48,7 +48,7 @@ namespace Khooversoft.Toolbox.Configuration
 
                 var newFiles = searchForKeys
                     .SelectMany(x => configuration.GetSection(x).GetChildren())
-                    .Select(x => Path.Combine(configFolder, x.Value).Do(Path.GetFullPath))
+                    .Select(x => Path.GetFullPath(Path.Combine(configFolder, x.Value)))
                     .Where(x => !files.Any(y => y.Equals(x, StringComparison.OrdinalIgnoreCase)))
                     .ToList();
 

@@ -95,7 +95,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public void Add(IEnumerable<float> dataItems)
         {
-            dataItems.Verify(nameof(dataItems)).IsNotNull();
+            dataItems.VerifyNotNull(nameof(dataItems));
             _statsComputed = false;
 
             lock (_lock)

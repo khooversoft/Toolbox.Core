@@ -12,12 +12,11 @@ namespace KHooversoft.Toolbox.Graph
     {
         public GraphEdge(TKey fromNodeKey, TKey toNodeKey)
         {
-            Key = Guid.NewGuid();
             FromNodeKey = fromNodeKey;
             ToNodeKey = toNodeKey;
         }
 
-        public Guid Key { get; }
+        public Guid Key { get; } = Guid.NewGuid();
 
         public TKey FromNodeKey { get; }
 

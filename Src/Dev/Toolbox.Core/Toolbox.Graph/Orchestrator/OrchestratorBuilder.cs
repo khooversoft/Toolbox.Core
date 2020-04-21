@@ -11,16 +11,16 @@ namespace KHooversoft.Toolbox.Graph
     {
         public OrchestratorBuilder(GraphMap<TKey, TNode, TEdge> graph)
         {
-            graph.Verify(nameof(graph)).IsNotNull();
+            graph.VerifyNotNull(nameof(graph));
 
             Graph = graph;
         }
 
         public GraphMap<TKey, TNode, TEdge> Graph { get; }
 
-        public OrchestratorHost<TKey, TNode, TEdge> Build(IJobHost jobHost = null, int? maxJobParallel = null)
+        public OrchestratorHost<TKey, TNode, TEdge> Build(IJobHost? jobHost = null, int? maxJobParallel = null)
         {
-            jobHost = jobHost ?? new JobHost();
+            jobHost ??= new JobHost();
             return new OrchestratorHost<TKey, TNode, TEdge>(Graph, jobHost, maxJobParallel);
         }
     }

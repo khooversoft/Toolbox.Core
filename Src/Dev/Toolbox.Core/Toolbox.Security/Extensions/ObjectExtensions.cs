@@ -19,11 +19,11 @@ namespace Khooversoft.Toolbox.Security
         /// <returns>hash as base 64</returns>
         public static string ToSHA256Hash(this IEnumerable<byte> inputBytes)
         {
-            inputBytes.Verify().IsNotNull();
+            inputBytes.VerifyNotNull(nameof(inputBytes));
 
             return SHA256.Create()
                 .ComputeHash(inputBytes.ToArray())
-                .Do(Convert.ToBase64String);
+                .Func(Convert.ToBase64String);
         }
     }
 }

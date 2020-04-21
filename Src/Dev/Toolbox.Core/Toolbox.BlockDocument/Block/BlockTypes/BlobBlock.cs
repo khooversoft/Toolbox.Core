@@ -14,13 +14,12 @@ namespace Khooversoft.Toolbox.BlockDocument
     {
         public BlobBlock(string name, string contentType, string author, IReadOnlyList<byte> content)
         {
-            name.Verify(nameof(name)).IsNotEmpty();
-            contentType.Verify(nameof(contentType)).IsNotEmpty();
-            author.Verify(nameof(author)).IsNotEmpty();
+            name.VerifyNotEmpty(nameof(name));
+            contentType.VerifyNotEmpty(nameof(contentType));
+            author.VerifyNotEmpty(nameof(author));
 
-            content.Verify(nameof(content))
-                .IsNotNull()
-                .Assert(x => x.Count > 0, "Content must have content");
+            content.VerifyNotNull(nameof(content))
+                .VerifyAssert(x => x.Count > 0, "Content must have content");
 
             Name = name;
             ContentType = contentType;
@@ -40,7 +39,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public string Digest { get; }
 
-        public string GetDigest() => $"{Name}-{ContentType}-{Author}-{Content.ToArray().Do(Convert.ToBase64String)}"
+        public string GetDigest() => $"{Name}-{ContentType}-{Author}-{Convert.ToBase64String(Content.ToArray())}"
                 .ToBytes()
                 .Concat(Content)
                 .ToSHA256Hash();

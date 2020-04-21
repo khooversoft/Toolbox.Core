@@ -18,10 +18,10 @@ namespace Khooversoft.Toolbox.Standard
 
         public DataflowSource(IEnumerable<IDataflowBlock> dataflowBlocks)
         {
-            dataflowBlocks.Verify(nameof(dataflowBlocks)).IsNotNull();
+            dataflowBlocks.VerifyNotNull(nameof(dataflowBlocks));
 
             _dataflowBlocks = dataflowBlocks.ToList();
-            _dataflowBlocks.Count.Verify(nameof(dataflowBlocks)).Assert(x => x > 0, $"{nameof(dataflowBlocks)} count must be greater than 0");
+            _dataflowBlocks.Count.VerifyAssert(x => x > 0, _ => $"{nameof(dataflowBlocks)} count must be greater than 0");
 
             _root = _dataflowBlocks.First() as ITargetBlock<T> ?? throw new ArgumentException($"First block must be implement ITargetBlock<T> interface");
         }
@@ -40,8 +40,8 @@ namespace Khooversoft.Toolbox.Standard
         public void Dispose()
         {
             IList<IDataflowBlock> dataflowBlocks = Interlocked.Exchange(ref _dataflowBlocks, null!);
-            
-            if( dataflowBlocks != null)
+
+            if (dataflowBlocks != null)
             {
                 Complete();
                 Completion.GetAwaiter().GetResult();

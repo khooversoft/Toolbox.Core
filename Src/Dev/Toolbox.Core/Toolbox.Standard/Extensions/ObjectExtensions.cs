@@ -19,27 +19,10 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>true if nullable, false if not</returns>
         public static bool IsNullableType(this Type type)
         {
-            type.Verify(nameof(type)).IsNotNull();
+            type.VerifyNotNull(nameof(type));
 
             return type.IsGenericType && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
         }
-
-        /// <summary>
-        /// Do action on any object, used for fluent patterns, acts like a F# function in a pipe
-        /// </summary>
-        /// <typeparam name="T">object to work on</typeparam>
-        /// <param name="self">instance of object</param>
-        /// <param name="func">function to perform work</param>
-        public static void Do<T>(this T self, Action<T> action) => action(self);
-
-        /// <summary>
-        /// Do action on any object, used for fluent patterns, acts like a F# function in a pipe
-        /// </summary>
-        /// <typeparam name="T">object to work on</typeparam>
-        /// <param name="self">instance of object</param>
-        /// <param name="func">function to perform work</param>
-        /// <returns>results</returns>
-        public static TResult Do<T, TResult>(this T self, Func<T, TResult> func) => func(self);
 
         /// <summary>
         /// Set property value based on name.  Handles null-able, enum, and guid along with base types
@@ -49,8 +32,8 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="valueToSet">value to set</param>
         public static void SetPropertyValue(this object objectToSet, string propertyName, object? valueToSet)
         {
-            objectToSet.Verify(nameof(objectToSet)).IsNotNull();
-            propertyName.Verify(nameof(propertyName)).IsNotEmpty();
+            objectToSet.VerifyNotNull(nameof(objectToSet));
+            propertyName.VerifyNotEmpty(nameof(propertyName));
 
             Type type = objectToSet.GetType();
 

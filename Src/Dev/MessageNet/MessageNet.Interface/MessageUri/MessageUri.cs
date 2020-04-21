@@ -14,7 +14,7 @@ namespace Khooversoft.MessageNet.Interface
     {
         private const string _protocolPatternText = @"^[a-zA-Z][a-zA-Z0-9]+$";
 
-        private readonly Regex _pattern = new Regex(_protocolPatternText, RegexOptions.Compiled);
+        private static readonly Regex _pattern = new Regex(_protocolPatternText, RegexOptions.Compiled);
 
         public MessageUri(string nameSpace, string networkId, string nodeId)
             : this(null, nameSpace, networkId, nodeId)
@@ -29,15 +29,15 @@ namespace Khooversoft.MessageNet.Interface
 
             QueueId.Verify(nameSpace, networkId, nodeId);
 
-            Protocol = protocol.Verify(nameof(protocol)).Assert(x => _pattern.Match(x).Success, $"Is not valid, regex={_protocolPatternText}").Value;
+            Protocol = protocol.VerifyAssert(x => _pattern.Match(x).Success, $"Is not valid, regex={_protocolPatternText}");
             Namespace = nameSpace;
             NetworkId = networkId;
             NodeId = nodeId;
 
             Route = route
                 ?.Split("/", StringSplitOptions.RemoveEmptyEntries)
-                ?.Select(x => x.Verify("route").Assert(x => _pattern.Match(x).Success, $"route is not value, regex={_protocolPatternText}").Value)
-                ?.Do(x => string.Join("/", x));
+                ?.Select(x => x.VerifyAssert(x => _pattern.Match(x).Success, $"route is not value, regex={_protocolPatternText}"))
+                ?.Func(x => string.Join("/", x));
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Khooversoft.MessageNet.Interface
         public override string ToString()
         {
             return $"{Protocol}://{Namespace}/{NetworkId}/{NodeId}"
-                .Do(x => Route.IsEmpty() ? x : $"{x}/{Route}");
+                .Func(x => Route.IsEmpty() ? x : $"{x}/{Route}");
         }
 
         public string ToString(string format)

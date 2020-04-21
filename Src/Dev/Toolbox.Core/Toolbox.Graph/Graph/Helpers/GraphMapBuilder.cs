@@ -25,9 +25,9 @@ namespace KHooversoft.Toolbox.Graph
 
         public GraphMapBuilder(Func<TKey, IGraphNode<TKey>> createNode, Func<TKey, TKey, IGraphEdge<TKey>> createEdge, Func<TKey, TKey, IGraphEdge<TKey>> createDepondsEdge)
         {
-            createNode.Verify(nameof(createNode)).IsNotNull();
-            createEdge.Verify(nameof(createEdge)).IsNotNull();
-            createDepondsEdge.Verify(nameof(createDepondsEdge)).IsNotNull();
+            createNode.VerifyNotNull(nameof(createNode));
+            createEdge.VerifyNotNull(nameof(createEdge));
+            createDepondsEdge.VerifyNotNull(nameof(createDepondsEdge));
 
             CreateNode = createNode;
             CreateEdge = createEdge;
@@ -48,14 +48,14 @@ namespace KHooversoft.Toolbox.Graph
             return this;
         }
 
-        public TResult Build<TResult>(Func<TResult> createGraphMap = null)
+        public TResult Build<TResult>(Func<TResult>? createGraphMap = null)
             where TResult : GraphMap<TKey, TNode, TEdge>
         {
             TResult map = createGraphMap?.Invoke() ?? (TResult)new GraphMap<TKey, TNode, TEdge>();
 
             foreach (var item in _items)
             {
-                AddItem(map, item, default);
+                AddItem(map, item, default!);
             }
 
             return map;
@@ -68,7 +68,7 @@ namespace KHooversoft.Toolbox.Graph
                 case NodeMap<TKey> node:
                     map.Add((TNode)CreateNode(node.Key));
 
-                    if (!EqualityComparer<TKey>.Default.Equals(parentKey, default(TKey)))
+                    if (!EqualityComparer<TKey>.Default.Equals(parentKey, default!))
                     {
                         map.Add((TEdge)CreateEdge(parentKey, node.Key));
                     }
@@ -121,14 +121,8 @@ namespace KHooversoft.Toolbox.Graph
             }
         }
 
-        public IEnumerator<IGraphCommon> GetEnumerator()
-        {
-            return _items.GetEnumerator();
-        }
+        public IEnumerator<IGraphCommon> GetEnumerator() => _items.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _items.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
     }
 }

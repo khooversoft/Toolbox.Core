@@ -55,7 +55,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public LocalProcess SetRemoveBlankLine(bool value) { RemoveBlankLine = value; return this; }
 
-        public LocalProcess SetFile(string value) { File = value.Verify(nameof(value)).IsNotEmpty().Value; return this; }
+        public LocalProcess SetFile(string value) { File = value.VerifyNotEmpty(nameof(value)); return this; }
 
         public LocalProcess SetArguments(string value) { Arguments = value; return this; }
 
@@ -92,8 +92,8 @@ namespace Khooversoft.Toolbox.Standard
 
         public Task<LocalProcess> Start(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            File!.Verify(nameof(File)).IsNotEmpty();
+            context.VerifyNotNull(nameof(context));
+            File!.VerifyNotEmpty(nameof(File));
 
             _outputList = CaptureOutput ? new List<string>() : null;
 
@@ -159,8 +159,7 @@ namespace Khooversoft.Toolbox.Standard
 
             // Start process
             Process.Start()
-                .Verify()
-                .Assert(x => x == true, $"{nameof(LocalProcess)}: Could not start process");
+                .VerifyAssert(x => x == true, $"{nameof(LocalProcess)}: Could not start process");
 
             Process.BeginOutputReadLine();
             Process.BeginErrorReadLine();

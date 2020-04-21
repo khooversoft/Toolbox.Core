@@ -11,9 +11,8 @@ namespace Khooversoft.MessageNet.Host
         public MessageNetConfig(params NamespaceRegistration[] namespaceRegistrations)
         {
             namespaceRegistrations
-                .Verify(nameof(namespaceRegistrations))
-                .IsNotNull()
-                .Assert(x => x.Count() > 0, "Must have at least one registration");
+                .VerifyNotNull(nameof(namespaceRegistrations))
+                .VerifyAssert(x => x.Count() > 0, "Must have at least one registration");
 
             Registrations = namespaceRegistrations.ToDictionary(x => x.Namespace, x => x, StringComparer.OrdinalIgnoreCase);
         }

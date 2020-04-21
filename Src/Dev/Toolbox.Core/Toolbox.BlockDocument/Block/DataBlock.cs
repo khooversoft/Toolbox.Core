@@ -16,9 +16,9 @@ namespace Khooversoft.Toolbox.BlockDocument
     {
         public DataBlock(string blockType, string blockId, T data, IEnumerable<KeyValuePair<string, string>>? properties = null)
         {
-            blockType.Verify(nameof(blockType)).IsNotEmpty();
-            blockId.Verify(nameof(blockId)).IsNotEmpty();
-            data.Verify(nameof(data)).IsNotNull();
+            blockType.VerifyNotEmpty(nameof(blockType));
+            blockId.VerifyNotEmpty(nameof(blockId));
+            data.VerifyNotNull(nameof(data));
 
             TimeStamp = UnixDate.UtcNow;
             BlockType = blockType;
@@ -56,7 +56,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public DataBlock(DataBlock<T> dataBlock)
         {
-            dataBlock.Verify(nameof(dataBlock)).IsNotNull();
+            dataBlock.VerifyNotNull(nameof(dataBlock));
             dataBlock.Validate();
 
             TimeStamp = dataBlock.TimeStamp;
@@ -69,14 +69,14 @@ namespace Khooversoft.Toolbox.BlockDocument
 
             Validate();
 
-            GetDigest().Verify().Assert<string, SecurityException>(x => x == dataBlock.Digest, "Copy from block digest does not match new block digest");
+            GetDigest().VerifyAssert<string, SecurityException>(x => x == dataBlock.Digest, _ => "Copy from block digest does not match new block digest");
         }
 
         public DataBlock(DataBlock<T> dataBlock, IPrincipleSignature principleSign)
             : this(dataBlock)
         {
-            dataBlock.Verify(nameof(dataBlock)).IsNotNull();
-            principleSign.Verify(nameof(principleSign)).IsNotNull();
+            dataBlock.VerifyNotNull(nameof(dataBlock));
+            principleSign.VerifyNotNull(nameof(principleSign));
 
             JwtSignature = principleSign.Sign(Digest);
             Validate();
@@ -98,7 +98,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public void Validate()
         {
-            GetDigest().Verify().Assert<string, SecurityException>(x => x == Digest, "Block cannot be verified");
+            GetDigest().VerifyAssert<string, SecurityException>(x => x == Digest, _ => "Block cannot be verified");
         }
 
         public string GetDigest()

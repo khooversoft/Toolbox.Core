@@ -14,8 +14,8 @@ namespace Khooversoft.Toolbox.Actor
     {
         public ActorTypeRegistration(Type interfaceType, Func<IWorkContext, IActor> createImplementation)
         {
-            interfaceType.Verify(nameof(interfaceType)).IsNotNull();
-            createImplementation.Verify(nameof(createImplementation)).IsNotNull();
+            interfaceType.VerifyNotNull(nameof(interfaceType));
+            createImplementation.VerifyNotNull(nameof(createImplementation));
 
             InterfaceType = interfaceType;
             CreateImplementation = createImplementation;

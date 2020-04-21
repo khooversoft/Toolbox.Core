@@ -13,8 +13,8 @@ namespace Khooversoft.MessageNet.Interface
     {
         public MessageContent(string contentType, string content)
         {
-            contentType.Verify(nameof(contentType)).IsNotEmpty();
-            content.Verify(nameof(content)).IsNotEmpty();
+            contentType.VerifyNotEmpty(nameof(contentType));
+            content.VerifyNotEmpty(nameof(content));
 
             ContentType = contentType;
             Content = content;

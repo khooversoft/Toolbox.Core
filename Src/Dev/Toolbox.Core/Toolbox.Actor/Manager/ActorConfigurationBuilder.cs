@@ -19,7 +19,7 @@ namespace Khooversoft.Toolbox.Actor
 
         public ActorConfigurationBuilder(ActorConfiguration configuration)
         {
-            configuration.Verify(nameof(configuration)).IsNotNull();
+            configuration.VerifyNotNull(nameof(configuration));
 
             Capacity = configuration.Capacity;
             ActorRepository = configuration.ActorRepository;

@@ -20,7 +20,7 @@ namespace Khooversoft.Toolbox.Configuration
         public static IReadOnlyList<string> FormatHelp<T>(this T option)
             where T : class
         {
-            option.Verify(nameof(option)).IsNotNull();
+            option.VerifyNotNull(nameof(option));
 
             return GetHelpData(option.GetType())
                 .FormatHelpOptionData();
@@ -34,7 +34,7 @@ namespace Khooversoft.Toolbox.Configuration
         /// <returns>help details</returns>
         public static IReadOnlyList<OptionHelp> GetHelpData(this Type type, bool onlyProperties = false)
         {
-            type.Verify(nameof(type)).IsNotNull();
+            type.VerifyNotNull(nameof(type));
 
             var propertyHelpText = type.GetProperties()
                 .SelectMany(x => x.GetCustomAttributes<OptionAttribute>(), (o, i) => new { PropertyInfo = o, Attr = i })
@@ -81,7 +81,7 @@ namespace Khooversoft.Toolbox.Configuration
         public static IReadOnlyList<string> FormatSettings<T>(this T option)
             where T : class
         {
-            option.Verify(nameof(option)).IsNotNull();
+            option.VerifyNotNull(nameof(option));
 
             IReadOnlyList<PropertyPathValue> properties = option.SerializeToKeyValue(x => x.GetCustomAttribute<OptionAttribute>() != null)
                 .OrderBy(x => x.Path)
@@ -103,8 +103,8 @@ namespace Khooversoft.Toolbox.Configuration
         /// <returns>new option attribute used for formatting</returns>
         private static OptionHelp GetHelpForAttribute(this OptionAttribute attribute, PropertyInfo propertyInfo)
         {
-            attribute.Verify(nameof(attribute)).IsNotNull();
-            propertyInfo.Verify(nameof(propertyInfo)).IsNotNull();
+            attribute.VerifyNotNull(nameof(attribute));
+            propertyInfo.VerifyNotNull(nameof(propertyInfo));
 
             bool isClassProperty = propertyInfo.PropertyType.IsClass && propertyInfo.PropertyType != typeof(string);
 
@@ -121,7 +121,7 @@ namespace Khooversoft.Toolbox.Configuration
         /// <returns>arr or string</returns>
         private static IReadOnlyList<string> FormatHelpOptionData(this IEnumerable<OptionHelp> helpData)
         {
-            helpData.Verify(nameof(helpData)).IsNotNull();
+            helpData.VerifyNotNull(nameof(helpData));
 
             int MaxColumn1 = helpData
                 .Max(x => x.Command?.Length ?? 0);

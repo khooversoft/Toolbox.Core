@@ -18,7 +18,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public HeaderBlock(UnixDate timeStamp, string description)
         {
-            description.Verify(nameof(description)).IsNotEmpty();
+            description.VerifyNotEmpty(nameof(description));
 
             TimeStamp = timeStamp;
             Description = description;

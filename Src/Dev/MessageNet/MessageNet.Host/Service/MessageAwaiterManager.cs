@@ -29,7 +29,7 @@ namespace Khooversoft.MessageNet.Host
 
         public void Add(Guid id, TaskCompletionSource<NetMessage> tcs, TimeSpan? timeout = null)
         {
-            tcs.Verify(nameof(tcs)).IsNotNull();
+            tcs.VerifyNotNull(nameof(tcs));
 
             timeout ??= _defaultTimeout;
             var cancellationTokenSource = new CancellationTokenSource((TimeSpan)timeout);
@@ -45,7 +45,7 @@ namespace Khooversoft.MessageNet.Host
         /// <returns>true for processed, false if not</returns>
         public bool SetResult(NetMessage netMessage)
         {
-            netMessage.Verify(nameof(netMessage)).IsNotNull();
+            netMessage.VerifyNotNull(nameof(netMessage));
 
             if (netMessage.Headers.Count < 2) return false;
             var header = netMessage.Headers[1];
@@ -67,7 +67,7 @@ namespace Khooversoft.MessageNet.Host
         /// <param name="exception">exception</param>
         public void SetException(Guid id, Exception exception)
         {
-            exception.Verify(nameof(exception)).IsNotNull();
+            exception.VerifyNotNull(nameof(exception));
 
             Registration registration;
 

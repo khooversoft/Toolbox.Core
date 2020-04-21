@@ -9,8 +9,8 @@ namespace Khooversoft.Toolbox.Standard
     {
         public ModuleTypeRegistration(Type objectType, Type interfaceType)
         {
-            objectType.Verify(nameof(objectType)).IsNotNull();
-            interfaceType.Verify(nameof(interfaceType)).IsNotNull();
+            objectType.VerifyNotNull(nameof(objectType));
+            interfaceType.VerifyNotNull(nameof(interfaceType));
 
             ObjectType = objectType;
             InterfaceType = interfaceType;

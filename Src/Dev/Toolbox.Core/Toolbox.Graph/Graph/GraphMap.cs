@@ -15,7 +15,7 @@ namespace KHooversoft.Toolbox.Graph
     /// 
     /// Circular dependency are not allowed and will raise an exception if added
     /// </summary>
-    public partial class GraphMap<TKey, TNode, TEdge> : IReadOnlyGraphMap<TKey, TNode, TEdge>
+    public class GraphMap<TKey, TNode, TEdge> : IEnumerable<IGraphCommon>
         where TNode : IGraphNode<TKey>
         where TEdge : IGraphEdge<TKey>
     {
@@ -23,20 +23,20 @@ namespace KHooversoft.Toolbox.Graph
         private readonly Dictionary<Guid, TEdge> _edges;
         private bool _strict;
 
-        public GraphMap(bool strict = true, IEqualityComparer<TKey> equalityComparer = null)
+        public GraphMap(bool strict = true, IEqualityComparer<TKey>? equalityComparer = null)
         {
             KeyCompare = equalityComparer ??
-                ((typeof(TKey) == typeof(string)) ? (IEqualityComparer<TKey>)StringComparer.OrdinalIgnoreCase : (IEqualityComparer<TKey>)null);
+                ((typeof(TKey) == typeof(string)) ? (IEqualityComparer<TKey>)StringComparer.OrdinalIgnoreCase : EqualityComparer<TKey>.Default);
 
             _strict = strict;
             _nodes = new Dictionary<TKey, TNode>(KeyCompare);
             _edges = new Dictionary<Guid, TEdge>();
         }
 
-        public GraphMap(IReadOnlyGraphMap<TKey, TNode, TEdge> graphMap)
+        public GraphMap(GraphMap<TKey, TNode, TEdge> graphMap)
             : this(true)
         {
-            graphMap.Verify(nameof(graphMap)).IsNotNull();
+            graphMap.VerifyNotNull(nameof(graphMap));
 
             graphMap.Nodes.Values.ForEach(x => Add(x));
             graphMap.Edges.Values.ForEach(x => Add(x));
@@ -157,7 +157,7 @@ namespace KHooversoft.Toolbox.Graph
         public GraphMap<TKey, TNode, TEdge> RemoveEdge(TKey fromNodeKey, TKey toNodeKey)
         {
             Guid? edgeKey = _edges.Values
-                .Where(x => KeyCompare.Equals(x.FromNodeKey, fromNodeKey) && KeyCompare.Equals(x.ToNodeKey, toNodeKey))
+                .Where(x => KeyCompare.Equals(x.FromNodeKey, fromNodeKey) == true && KeyCompare.Equals(x.ToNodeKey, toNodeKey))
                 .Select(x => x.Key)
                 .FirstOrDefault();
 
@@ -170,19 +170,24 @@ namespace KHooversoft.Toolbox.Graph
         }
 
         /// <summary>
+        /// Return edges for a node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public IReadOnlyList<TEdge> GetEdgesForNode(TNode node) =>
+            _edges.Values
+            .Where(x => KeyCompare.Equals(x.FromNodeKey, node.Key))
+            .ToList();
+
+        /// <summary>
         /// Get connected nodes for node specified (directed)
         /// </summary>
         /// <param name="node">node to search for</param>
         /// <returns>list of connected nodes</returns>
-        public IReadOnlyList<TNode> GetConnectedNodes(TNode node)
-        {
-            var list = _edges.Values
+        public IReadOnlyList<TNode> GetConnectedNodes(TNode node) => _edges.Values
                 .Where(x => KeyCompare.Equals(x.FromNodeKey, node.Key))
                 .Join(_nodes.Values, x => x.ToNodeKey, x => x.Key, (o, i) => i)
                 .ToList();
-
-            return list;
-        }
 
         /// <summary>
         /// Find cycles where edges create a loop(s)
@@ -200,7 +205,7 @@ namespace KHooversoft.Toolbox.Graph
         /// <returns>nodes matching set</returns>
         public IReadOnlyList<TNode> FindNodesByKey(IEnumerable<TKey> nodeKeys)
         {
-            if( nodeKeys == null || !nodeKeys.Any())
+            if (nodeKeys == null || !nodeKeys.Any())
             {
                 return new List<TNode>();
             }
@@ -220,7 +225,11 @@ namespace KHooversoft.Toolbox.Graph
 
             foreach (var edge in _edges.Values)
             {
-                string errorMessage = TestEdge(edge);
+                string? errorMessage = TestEdge(edge);
+                if (errorMessage != null)
+                {
+                    list.Add((edge, errorMessage));
+                }
             }
 
             return list;
@@ -248,7 +257,7 @@ namespace KHooversoft.Toolbox.Graph
                 return;
             }
 
-            string errorMessage = TestEdge(edge);
+            string? errorMessage = TestEdge(edge);
             if (errorMessage == null)
             {
                 return;
@@ -262,7 +271,7 @@ namespace KHooversoft.Toolbox.Graph
         /// </summary>
         /// <param name="edge"></param>
         /// <returns>error message</returns>
-        private string TestEdge(TEdge edge)
+        private string? TestEdge(TEdge edge)
         {
             if (!_nodes.ContainsKey(edge.FromNodeKey))
             {
@@ -286,18 +295,12 @@ namespace KHooversoft.Toolbox.Graph
         /// Enumerator
         /// </summary>
         /// <returns>Enumerator</returns>
-        public IEnumerator<IGraphCommon> GetEnumerator()
-        {
-            return _nodes.Values.OfType<IGraphCommon>().GetEnumerator();
-        }
+        public IEnumerator<IGraphCommon> GetEnumerator() => _nodes.Values.OfType<IGraphCommon>().GetEnumerator();
 
         /// <summary>
         /// Enumerator
         /// </summary>
         /// <returns>Enumerator</returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

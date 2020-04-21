@@ -13,7 +13,7 @@ namespace Khooversoft.Toolbox.Standard
     {
         public SelectDataflow(Func<T, T> transform)
         {
-            transform.Verify(nameof(transform)).IsNotNull();
+            transform.VerifyNotNull(nameof(transform));
 
             Transform = transform;
             Predicate = x => true;
@@ -22,7 +22,7 @@ namespace Khooversoft.Toolbox.Standard
         public SelectDataflow(Func<T, T> transform, Func<T, bool> predicate)
             : this(transform)
         {
-            predicate.Verify(nameof(predicate)).IsNotNull();
+            predicate.VerifyNotNull(nameof(predicate));
 
             Predicate = predicate;
         }

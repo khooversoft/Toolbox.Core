@@ -34,7 +34,7 @@ namespace MicroserviceHost
 
         public FunctionHostBuilder UseContainer(IServiceContainer serviceContainer)
         {
-            serviceContainer.Verify(nameof(serviceContainer)).IsNotNull();
+            serviceContainer.VerifyNotNull(nameof(serviceContainer));
 
             Container = serviceContainer;
             return this;
@@ -42,7 +42,7 @@ namespace MicroserviceHost
 
         public FunctionHostBuilder UseResolver(IPropertyResolver resolver)
         {
-            resolver.Verify(nameof(resolver)).IsNotNull();
+            resolver.VerifyNotNull(nameof(resolver));
 
             PropertyResolver = resolver;
             return this;
@@ -56,8 +56,8 @@ namespace MicroserviceHost
 
         public FunctionHost Build(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            MessageNetConfig.Verify(nameof(MessageNetConfig)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            MessageNetConfig.VerifyNotNull(nameof(MessageNetConfig));
 
             PropertyResolver ??= new PropertyResolver();
 
@@ -83,7 +83,7 @@ namespace MicroserviceHost
         /// <returns>list of functions</returns>
         private static IReadOnlyList<Function> GetFunctionMethods(IEnumerable<Type> types)
         {
-            types.Verify(nameof(types)).IsNotNull();
+            types.VerifyNotNull(nameof(types));
 
             List<Function> results = types
                 .SelectMany(x => x.GetMethodsWithAttribute<MessageFunctionAttribute>())
@@ -101,14 +101,12 @@ namespace MicroserviceHost
 
                 // Only two parameters are required
                 parameters
-                    .Verify()
-                    .Assert(x => x.Length == 2, $"Function {methodName} does not have 2 parameters");
+                    .VerifyAssert(x => x.Length == 2, $"Function {methodName} does not have 2 parameters");
 
                 // Verify first parameter is the "IWorkContext"
                 parameters
                     .First()
-                    .Verify()
-                    .Assert(x => x.ParameterType == typeof(IWorkContext), $"The first parameter is not {typeof(IWorkContext).GetType().FullName} for function {methodName}");
+                    .VerifyAssert(x => x.ParameterType == typeof(IWorkContext), $"The first parameter is not {typeof(IWorkContext).GetType().FullName} for function {methodName}");
 
                 // Figure out the second parameter's type, this must be a derived from RouteMessage<T>
                 Type sendMessageType = parameters
@@ -127,8 +125,8 @@ namespace MicroserviceHost
         /// <returns></returns>
         private static IReadOnlyList<FunctionConfiguration> GetFunctionConfiguration(IEnumerable<Function> functions, IPropertyResolver resolver)
         {
-            functions.Verify(nameof(functions)).IsNotNull();
-            resolver.Verify(nameof(resolver)).IsNotNull();
+            functions.VerifyNotNull(nameof(functions));
+            resolver.VerifyNotNull(nameof(resolver));
 
             return functions
                 .Select(x => new FunctionConfiguration(x, getMessageNetNodeId(x, resolver)))
@@ -138,10 +136,8 @@ namespace MicroserviceHost
             {
                 return function.FunctionAttribute.NodeId
                     .Resolve(resolver)
-                    .Verify(nameof(function.FunctionAttribute.NodeId))
-                    .IsNotEmpty($"Function: {function.Name} {function.FunctionAttribute.NodeId} is required")
-                    .Assert(x => x.GetPropertyNames()?.Count == 0, $"Unresolved properties for {function.FunctionAttribute.NodeId}")
-                    .Value;
+                    .VerifyNotEmpty($"Function: {function.Name} {function.FunctionAttribute.NodeId} is required")
+                    .VerifyAssert(x => x.GetPropertyNames()?.Count == 0, $"Unresolved properties for {function.FunctionAttribute.NodeId}");
             }
         }
     }

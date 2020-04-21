@@ -30,7 +30,7 @@ namespace Khooversoft.Toolbox.Actor
 
         public ActorManager(ActorConfiguration configuration)
         {
-            configuration.Verify(nameof(configuration)).IsNotNull();
+            configuration.VerifyNotNull(nameof(configuration));
 
             Configuration = configuration;
             _actorRepository = Configuration.ActorRepository ?? new ActorRepository(Configuration);
@@ -71,7 +71,7 @@ namespace Khooversoft.Toolbox.Actor
         public IActorManager Register<T>(Func<IWorkContext, T> createImplementation) where T : IActor
         {
             Verify.Assert(IsRunning, _disposedTestText);
-            createImplementation.Verify(nameof(createImplementation)).IsNotNull();
+            createImplementation.VerifyNotNull(nameof(createImplementation));
 
             _typeManager.Register(Configuration.WorkContext.WithActivity(), createImplementation);
             return this;
@@ -99,7 +99,7 @@ namespace Khooversoft.Toolbox.Actor
         {
             Verify.Assert(IsRunning, _disposedTestText);
 
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
+            actorKey.VerifyNotNull(nameof(actorKey));
 
             Type actorType = typeof(T);
 
@@ -144,7 +144,7 @@ namespace Khooversoft.Toolbox.Actor
         public async Task<bool> Deactivate<T>(ActorKey actorKey)
         {
             Verify.Assert(IsRunning, _disposedTestText);
-            actorKey.Verify(nameof(actorKey)).IsNotNull();
+            actorKey.VerifyNotNull(nameof(actorKey));
 
             IActorRegistration? actorRegistration = await _actorRepository.Remove(Configuration.WorkContext.WithActivity(), typeof(T), actorKey).ConfigureAwait(false);
             if (actorRegistration == null)
@@ -165,7 +165,7 @@ namespace Khooversoft.Toolbox.Actor
         public async Task<bool> Deactivate(Type actorType, ActorKey actorKey)
         {
             Verify.Assert(IsRunning, _disposedTestText);
-            actorType.Verify(nameof(actorType)).IsNotNull();
+            actorType.VerifyNotNull(nameof(actorType));
 
             IActorRegistration? subject = await _actorRepository.Remove(Configuration.WorkContext.WithActivity(), actorType, actorKey).ConfigureAwait(false);
             if (subject == null)
@@ -183,7 +183,7 @@ namespace Khooversoft.Toolbox.Actor
         /// <returns>task</returns>
         public async Task DeactivateAll()
         {
-            IsRunning.Verify().Assert(x => x == true, _disposedTestText);
+            IsRunning.VerifyAssert(x => x == true, _disposedTestText);
 
             await _actorRepository.Clear(Configuration.WorkContext.WithActivity()).ConfigureAwait(false);
         }

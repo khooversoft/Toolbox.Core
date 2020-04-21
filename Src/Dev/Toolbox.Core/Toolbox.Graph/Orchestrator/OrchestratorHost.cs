@@ -18,11 +18,11 @@ namespace KHooversoft.Toolbox.Graph
         private readonly IJobHost _jobHost;
         private int _running = 0;
         private readonly Dictionary<Guid, TKey> _processedDict = new Dictionary<Guid, TKey>();
-        private GraphTopologicalContext<TKey, TEdge> _graphContext;
+        private GraphTopologicalContext<TKey, TEdge>? _graphContext;
         private readonly HashSet<TKey> _runningKeys;
         private readonly List<IJobResult> _jobResults = new List<IJobResult>();
         private readonly int? _maxParallel;
-        private readonly SemaphoreSlim _semaphore;
+        private readonly SemaphoreSlim? _semaphore;
 
         private object _lock = new object();
 
@@ -34,27 +34,27 @@ namespace KHooversoft.Toolbox.Graph
         /// <param name="maxParallel">max number of parallel task, if null or 0, there is no limit</param>
         public OrchestratorHost(GraphMap<TKey, TNode, TEdge> graph, IJobHost jobHost, int? maxParallel = null)
         {
-            graph.Verify(nameof(graph)).IsNotNull();
-            jobHost.Verify(nameof(jobHost)).IsNotNull();
-            maxParallel.Verify(nameof(maxParallel)).Assert(x => x == null || x >= 0, "value must be greater then or equal to zero");
+            graph.VerifyNotNull(nameof(graph));
+            jobHost.VerifyNotNull(nameof(jobHost));
+            maxParallel.VerifyAssert(x => x == null || x >= 0, "value must be greater then or equal to zero");
 
             _graph = graph;
             _jobHost = jobHost;
 
             _runningKeys = new HashSet<TKey>(_graph.KeyCompare);
             _maxParallel = maxParallel;
-            _semaphore = maxParallel > 0 ? _semaphore = new SemaphoreSlim((int)maxParallel, (int)maxParallel) : null;
+            _semaphore = maxParallel > 0 ? new SemaphoreSlim((int)maxParallel, (int)maxParallel) : null;
         }
 
         public bool IsRunning => _running == 1;
 
-        public Task RunningTask { get; private set; }
+        public Task? RunningTask { get; private set; }
 
         public IReadOnlyCollection<TKey> RunningKeys => _runningKeys;
 
-        public IReadOnlyList<TKey> GetProcessedNodeKeys() => _graphContext.ProcessedNodeKeys.ToList();
+        public IReadOnlyList<TKey> GetProcessedNodeKeys() => _graphContext!.ProcessedNodeKeys.ToList();
 
-        public IReadOnlyList<TKey> GetStopNodeKeys() => _graphContext.StopNodeKeys.ToList();
+        public IReadOnlyList<TKey> GetStopNodeKeys() => _graphContext!.StopNodeKeys.ToList();
 
         public IReadOnlyList<IJobResult> GetJobResults() => _jobResults.ToList();
 
@@ -65,7 +65,7 @@ namespace KHooversoft.Toolbox.Graph
         /// <returns>this</returns>
         public OrchestratorHost<TKey, TNode, TEdge> Start(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             int running = Interlocked.CompareExchange(ref _running, 1, 0);
             if (running == 1)
@@ -113,7 +113,7 @@ namespace KHooversoft.Toolbox.Graph
 
             timeout = timeout ?? TimeSpan.FromMilliseconds(-1);
             context.Telemetry.Verbose(context, $"OrchestratorHost: (Wait) timeout={timeout}");
-            bool status = Task.WaitAll(new Task[] { RunningTask }, (int)((TimeSpan)timeout).TotalMilliseconds, context.CancellationToken);
+            bool status = Task.WaitAll(new Task[] { RunningTask! }, (int)((TimeSpan)timeout).TotalMilliseconds, context.CancellationToken);
             context.Telemetry.Verbose(context, $"OrchestratorHost: (Wait) return status {status}");
 
             return status;
@@ -128,7 +128,7 @@ namespace KHooversoft.Toolbox.Graph
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
 
-                var nodesToRun = _graph.TopologicalSort(_graphContext);
+                var nodesToRun = _graph.TopologicalSort(_graphContext!);
                 if (nodesToRun.Count == 0)
                 {
                     context.Telemetry.Verbose(context, $"Exit-{nameof(RunJobGraph)}, no nodes to run");
@@ -151,7 +151,7 @@ namespace KHooversoft.Toolbox.Graph
 
                         lock (_lock)
                         {
-                            _graphContext.AddProcessedNodeKey(node.Key);
+                            _graphContext!.AddProcessedNodeKey(node.Key);
                         }
 
                         continue;
@@ -165,14 +165,14 @@ namespace KHooversoft.Toolbox.Graph
                     }
 
                     nodeContext = nodeContext
-                        .WithCreateLogger(node.Key.ToString())
+                        .WithCreateLogger(node.Key!.ToString())
                         .WithActivity();
 
                     context.Telemetry.Verbose(context, $"{nameof(RunJobGraph)} Starting job for node {node.Key}, node's activity={nodeContext.ActivityId}");
 
                     jobId = await _jobHost.StartJob(nodeContext, node, UpdateCompletionList);
 
-                    context.Telemetry.ActivityStart(context, $"{nameof(RunJobGraph)} Started JobId={jobId.ToString()} for node {node.Key}");
+                    context.Telemetry.ActivityStart(context, $"{nameof(RunJobGraph)} Started JobId={jobId} for node {node.Key}");
 
                     lock (_lock)
                     {
@@ -191,11 +191,11 @@ namespace KHooversoft.Toolbox.Graph
 
         private void UpdateCompletionList(IWorkContext context, IJobResult jobResult)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            jobResult.Verify(nameof(jobResult)).IsNotNull();
-            jobResult.JobId.Verify(nameof(jobResult.JobId)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            jobResult.VerifyNotNull(nameof(jobResult));
+            jobResult.JobId.VerifyNotNull(nameof(jobResult.JobId));
 
-            context.Telemetry.ActivityStop(context, $"{nameof(UpdateCompletionList)} for JobId={((Guid)jobResult.JobId).ToString()}, Status={jobResult.Status}", (long)(jobResult.Duration?.TotalMilliseconds ?? 0));
+            context.Telemetry.ActivityStop(context, $"{nameof(UpdateCompletionList)} for JobId={(Guid)jobResult.JobId!}, Status={jobResult.Status}", (long)(jobResult.Duration?.TotalMilliseconds ?? 0));
 
             if (_semaphore != null)
             {
@@ -209,11 +209,11 @@ namespace KHooversoft.Toolbox.Graph
                 {
                     if (jobResult.Status == JobStatus.Completed)
                     {
-                        _graphContext.AddProcessedNodeKey(value);
+                        _graphContext!.AddProcessedNodeKey(value);
                     }
                     else
                     {
-                        _graphContext.AddStopNodeKey(value);
+                        _graphContext!.AddStopNodeKey(value);
                     }
 
                     _runningKeys.Remove(value);

@@ -13,8 +13,8 @@ namespace Khooversoft.Toolbox.Azure
     {
         public static QueueDescription ConvertTo(this QueueDefinition subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
-            subject.QueueName!.Verify(nameof(subject.QueueName)).IsNotEmpty();
+            subject.VerifyNotNull(nameof(subject));
+            subject.QueueName!.VerifyNotEmpty(nameof(subject.QueueName));
 
             return new QueueDescription(subject.QueueName)
             {
@@ -32,7 +32,7 @@ namespace Khooversoft.Toolbox.Azure
 
         public static QueueDefinition ConvertTo(this QueueDescription subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return new QueueDefinition(subject.Path)
             {

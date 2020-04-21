@@ -20,7 +20,7 @@ namespace Khooversoft.Toolbox.Actor
             IWorkContext workContext
             )
         {
-            workContext.Verify(nameof(workContext)).IsNotNull();
+            workContext.VerifyNotNull(nameof(workContext));
 
             Capacity = capacity;
             ActorRepository = actorRepository;

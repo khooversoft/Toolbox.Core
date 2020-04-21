@@ -21,7 +21,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="getValue"></param>
         public Deferred(Action<IWorkContext> execute)
         {
-            execute.Verify(nameof(execute)).IsNotNull();
+            execute.VerifyNotNull(nameof(execute));
 
             _execute = x => InternalExecute(() => execute(x));
         }

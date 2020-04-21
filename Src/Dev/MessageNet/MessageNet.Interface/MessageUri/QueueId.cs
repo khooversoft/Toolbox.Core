@@ -47,10 +47,10 @@ namespace Khooversoft.MessageNet.Interface
 
         public static QueueId Parse(string queueId)
         {
-            queueId.Verify(nameof(queueId)).IsNotEmpty();
+            queueId.VerifyNotEmpty(nameof(queueId));
 
             var parts = queueId.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            parts.Verify().Assert(x => x.Length == 3, "Invalid format for queue id");
+            parts.VerifyAssert(x => x.Length == 3, "Invalid format for queue id");
 
             return new QueueId(parts[0], parts[1], parts[2]);
         }
@@ -75,9 +75,9 @@ namespace Khooversoft.MessageNet.Interface
 
         public static void Verify(string? nameSpace, string? networkId, string? nodeId)
         {
-            nameSpace.Verify(nameof(nameSpace)).Assert(_idVerify.IsMatch(nameSpace), "Namespace id is not valid: [alpha][alpha, numeric, ...]");
-            networkId.Verify(nameof(networkId)).Assert(_idVerify.IsMatch(networkId), "Network id is not valid: [alpha][alpha, numeric, ...]");
-            nodeId.Verify(nameof(nodeId)).Assert(_nodeIdVerify.IsMatch(nodeId), "Node id is not valid: [alpha][alpha, numeric, '.', ...]");
+            nameSpace.VerifyAssert(x => _idVerify.IsMatch(x), "Namespace id is not valid: [alpha][alpha, numeric, ...]");
+            networkId.VerifyAssert(x => _idVerify.IsMatch(networkId), "Network id is not valid: [alpha][alpha, numeric, ...]");
+            nodeId.VerifyAssert(x => _nodeIdVerify.IsMatch(nodeId), "Node id is not valid: [alpha][alpha, numeric, '.', ...]");
         }
     }
 }

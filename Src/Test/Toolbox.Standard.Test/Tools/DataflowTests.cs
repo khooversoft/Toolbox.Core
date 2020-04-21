@@ -76,7 +76,7 @@ namespace Toolbox.Standard.Test.Tools
             }.Build();
 
             Enumerable.Range(0, max)
-                .ForEach(x => dataflow.Post(x).Verify().Assert(x => x == true, "Failed to post"));
+                .ForEach(x => dataflow.Post(x).VerifyAssert(x => x == true, "Failed to post"));
 
             dataflow.Complete();
             dataflow.Completion.Wait();

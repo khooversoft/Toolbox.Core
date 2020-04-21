@@ -10,14 +10,14 @@ namespace KHooversoft.Toolbox.Graph
 {
     public class JobResult : IJobResult
     {
-        public JobResult(JobStatus status, IEnumerable<string> errors = null, AggregateException exception = null)
+        public JobResult(JobStatus status, IEnumerable<string>? errors = null, AggregateException? exception = null)
         {
             Status = status;
             Errors = errors?.ToList();
             Exception = exception;
         }
 
-        public JobResult(Guid jobId, JobStatus status, TimeSpan duration, IEnumerable<string> errors = null, AggregateException exception = null)
+        public JobResult(Guid jobId, JobStatus status, TimeSpan duration, IEnumerable<string>? errors = null, AggregateException? exception = null)
             : this(status, errors, exception)
         {
             JobId = jobId;
@@ -28,9 +28,9 @@ namespace KHooversoft.Toolbox.Graph
 
         public JobStatus Status { get; }
 
-        public AggregateException Exception { get; }
+        public AggregateException? Exception { get; }
 
-        public IReadOnlyList<string> Errors { get; }
+        public IReadOnlyList<string>? Errors { get; }
 
         public TimeSpan? Duration { get; }
     }

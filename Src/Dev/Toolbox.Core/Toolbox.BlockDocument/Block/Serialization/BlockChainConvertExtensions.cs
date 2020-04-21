@@ -12,8 +12,8 @@ namespace Khooversoft.Toolbox.BlockDocument
     {
         public static string ToJson(this BlockChain blockChain)
         {
-            blockChain.Verify(nameof(blockChain)).IsNotNull();
-            blockChain.Blocks.Count.Verify(nameof(blockChain.Blocks.Count)).Assert<int, InvalidOperationException>(x => x > 1, "Empty block chain");
+            blockChain.VerifyNotNull(nameof(blockChain));
+            blockChain.Blocks.Count.VerifyAssert<int, InvalidOperationException>(x => x > 1, _ => "Empty block chain");
 
             var list = new List<BlockChainNodeModel>();
 
@@ -33,10 +33,10 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public static BlockChain ToBlockChain(this string json)
         {
-            json.Verify(nameof(json)).IsNotEmpty();
+            json.VerifyNotEmpty(nameof(json));
 
             var blockChainModel = JsonConvert.DeserializeObject<BlockChainModel>(json);
-            blockChainModel.Blocks.Verify(nameof(blockChainModel.Blocks)).IsNotNull();
+            blockChainModel.Blocks.VerifyNotNull(nameof(blockChainModel.Blocks));
 
             var list = new List<BlockNode>();
 

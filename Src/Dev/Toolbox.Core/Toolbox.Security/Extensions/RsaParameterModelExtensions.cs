@@ -48,21 +48,21 @@ namespace Khooversoft.Toolbox.Security
 
         public static string ToJson(this RsaParameterModel subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             return JsonConvert.SerializeObject(subject);
         }
 
         public static RsaParameterModel ToRasParameterModel(this string json)
         {
-            json.Verify(nameof(json)).IsNotEmpty();
+            json.VerifyNotEmpty(nameof(json));
 
             return JsonConvert.DeserializeObject<RsaParameterModel>(json);
         }
 
         public static string ToBinaryString(this RSAParameters subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             RsaParameterModel model = subject.ConvertTo();
 
@@ -76,7 +76,7 @@ namespace Khooversoft.Toolbox.Security
 
         public static RSAParameters ToRSAParameters(this string subject)
         {
-            subject.Verify(nameof(subject)).IsNotEmpty();
+            subject.VerifyNotEmpty(nameof(subject));
 
             byte[] array = Convert.FromBase64String(subject);
 

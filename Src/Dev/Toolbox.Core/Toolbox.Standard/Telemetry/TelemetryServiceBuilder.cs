@@ -18,7 +18,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public TelemetryServiceBuilder(Func<TelemetryMessage, TelemetryMessage> transform)
         {
-            transform.Verify(nameof(transform)).IsNotNull();
+            transform.VerifyNotNull(nameof(transform));
 
             _dataflowBuilder = new DataflowBuilder<TelemetryMessage>
             {
@@ -36,7 +36,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public TelemetryServiceBuilder AddConsoleLogger(TelemetryType telemetryType, ITelemetryLogger logger)
         {
-            logger.Verify(nameof(logger)).IsNotNull();
+            logger.VerifyNotNull(nameof(logger));
 
             _dataflowBuilder.Add(new ActionDataflow<TelemetryMessage>(x => logger.Write(x), x => x.TelemetryType.IsReplay() || x.TelemetryType.FilterLevel(telemetryType)));
             return this;
@@ -44,7 +44,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public TelemetryServiceBuilder AddFileLogger(ITelemetryLogger logger)
         {
-            logger.Verify(nameof(logger)).IsNotNull();
+            logger.VerifyNotNull(nameof(logger));
 
             _dataflowBuilder.Add(new ActionDataflow<TelemetryMessage>(x => logger.Write(x), x => !x.TelemetryType.IsReplay() && !x.TelemetryType.IsMetric()));
             return this;
@@ -52,7 +52,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public TelemetryServiceBuilder AddEventLogger(ITelemetryLogger logger)
         {
-            logger.Verify(nameof(logger)).IsNotNull();
+            logger.VerifyNotNull(nameof(logger));
 
             _dataflowBuilder.Add(new ActionDataflow<TelemetryMessage>(x => logger.Write(x), x => !x.TelemetryType.IsReplay() && x.TelemetryType.IsEvent() && !x.TelemetryType.IsVerbose()));
             return this;
@@ -60,9 +60,9 @@ namespace Khooversoft.Toolbox.Standard
 
         public TelemetryServiceBuilder AddErrorReplay(IWorkContext context, TelemetryType console, ITelemetryQuery logger, ITelemetryService telemetryService)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            logger.Verify(nameof(logger)).IsNotNull();
-            telemetryService.Verify(nameof(telemetryService)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            logger.VerifyNotNull(nameof(logger));
+            telemetryService.VerifyNotNull(nameof(telemetryService));
 
             void action(TelemetryMessage x)
             {

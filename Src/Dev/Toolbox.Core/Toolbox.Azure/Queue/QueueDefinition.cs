@@ -12,7 +12,7 @@ namespace Khooversoft.Toolbox.Azure
     {
         public QueueDefinition(string queueName)
         {
-            queueName.Verify(nameof(queueName)).IsNotEmpty();
+            queueName.VerifyNotEmpty(nameof(queueName));
 
             QueueName = queueName;
             AutoDeleteOnIdle = TimeSpan.FromDays(30);

@@ -51,7 +51,7 @@ namespace Khooversoft.Toolbox.Standard
         public CorrelationVector(string correlationTag)
             : this()
         {
-            correlationTag.Verify(nameof(correlationTag)).IsNotEmpty();
+            correlationTag.VerifyNotEmpty(nameof(correlationTag));
 
             string[] parts = correlationTag.Split(_splitSearch, StringSplitOptions.RemoveEmptyEntries);
 
@@ -68,7 +68,7 @@ namespace Khooversoft.Toolbox.Standard
         private CorrelationVector(string correlationTag, int extensionValue)
             : this()
         {
-            correlationTag.Verify(nameof(correlationTag)).IsNotEmpty();
+            correlationTag.VerifyNotEmpty(nameof(correlationTag));
 
             BaseCv = correlationTag;
             ExtensionValue = extensionValue;

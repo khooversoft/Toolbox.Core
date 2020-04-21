@@ -48,7 +48,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>shuffled list</returns>
         public static IReadOnlyList<T> Shuffle<T>(this IEnumerable<T> self)
         {
-            self.Verify(nameof(self)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
 
             var list = self.ToList();
 

@@ -21,7 +21,7 @@ namespace Khooversoft.Toolbox.Security
 
         public LocalCertificate(LocalCertificateKey key)
         {
-            key.Verify(nameof(key)).IsNotNull();
+            key.VerifyNotNull(nameof(key));
 
             LocalCertificateKey = key;
         }

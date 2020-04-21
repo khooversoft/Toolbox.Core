@@ -2,6 +2,7 @@
 using Khooversoft.MessageNet.Host;
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
+using MessageNet.Host.Tests.Application;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -146,7 +147,7 @@ namespace MessageNet.Host.Tests
                 // client -> identity
                 case "get.id.token":
                     {
-                        IdentityTokenRequest request = netMessage.Content.Deserialize<IdentityTokenRequest>();
+                        IdentityTokenRequest request = netMessage.Content!.Deserialize<IdentityTokenRequest>();
                         request.Should().NotBeNull();
                         request.UserId.Should().Be("user1@domain.com");
                         request.SecurityToken.Should().Be(_securityIdToken);
@@ -162,7 +163,7 @@ namespace MessageNet.Host.Tests
                 // identity -> client
                 case "get.id.token.response":
                     {
-                        IdentityToken response = netMessage.Content.Deserialize<IdentityToken>();
+                        IdentityToken response = netMessage.Content!.Deserialize<IdentityToken>();
                         response.JwtId.Should().Be(_securityIdToken);
 
                         NetMessage message = new NetMessageBuilder(netMessage)
@@ -176,7 +177,7 @@ namespace MessageNet.Host.Tests
                 // client -> auth
                 case "get.auth":
                     {
-                        ResourceAuthorizationRequest request = netMessage.Content.Deserialize<ResourceAuthorizationRequest>();
+                        ResourceAuthorizationRequest request = netMessage.Content!.Deserialize<ResourceAuthorizationRequest>();
                         request.Should().NotBeNull();
                         request.JwtId.Should().Be(_securityIdToken);
                         request.Resource.Should().Be("get.balance");
@@ -192,12 +193,12 @@ namespace MessageNet.Host.Tests
                 // client -> tbank
                 case "get.auth.response":
                     {
-                        ResourceAuthorization response = netMessage.Content.Deserialize<ResourceAuthorization>();
+                        ResourceAuthorization response = netMessage.Content!.Deserialize<ResourceAuthorization>();
                         response.JwtId.Should().Be(_securityIdToken);
                         response.JwtAuth.Should().Be(_securityAuthToken);
 
                         NetMessage message = new NetMessageBuilder(netMessage)
-                            .Add(new MessageHeader(_tbankUri, _clientUri, "get.balance", new MessageClaim("accountId", "1234"), new MessageClaim("bearer", response.JwtAuth)))
+                            .Add(new MessageHeader(_tbankUri, _clientUri, "get.balance", new MessageClaim("accountId", "1234"), new MessageClaim("bearer", response.JwtAuth!)))
                             .Build();
 
                         return netHost.Send(_workContext, message);
@@ -227,7 +228,7 @@ namespace MessageNet.Host.Tests
                 // client (last response)
                 case "get.balance.response":
                     {
-                        TBankBalanceDetails response = netMessage.Content.Deserialize<TBankBalanceDetails>();
+                        TBankBalanceDetails response = netMessage.Content!.Deserialize<TBankBalanceDetails>();
                         response.Should().NotBeNull();
                         response.AccountId.Should().Be("1234");
                         response.Balance.Should().Be(100.55m);
@@ -243,33 +244,33 @@ namespace MessageNet.Host.Tests
 
         private class IdentityTokenRequest
         {
-            public string UserId { get; set; }
+            public string? UserId { get; set; }
 
-            public string SecurityToken { get; set; }
+            public string? SecurityToken { get; set; }
         }
 
         private class IdentityToken
         {
-            public string JwtId { get; set; }
+            public string? JwtId { get; set; }
         }
 
         private class ResourceAuthorizationRequest
         {
-            public string JwtId { get; set; }
+            public string? JwtId { get; set; }
 
-            public string Resource { get; set; }
+            public string? Resource { get; set; }
         }
 
         public class ResourceAuthorization
         {
-            public string JwtId { get; set; }
+            public string? JwtId { get; set; }
 
-            public string JwtAuth { get; set; }
+            public string? JwtAuth { get; set; }
         }
 
         public class TBankBalanceDetails
         {
-            public string AccountId { get; set; }
+            public string? AccountId { get; set; }
 
             public decimal Balance { get; set; }
         }

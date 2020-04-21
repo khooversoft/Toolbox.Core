@@ -42,7 +42,7 @@ namespace EventHubPerformanceTest
 
         public Task ProcessEventsAsync(PartitionContext partitionContext, IEnumerable<EventData> messages)
         {
-            messages.Verify().IsNotNull();
+            messages.VerifyNotNull(nameof(messages));
             if (messages == null) return partitionContext.CheckpointAsync();
 
             foreach (var eventData in messages)

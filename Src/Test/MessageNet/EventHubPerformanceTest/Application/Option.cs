@@ -49,24 +49,24 @@ namespace EventHubPerformanceTest
                 .Build()
                 .BuildOption<Option>();
 
-            if ( option.Help) { return option; }
+            if (option.Help) { return option; }
 
-            option.Verify(nameof(option)).IsNotNull();
-            (option.Send || option.Receive).Verify().Assert("Send and/or Receive must be specified");
-            option.EventHub.Verify().IsNotNull("Must specify Event hub details");
-            option.EventHub!.ConnectionString!.Verify().IsNotEmpty("Event hub connection string is required");
-            option.EventHub!.Name!.Verify().IsNotEmpty("Event hub name is required");
-            option.EventHub!.ConsumerGroupName!.Verify().IsNotEmpty("Event hub consumer group name is required");
-            option.Count.Verify().Assert(x => x >= 0, "Count must be greater then 0, or 0 for no limit");
+            option.VerifyNotNull(nameof(option));
+            (option.Send || option.Receive).VerifyAssert(x => x, "Send and/or Receive must be specified");
+            option.EventHub.VerifyNotNull("Must specify Event hub details");
+            option.EventHub!.ConnectionString!.VerifyNotEmpty("Event hub connection string is required");
+            option.EventHub!.Name!.VerifyNotEmpty("Event hub name is required");
+            option.EventHub!.ConsumerGroupName!.VerifyNotEmpty("Event hub consumer group name is required");
+            option.Count.VerifyAssert(x => x >= 0, "Count must be greater then 0, or 0 for no limit");
 
-            (option.Send || option.Receive).Verify().Assert(x => x == true, "Must specify 'Send' or 'Receive'");
+            (option.Send || option.Receive).VerifyAssert(x => x == true, "Must specify 'Send' or 'Receive'");
 
             if (option.Receive)
             {
-                option.StorageAccount.Verify().IsNotNull("Storage account details are required");
-                option.StorageAccount!.AccountName!.Verify().IsNotNull("Storage account name is required");
-                option.StorageAccount.ContainerName.Verify().IsNotNull("Storage account container name is required");
-                option.StorageAccount.AccountKey.Verify().IsNotNull("Storage account key is required");
+                option.StorageAccount.VerifyNotNull("Storage account details are required");
+                option.StorageAccount!.AccountName!.VerifyNotNull("Storage account name is required");
+                option.StorageAccount.ContainerName.VerifyNotNull("Storage account container name is required");
+                option.StorageAccount.AccountKey.VerifyNotNull("Storage account key is required");
             }
 
             return option;

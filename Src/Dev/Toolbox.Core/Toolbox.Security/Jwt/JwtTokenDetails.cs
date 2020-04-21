@@ -18,7 +18,7 @@ namespace Khooversoft.Toolbox.Security
     {
         public JwtTokenDetails(JwtSecurityToken jwtSecurityToken)
         {
-            jwtSecurityToken.Verify(nameof(jwtSecurityToken)).IsNotNull();
+            jwtSecurityToken.VerifyNotNull(nameof(jwtSecurityToken));
 
             JwtSecurityToken = jwtSecurityToken;
 
@@ -43,8 +43,8 @@ namespace Khooversoft.Toolbox.Security
         public JwtTokenDetails(JwtSecurityToken jwtSecurityToken, SecurityToken securityToken, ClaimsPrincipal claimsPrincipal)
             : this(jwtSecurityToken)
         {
-            securityToken.Verify(nameof(securityToken)).IsNotNull();
-            claimsPrincipal.Verify(nameof(claimsPrincipal)).IsNotNull();
+            securityToken.VerifyNotNull(nameof(securityToken));
+            claimsPrincipal.VerifyNotNull(nameof(claimsPrincipal));
 
             SecurityToken = securityToken;
             ClaimsPrincipal = claimsPrincipal;

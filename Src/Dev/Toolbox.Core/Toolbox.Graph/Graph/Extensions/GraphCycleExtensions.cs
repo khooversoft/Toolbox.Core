@@ -44,7 +44,7 @@ namespace KHooversoft.Toolbox.Graph
                     break;
 
                 case VisitState.Visiting:
-                    stack.Count.Verify().Assert(x => x > 0, "Stack is empty");
+                    stack.Count.VerifyAssert(x => x > 0, "Stack is empty");
 
                     var list = stack.Select(pair => pair.Key)
                         .TakeWhile(parent => !EqualityComparer<T>.Default.Equals(parent, node))

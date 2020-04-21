@@ -50,7 +50,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public Func<IWorkContext, T, Task> Build()
         {
-            _pipelineItems.Count.Verify().Assert(x => x > 0, "Empty list");
+            _pipelineItems.Count.VerifyAssert(x => x > 0, _ => "Empty list");
 
             Func<IWorkContext, T, Task> pipeline = (context, message) =>
             {

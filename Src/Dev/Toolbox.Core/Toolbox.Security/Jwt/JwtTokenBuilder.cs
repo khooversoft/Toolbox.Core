@@ -56,7 +56,7 @@ namespace Khooversoft.Toolbox.Security
 
         public JwtTokenBuilder AddSubject(string subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             Claims.Add(new Claim(JwtStandardClaimNames.SubjectName, subject));
             return this;
@@ -64,7 +64,7 @@ namespace Khooversoft.Toolbox.Security
 
         public JwtTokenBuilder SetDigest(string payloadDigest)
         {
-            payloadDigest.Verify(nameof(payloadDigest)).IsNotNull();
+            payloadDigest.VerifyNotNull(nameof(payloadDigest));
 
             Claims.Add(new Claim(JwtStandardClaimNames.DigestName, payloadDigest));
             return this;
@@ -102,7 +102,7 @@ namespace Khooversoft.Toolbox.Security
 
         public JwtTokenBuilder SetClaim(Claim claim)
         {
-            claim.Verify(nameof(claim)).IsNotNull();
+            claim.VerifyNotNull(nameof(claim));
 
             Claims.Add(claim);
             return this;
@@ -121,7 +121,7 @@ namespace Khooversoft.Toolbox.Security
 
             if (PublicPrivateKey == null)
             {
-                Certificate.Verify(nameof(Certificate)).IsNotNull();
+                Certificate.VerifyNotNull(nameof(Certificate));
                 var securityKey = new X509SecurityKey(Certificate);
                 signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha512);
             }

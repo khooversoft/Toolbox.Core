@@ -10,7 +10,7 @@ namespace KHooversoft.Toolbox.Graph
 {
     public abstract class JobBase<TKey> : IJob, IGraphNode<TKey>, IDisposable
     {
-        private Task _executingTask;
+        private Task? _executingTask;
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
 
         public JobBase(TKey key)
@@ -79,9 +79,6 @@ namespace KHooversoft.Toolbox.Graph
             }
         }
 
-        public virtual void Dispose()
-        {
-            _stoppingCts.Cancel();
-        }
+        public virtual void Dispose() => _stoppingCts.Cancel();
     }
 }

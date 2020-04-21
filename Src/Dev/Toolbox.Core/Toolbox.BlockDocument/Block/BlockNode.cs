@@ -15,7 +15,7 @@ namespace Khooversoft.Toolbox.BlockDocument
     {
         public BlockNode(IDataBlock blockData)
         {
-            blockData.Verify(nameof(blockData)).IsNotNull();
+            blockData.VerifyNotNull(nameof(blockData));
 
             BlockData = blockData;
             Digest = GetDigest();
@@ -23,7 +23,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public BlockNode(IDataBlock blockData, int index, string? previousHash)
         {
-            blockData.Verify(nameof(blockData)).IsNotNull();
+            blockData.VerifyNotNull(nameof(blockData));
 
             BlockData = blockData;
             Index = index;

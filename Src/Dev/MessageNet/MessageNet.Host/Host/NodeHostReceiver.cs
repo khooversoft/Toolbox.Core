@@ -14,8 +14,8 @@ namespace Khooversoft.MessageNet.Host
     {
         public NodeHostReceiver(QueueId queueId, Func<NetMessage, Task> receiver)
         {
-            queueId.Verify(nameof(queueId)).IsNotNull();
-            receiver.Verify(nameof(receiver)).IsNotNull();
+            queueId.VerifyNotNull(nameof(queueId));
+            receiver.VerifyNotNull(nameof(receiver));
 
             QueueId = queueId;
             Receiver = receiver;

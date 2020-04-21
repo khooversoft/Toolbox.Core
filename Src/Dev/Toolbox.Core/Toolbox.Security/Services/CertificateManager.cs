@@ -26,7 +26,7 @@ namespace Khooversoft.Toolbox.Security
 
         public void Set(IWorkContext context, LocalCertificate certificate)
         {
-            certificate.Verify(nameof(certificate)).IsNotNull();
+            certificate.VerifyNotNull(nameof(certificate));
 
             _registration[certificate.LocalCertificateKey.Thumbprint] = certificate;
         }

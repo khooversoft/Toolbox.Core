@@ -2,6 +2,7 @@
 using Khooversoft.MessageNet.Host;
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
+using MessageNet.Host.Tests.Application;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -196,7 +197,7 @@ namespace MessageNet.Host.Tests
 
             for (int index = 0; index < max; index++)
             {
-                if (!messageReceivedQueue.TryDequeue(out NetMessage receivedMessage)) throw new InvalidOperationException("empty queue");
+                if (!messageReceivedQueue.TryDequeue(out NetMessage? receivedMessage)) throw new InvalidOperationException("empty queue");
 
                 receivedMessage.Headers.Count.Should().Be(2);
                 receivedMessage.Headers.First().ToUri.Should().Be(clientQueueId.ToMessageUri().ToString());

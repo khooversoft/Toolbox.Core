@@ -13,7 +13,7 @@ namespace Khooversoft.MessageNet.Interface
     {
         public MessageHeader(MessageHeader subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             MessageId = subject.MessageId;
             ToUri = subject.ToUri;
@@ -24,9 +24,9 @@ namespace Khooversoft.MessageNet.Interface
 
         public MessageHeader(string toUri, string fromUri, string method, params MessageClaim[] claims)
         {
-            toUri.Verify(nameof(toUri)).IsNotEmpty();
-            fromUri.Verify(nameof(fromUri)).IsNotEmpty();
-            method.Verify(nameof(method)).IsNotEmpty();
+            toUri.VerifyNotEmpty(nameof(toUri));
+            fromUri.VerifyNotEmpty(nameof(fromUri));
+            method.VerifyNotEmpty(nameof(method));
 
             ToUri = toUri.ToMessageUri().ToString();
             FromUri = fromUri.ToMessageUri().ToString();
@@ -42,9 +42,9 @@ namespace Khooversoft.MessageNet.Interface
 
         public MessageHeader(MessageUri toUri, MessageUri fromUri, string method, params MessageClaim[] claims)
         {
-            ToUri = toUri.Verify(nameof(toUri)).IsNotNull().Value.ToString();
-            FromUri = fromUri.Verify(nameof(fromUri)).IsNotNull().Value.ToString();
-            Method = method.Verify(nameof(method)).IsNotEmpty().Value.ToString();
+            ToUri = toUri.VerifyNotNull(nameof(toUri)).ToString();
+            FromUri = fromUri.VerifyNotNull(nameof(fromUri)).ToString();
+            Method = method.VerifyNotNull(nameof(method)).ToString();
             Claims = claims.GroupBy(x => x.Role, StringComparer.OrdinalIgnoreCase).Select(x => x.First()).ToList();
         }
 

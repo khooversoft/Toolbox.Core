@@ -24,76 +24,6 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
-        /// Execute 'action' on each item
-        /// </summary>
-        /// <typeparam name="T">type</typeparam>
-        /// <param name="list">list to operate on</param>
-        /// <param name="action">action to execute</param>
-        public static void ForEach<T>(this IEnumerable<T> list, Action<T> action)
-        {
-            list.Verify(nameof(list)).IsNotNull();
-            action.Verify(nameof(action)).IsNotNull();
-
-            foreach (var item in list)
-            {
-                action(item);
-            }
-        }
-
-        /// <summary>
-        /// Execute 'action' on each item
-        /// </summary>
-        /// <typeparam name="T">type</typeparam>
-        /// <param name="list">list to operate on</param>
-        /// <param name="action">action to execute</param>
-        public static void ForEach<T>(this IEnumerable<T> list, Action<T, int> action)
-        {
-            list.Verify(nameof(list)).IsNotNull();
-            action.Verify(nameof(action)).IsNotNull();
-
-            int index = 0;
-            foreach (var item in list)
-            {
-                action(item, index++);
-            }
-        }
-
-        /// <summary>
-        /// Execute 'action' on each item
-        /// </summary>
-        /// <typeparam name="T">type</typeparam>
-        /// <param name="list">list to operate on</param>
-        /// <param name="action">action to execute</param>
-        public static async Task ForEachAsync<T>(this IEnumerable<T> list, Func<T, Task> action)
-        {
-            list.Verify(nameof(list)).IsNotNull();
-            action.Verify(nameof(action)).IsNotNull();
-
-            foreach (var item in list)
-            {
-                await action(item);
-            }
-        }
-
-        /// <summary>
-        /// Execute 'action' on each item
-        /// </summary>
-        /// <typeparam name="T">type</typeparam>
-        /// <param name="list">list to operate on</param>
-        /// <param name="action">function to execute, index is passed</param>
-        public static async Task ForEachAsync<T>(this IEnumerable<T> list, Func<T, int, Task> action)
-        {
-            list.Verify(nameof(list)).IsNotNull();
-            action.Verify(nameof(action)).IsNotNull();
-
-            int index = 0;
-            foreach (var item in list)
-            {
-                await action(item, index++);
-            }
-        }
-
-        /// <summary>
         /// Convert enumerable to stack
         /// </summary>
         /// <typeparam name="T">type</typeparam>
@@ -101,7 +31,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>hash set</returns>
         public static Stack<T> ToStack<T>(this IEnumerable<T> self)
         {
-            self.Verify(nameof(self)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
 
             return new Stack<T>(self);
         }
@@ -114,7 +44,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>enumerable of T</returns>
         public static IEnumerable<T> Drain<T>(this Stack<T> subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             while (subject.TryPop(out T item)) yield return item;
         }
@@ -127,7 +57,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>enumerable of T</returns>
         public static IEnumerable<T> Drain<T>(this Queue<T> subject)
         {
-            subject.Verify(nameof(subject)).IsNotNull();
+            subject.VerifyNotNull(nameof(subject));
 
             while (subject.TryDequeue(out T item)) yield return item;
         }
@@ -139,7 +69,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>task</returns>
         public static Task WhenAll(this IEnumerable<Task> tasks)
         {
-            tasks.Verify(nameof(tasks)).IsNotNull();
+            tasks.VerifyNotNull(nameof(tasks));
 
             return Task.WhenAll(tasks);
         }
@@ -152,7 +82,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>array of types</returns>
         public static Task<T[]> WhenAll<T>(this IEnumerable<Task<T>> tasks)
         {
-            tasks.Verify(nameof(tasks)).IsNotNull();
+            tasks.VerifyNotNull(nameof(tasks));
 
             return Task.WhenAll(tasks);
         }

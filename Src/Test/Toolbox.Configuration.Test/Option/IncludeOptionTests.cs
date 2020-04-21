@@ -21,10 +21,9 @@ namespace Toolbox.Core.Extensions.Configuration.Test.Option
         public IncludeOptionTests()
         {
             Stream stream = Assembly.GetAssembly(typeof(IncludeOptionTests))
-                .Verify().IsNotNull("Assembly cannot be loaded").Value!
+                .VerifyNotNull("Assembly cannot be loaded")!
                 .GetManifestResourceStream("Toolbox.Configuration.Test.Option.Test.json")!
-                .Verify().IsNotNull("Cannot find Test.json in resources")
-                .Value;
+                .VerifyNotNull("Cannot find Test.json in resources");
 
             TestJsonFilePath = Path.GetTempFileName();
             using (var wr = new StreamWriter(TestJsonFilePath))
@@ -71,18 +70,18 @@ namespace Toolbox.Core.Extensions.Configuration.Test.Option
                 Option option = new Option();
                 configuration.Bind(option);
 
-                option.Verify(nameof(option)).IsNotNull();
-                (option.Send || option.Receive).Verify().Assert("Send and/or Receive must be specified");
-                option.EventHub.Verify().IsNotNull("Must specify Event hub details");
-                option.EventHub?.ConnectionString.Verify().IsNotEmpty("Event hub connection string is required");
-                option.EventHub?.Name.Verify().IsNotEmpty("Event hub name is required");
+                option.VerifyNotNull(nameof(option));
+                (option.Send || option.Receive).VerifyAssert(x => x, "Send and/or Receive must be specified");
+                option.EventHub.VerifyNotNull("Must specify Event hub details");
+                option.EventHub?.ConnectionString.VerifyNotEmpty("Event hub connection string is required");
+                option.EventHub?.Name.VerifyNotEmpty("Event hub name is required");
 
                 if (option.Receive)
                 {
-                    option.StorageAccount.Verify().IsNotNull("Storage account details are required");
-                    option.StorageAccount?.AccountName.Verify().IsNotEmpty("Storage account name is required");
-                    option.StorageAccount?.ContainerName.Verify().IsNotEmpty("Storage account container name is required");
-                    option.StorageAccount?.AccountKey.Verify().IsNotEmpty("Storage account key is required");
+                    option.StorageAccount.VerifyNotNull("Storage account details are required");
+                    option.StorageAccount?.AccountName.VerifyNotEmpty("Storage account name is required");
+                    option.StorageAccount?.ContainerName.VerifyNotEmpty("Storage account container name is required");
+                    option.StorageAccount?.AccountKey.VerifyNotEmpty("Storage account key is required");
                 }
 
                 return option;

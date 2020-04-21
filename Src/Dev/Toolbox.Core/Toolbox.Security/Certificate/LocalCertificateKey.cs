@@ -14,7 +14,7 @@ namespace Khooversoft.Toolbox.Security
     {
         public LocalCertificateKey(StoreLocation storeLocation, StoreName storeName, string thumbprint, bool requirePrivateKey)
         {
-            thumbprint.Verify(nameof(thumbprint)).IsNotNull();
+            thumbprint.VerifyNotNull(nameof(thumbprint));
 
             StoreLocation = storeLocation;
             StoreName = storeName;

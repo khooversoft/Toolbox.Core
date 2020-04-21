@@ -31,8 +31,8 @@ namespace KHooversoft.Toolbox.Graph
 
         public Task<Guid> StartJob(IWorkContext context, IJob job, Action<IWorkContext, IJobResult> completionNotification)
         {
-            job.Verify(nameof(job)).IsNotNull();
-            completionNotification.Verify(nameof(completionNotification)).IsNotNull();
+            job.VerifyNotNull(nameof(job));
+            completionNotification.VerifyNotNull(nameof(completionNotification));
 
             lock (_lock)
             {
@@ -52,7 +52,7 @@ namespace KHooversoft.Toolbox.Graph
 
         public async Task<bool> StopJob(IWorkContext context, Guid jobId)
         {
-            JobEntry jobEntry = null;
+            JobEntry jobEntry = default!;
 
             lock (_lock)
             {
@@ -64,7 +64,7 @@ namespace KHooversoft.Toolbox.Graph
                 Verify.Assert<InvalidOperationException>(_currentJob.Remove(jobId), $"Failed to remove job id {jobId} from collection");
             }
 
-            if (jobEntry.RunningTask.IsCompleted)
+            if (jobEntry.RunningTask?.IsCompleted == false)
             {
                 await jobEntry.Job.Stop(context);
             }
@@ -74,7 +74,7 @@ namespace KHooversoft.Toolbox.Graph
 
         private void Completed(IWorkContext context, Task task, Guid jobId, IJobResult jobResult)
         {
-            JobEntry jobEntry = null;
+            JobEntry jobEntry = null!;
 
             lock (_lock)
             {
@@ -103,7 +103,7 @@ namespace KHooversoft.Toolbox.Graph
 
             jobEntry?.CompletionNotification(context, new JobResult(jobId, status, duration, jobResult.Errors, task.Exception));
 
-            if( task.IsFaulted)
+            if (task.IsFaulted)
             {
                 context.Telemetry.Verbose(context, "Task disposed");
                 task.Dispose();
@@ -117,7 +117,7 @@ namespace KHooversoft.Toolbox.Graph
             lock (_lock)
             {
                 list = _currentJob.Values
-                    .Select(x => x.RunningTask)
+                    .Select(x => x.RunningTask!)
                     .ToArray();
             }
 
@@ -138,7 +138,7 @@ namespace KHooversoft.Toolbox.Graph
             lock (_lock)
             {
                 list = _currentJob.Values
-                    .Select(x => x.RunningTask)
+                    .Select(x => x.RunningTask!)
                     .ToArray();
             }
 
@@ -170,7 +170,7 @@ namespace KHooversoft.Toolbox.Graph
 
             public Action<IWorkContext, IJobResult> CompletionNotification { get; }
 
-            public Task RunningTask { get; set; }
+            public Task? RunningTask { get; set; }
 
             public DateTimeOffset StartTime = DateTimeOffset.Now;
         }

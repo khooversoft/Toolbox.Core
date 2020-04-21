@@ -19,9 +19,9 @@ namespace Khooversoft.MessageNet.Host
 
         public MessageClient(string connectionString, string queueName, IMessageAwaiterManager awaiterManager)
         {
-            connectionString.Verify(nameof(connectionString)).IsNotEmpty();
-            queueName.Verify(nameof(queueName)).IsNotEmpty();
-            awaiterManager.Verify(nameof(awaiterManager)).IsNotNull();
+            connectionString.VerifyNotEmpty(nameof(connectionString));
+            queueName.VerifyNotEmpty(nameof(queueName));
+            awaiterManager.VerifyNotNull(nameof(awaiterManager));
 
             _connectionString = connectionString;
             _queueName = queueName;

@@ -33,7 +33,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public IStateManager Build()
         {
-            StateItems.Verify(nameof(StateItems)).IsNotNull();
+            StateItems.VerifyNotNull(nameof(StateItems));
 
             return new StateManager(Policy, StateItems.ToArray());
         }

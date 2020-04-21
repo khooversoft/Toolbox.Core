@@ -20,7 +20,7 @@ namespace Khooversoft.Toolbox.Standard
 
         public EventDimensions(IEnumerable<KeyValuePair<string, object>> values)
         {
-            values.Verify(nameof(values)).IsNotNull();
+            values.VerifyNotNull(nameof(values));
 
             _dimension = values.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
         }
@@ -45,8 +45,8 @@ namespace Khooversoft.Toolbox.Standard
 
         public static EventDimensions operator +(EventDimensions self, IEventDimensions right)
         {
-            self.Verify(nameof(self)).IsNotNull();
-            right.Verify(nameof(right)).IsNotNull();
+            self.VerifyNotNull(nameof(self));
+            right.VerifyNotNull(nameof(right));
 
             var newDimensions = new Dictionary<string, object>();
 
