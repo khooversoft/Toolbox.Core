@@ -18,8 +18,8 @@ namespace MicroserviceHost
 
         public Task Run(IWorkContext context, IExecutionContext executionContext)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            executionContext.Verify(nameof(executionContext)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            executionContext.VerifyNotNull(nameof(executionContext));
 
             //IReadOnlyList<FunctionMessageReceiver> receivers = executionContext.FunctionConfigurations
             //    .Select(x => new FunctionMessageReceiver(x))

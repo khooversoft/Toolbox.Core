@@ -1,14 +1,12 @@
 ﻿using Autofac;
-using Khooversoft.MessageNet.Client;
+using Khooversoft.MessageNet.Host;
+using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Standard;
 using Microservice.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using Khooversoft.Toolbox.Autofac;
-using Khooversoft.MessageNet.Host;
 
 namespace MicroserviceHost
 {
@@ -62,8 +60,8 @@ namespace MicroserviceHost
             PropertyResolver ??= new PropertyResolver();
 
             IReadOnlyList<FunctionConfiguration> functionConfigurations = FunctionTypes
-                .Do(x => GetFunctionMethods(x))
-                .Do(x => GetFunctionConfiguration(x, PropertyResolver))
+                .Func(x => GetFunctionMethods(x))
+                .Func(x => GetFunctionConfiguration(x, PropertyResolver))
                 .ToList();
 
             ILifetimeScope? lifetimeScope = null;
@@ -111,7 +109,7 @@ namespace MicroserviceHost
                 // Figure out the second parameter's type, this must be a derived from RouteMessage<T>
                 Type sendMessageType = parameters
                     .Last()
-                    .Do(x => x.ParameterType);
+                    .Func(x => x.ParameterType);
 
                 return sendMessageType;
             }

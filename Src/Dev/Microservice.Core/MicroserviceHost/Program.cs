@@ -43,7 +43,7 @@ namespace MicroserviceHost
             Console.WriteLine(_programTitle);
             Console.WriteLine();
 
-            IOption option = Option.Build(args);
+            IOption option = OptionBuilder.Build(args);
 
             if (option.Help)
             {
@@ -79,7 +79,7 @@ namespace MicroserviceHost
                 Console.WriteLine("Hit Ctrl C to quit");
                 Console.WriteLine();
 
-                IExecutionContext executionContext = new ExecutionContext();
+                //IExecutionContext executionContext = new ExecutionContext();
 
                 //await new IAction[]
                 //{

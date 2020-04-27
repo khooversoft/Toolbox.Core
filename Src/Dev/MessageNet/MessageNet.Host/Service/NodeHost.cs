@@ -36,7 +36,7 @@ namespace Khooversoft.MessageNet.Host
             context.Telemetry.Info(context, $"Starting node host for {_nodeHostReceiver.QueueId}");
             _receiver = await _routeRepository.Register(context, _nodeHostReceiver.QueueId);
 
-            await _receiver.Start(context, x => _nodeHostReceiver.Receiver(x.ConvertTo()));
+            //await _receiver.Start(context, x => _nodeHostReceiver.Receiver(x.ConvertTo()));
         }
 
         public Task Stop(IWorkContext context)

@@ -29,7 +29,7 @@ namespace MicroserviceHost
 
         public ExecutionContextBuilder SetPropertyResolver(IPropertyResolver propertyResolver)
         {
-            _propertyResolver.Verify(nameof(_propertyResolver)).IsNotNull();
+            _propertyResolver.VerifyNotNull(nameof(_propertyResolver));
 
             _propertyResolver = propertyResolver;
             return this;
@@ -37,7 +37,7 @@ namespace MicroserviceHost
 
         public ExecutionContextBuilder SetNameServerUri(Uri nameServerUri)
         {
-            nameServerUri.Verify(nameof(nameServerUri)).IsNotNull();
+            nameServerUri.VerifyNotNull(nameof(nameServerUri));
 
             NameServerUri = nameServerUri;
             return this;
@@ -45,7 +45,7 @@ namespace MicroserviceHost
 
         public ExecutionContextBuilder SetServiceBusConnection(string serviceBusConnection)
         {
-            serviceBusConnection.Verify(nameof(serviceBusConnection)).IsNotEmpty();
+            serviceBusConnection.VerifyNotEmpty(nameof(serviceBusConnection));
 
             ServiceBusConnection = serviceBusConnection;
             return this;
@@ -53,7 +53,7 @@ namespace MicroserviceHost
 
         public ExecutionContextBuilder SetTypes(params Type[] types)
         {
-            types.Verify(nameof(types)).IsNotNull();
+            types.VerifyNotNull(nameof(types));
 
             Types = types;
             return this;
@@ -61,7 +61,7 @@ namespace MicroserviceHost
 
         public ExecutionContextBuilder SetContainer(ContainerBuilder container)
         {
-            container.Verify(nameof(container)).IsNotNull();
+            container.VerifyNotNull(nameof(container));
 
             ContainerBuilder = container;
             return this;
@@ -69,9 +69,9 @@ namespace MicroserviceHost
 
         public IReadOnlyList<FunctionConfiguration> Build(IWorkContext context)
         {
-            _propertyResolver.Verify().IsNotNull("Property resolver not set");
-            NameServerUri!.Verify().IsNotNull("Name server URI is not set");
-            ServiceBusConnection!.Verify().IsNotEmpty("Service bus connection is not set");
+            _propertyResolver.VerifyNotNull("Property resolver not set");
+            NameServerUri.VerifyNotNull("Name server URI is not set");
+            ServiceBusConnection.VerifyNotEmpty("Service bus connection is not set");
 
             IReadOnlyList<Function> functions = GetFunctions(context, Types!);
             IReadOnlyList<FunctionConfiguration> functionConfigurations = GetFunctionConfiguration(context, functions);
@@ -123,27 +123,25 @@ namespace MicroserviceHost
 
             // Only two parameters are required
             parameters
-                .Verify()
-                .Assert(x => x.Length == 2, $"Function {methodName} does not have 2 parameters");
+                .VerifyAssert(x => x.Length == 2, $"Function {methodName} does not have 2 parameters");
 
             // Verify first parameter is the "IWorkContext"
             parameters
                 .First()
-                .Verify()
-                .Assert(x => x.ParameterType == typeof(IWorkContext), $"The first parameter is not {typeof(IWorkContext).GetType().FullName} for function {methodName}");
+                .VerifyAssert(x => x.ParameterType == typeof(IWorkContext), $"The first parameter is not {typeof(IWorkContext).GetType().FullName} for function {methodName}");
 
             // Figure out the second parameter's type, this must be a derived from RouteMessage<T>
             Type sendMessageType = parameters
                 .Last()
-                .Do(x => x.ParameterType);
+                .Func(x => x.ParameterType);
 
             return sendMessageType;
         }
 
         public IReadOnlyList<FunctionConfiguration> GetFunctionConfiguration(IWorkContext context, IReadOnlyList<Function> functions)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            functions.Verify(nameof(functions)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            functions.VerifyNotNull(nameof(functions));
 
             return functions
                 .Select(x => MessageNetFactory(x))
@@ -154,10 +152,8 @@ namespace MicroserviceHost
         {
             string nodeId = function.FunctionAttribute.NodeId
                 .Resolve(_propertyResolver!)
-                .Verify(nameof(function.FunctionAttribute.NodeId))
-                .IsNotEmpty($"Function: {function.Name} {function.FunctionAttribute.NodeId} is required")
-                .Assert(x => x.GetPropertyNames()?.Count == 0, $"Unresolved properties for {function.FunctionAttribute.NodeId}")
-                .Value;
+                .VerifyNotEmpty($"Function: {function.Name} {function.FunctionAttribute.NodeId} is required")
+                .VerifyAssert(x => x.GetPropertyNames()?.Count == 0, $"Unresolved properties for {function.FunctionAttribute.NodeId}");
 
             return new FunctionConfiguration(function, nodeId);
         }

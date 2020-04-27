@@ -14,8 +14,8 @@ namespace MicroserviceHost.Actions
 
         public Task Run(IWorkContext context, IExecutionContext executionContext)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            executionContext.Verify(nameof(executionContext)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            executionContext.VerifyNotNull(nameof(executionContext));
 
             //var functionConfigurations = executionContext.Functions
             //    .Select(x => MessageNetFactory(x))
@@ -29,10 +29,8 @@ namespace MicroserviceHost.Actions
         {
             string nodeId = function.FunctionAttribute.NodeId
                 .Resolve(_option.Properties)
-                .Verify(nameof(function.FunctionAttribute.NodeId))
-                .IsNotEmpty($"Function: {function.Name} {function.FunctionAttribute.NodeId} is required")
-                .Assert(x => x.GetPropertyNames()?.Count == 0, $"Unresolved properties for {function.FunctionAttribute.NodeId}")
-                .Value;
+                .VerifyNotEmpty($"Function: {function.Name} {function.FunctionAttribute.NodeId} is required")
+                .VerifyAssert(x => x.GetPropertyNames()?.Count == 0, $"Unresolved properties for {function.FunctionAttribute.NodeId}");
 
             return new FunctionConfiguration(function, nodeId);
         }

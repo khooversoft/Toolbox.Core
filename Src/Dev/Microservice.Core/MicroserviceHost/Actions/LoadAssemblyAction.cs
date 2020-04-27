@@ -22,8 +22,8 @@ namespace MicroserviceHost
 
         public Task Run(IWorkContext context, IExecutionContext executionContext)
         {
-            context.Verify(nameof(context)).IsNotNull();
-            executionContext.Verify(nameof(executionContext)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
+            executionContext.VerifyNotNull(nameof(executionContext));
 
             Assembly assembly = LoadAssembly(context);
             var list = new List<Function>();
@@ -51,7 +51,7 @@ namespace MicroserviceHost
 
         private Assembly LoadAssembly(IWorkContext context)
         {
-            context.Verify(nameof(context)).IsNotNull();
+            context.VerifyNotNull(nameof(context));
 
             context.Telemetry.Info(context, $"Loading assembly {_option.AssemblyPath}");
             Assembly assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(_option.AssemblyPath!);
@@ -66,23 +66,19 @@ namespace MicroserviceHost
 
             // Only two parameters are required
             parameters
-                .Verify()
-                .Assert(x => x.Length == 2, $"Function {methodName} does not have 2 parameters");
+                .VerifyAssert(x => x.Length == 2, $"Function {methodName} does not have 2 parameters");
 
             // Verify first parameter is the "IWorkContext"
             parameters
                 .First()
-                .Verify()
-                .Assert(x => x.ParameterType == typeof(IWorkContext), $"The first parameter is not {typeof(IWorkContext).GetType().FullName} for function {methodName}");
+                .VerifyAssert(x => x.ParameterType == typeof(IWorkContext), $"The first parameter is not {typeof(IWorkContext).GetType().FullName} for function {methodName}");
 
             // Figure out the second parameter's type, this must be a derived from RouteMessage<T>
             Type sendMessageType = parameters
                 .Last()
-                .Do(x => x.ParameterType)
-                .Verify()
-                .Assert(x => x.DeclaringType == typeof(NetMessage) || x.DeclaringType!.IsClass, $"The second parameter type is not NetMessage or a class for {methodName} ")
-                .Assert(x => x.GetConstructor(Type.EmptyTypes) != null, $"The second parameter type does not implement a parameterless constructor for function {methodName}")
-                .Value;
+                .Func(x => x.ParameterType)
+                .VerifyAssert(x => x.DeclaringType == typeof(NetMessage) || x.DeclaringType!.IsClass, $"The second parameter type is not NetMessage or a class for {methodName} ")
+                .VerifyAssert(x => x.GetConstructor(Type.EmptyTypes) != null, $"The second parameter type does not implement a parameterless constructor for function {methodName}");
 
             return sendMessageType;
         }

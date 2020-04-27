@@ -10,7 +10,7 @@ namespace MicroserviceHost
     {
         public ExecutionContext(IEnumerable<FunctionConfiguration> functionConfigurations)
         {
-            functionConfigurations.Verify(nameof(functionConfigurations)).IsNotNull();
+            functionConfigurations.VerifyNotNull(nameof(functionConfigurations));
 
             FunctionConfigurations = functionConfigurations.ToList();
         }

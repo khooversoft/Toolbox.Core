@@ -1,5 +1,4 @@
-﻿using Khooversoft.MessageNet.Client;
-using Khooversoft.Toolbox.Standard;
+﻿using Khooversoft.Toolbox.Standard;
 using Microservice.Interface;
 using System;
 using System.Reflection;

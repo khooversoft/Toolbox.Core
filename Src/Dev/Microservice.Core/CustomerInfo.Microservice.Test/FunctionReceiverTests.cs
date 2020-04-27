@@ -1,7 +1,7 @@
 using Autofac;
+using CustomerInfo.Microservice.Test.Application;
 using CustomerInfo.MicroService;
 using FluentAssertions;
-using Khooversoft.MessageNet.Client;
 using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Standard;
 using Microservice.Interface;
@@ -18,8 +18,17 @@ using Xunit;
 
 namespace CustomerInfo.Microservice.Test
 {
-    public class FunctionReceiverTests
+    public class FunctionReceiverTests : IClassFixture<ApplicationFixture>
     {
+        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
+        private readonly ApplicationFixture _application;
+
+        public FunctionReceiverTests(ApplicationFixture application)
+        {
+            _application = application;
+        }
+
+
         [Fact]
         public async Task GivenFunction_AfterBind_SendSingleMessageIsReceived()
         {
@@ -37,7 +46,7 @@ namespace CustomerInfo.Microservice.Test
             FunctionHost host = new FunctionHostBuilder()
                 .AddFunctionType(assemblyLoader.LoadFromAssemblyPath(assemblyPathToLoad).GetExportedTypes())
                 .UseContainer(new ServiceContainerBuilder().SetLifetimeScope(lifetimeScope).Build())
-                .SetMessageNetClient(messageNetClient)
+                .SetMessageNetConfig(_application.GetMessageNetConfig())
                 .Build(workContext);
 
             await host.Start(workContext);

@@ -14,8 +14,8 @@ namespace MicroserviceHost
 
         public void Verify()
         {
-            Namespace.Verify(nameof(Namespace)).IsNotNull();
-            ConnectionString.Verify(nameof(ConnectionString)).IsNotNull();
+            Namespace.VerifyNotNull(nameof(Namespace));
+            ConnectionString.VerifyNotNull(nameof(ConnectionString));
         }
     }
 }

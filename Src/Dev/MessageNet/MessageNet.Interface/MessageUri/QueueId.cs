@@ -30,21 +30,6 @@ namespace Khooversoft.MessageNet.Interface
 
         public override string ToString() => Namespace + "/" + NetworkId + "/" + NodeId;
 
-        public override bool Equals(object obj) => obj switch
-        {
-            QueueId queueId => Namespace.Equals(queueId.NetworkId, StringComparison.OrdinalIgnoreCase) &&
-                NetworkId.Equals(queueId.NetworkId, StringComparison.OrdinalIgnoreCase) &&
-                NodeId.Equals(queueId.NodeId, StringComparison.OrdinalIgnoreCase),
-
-            _ => false,
-        };
-
-        public override int GetHashCode() => HashCode.Combine(NetworkId, NodeId);
-
-        public static bool operator ==(QueueId v1, QueueId v2) => v1?.Equals(v2) == true;
-
-        public static bool operator !=(QueueId v1, QueueId v2) => v1?.Equals(v2) == false;
-
         public static QueueId Parse(string queueId)
         {
             queueId.VerifyNotEmpty(nameof(queueId));
@@ -79,5 +64,19 @@ namespace Khooversoft.MessageNet.Interface
             networkId.VerifyAssert(x => _idVerify.IsMatch(networkId), "Network id is not valid: [alpha][alpha, numeric, ...]");
             nodeId.VerifyAssert(x => _nodeIdVerify.IsMatch(nodeId), "Node id is not valid: [alpha][alpha, numeric, '.', ...]");
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is QueueId id &&
+                   Namespace.Equals(id.Namespace, StringComparison.OrdinalIgnoreCase) &&
+                   NetworkId.Equals(id.NetworkId, StringComparison.OrdinalIgnoreCase) &&
+                   NodeId.Equals(id.NodeId, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Namespace, NetworkId, NodeId);
+
+        public static bool operator ==(QueueId? left, QueueId? right) => EqualityComparer<QueueId>.Default.Equals(left!, right!);
+
+        public static bool operator !=(QueueId? left, QueueId? right) => !(left == right);
     }
 }
