@@ -1,18 +1,8 @@
 using Autofac;
 using CustomerInfo.Microservice.Test.Application;
-using CustomerInfo.MicroService;
-using FluentAssertions;
-using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Standard;
-using Microservice.Interface;
-using Microservice.Interface.Test;
 using MicroserviceHost;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Loader;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -20,7 +10,6 @@ namespace CustomerInfo.Microservice.Test
 {
     public class FunctionReceiverTests : IClassFixture<ApplicationFixture>
     {
-        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly ApplicationFixture _application;
 
         public FunctionReceiverTests(ApplicationFixture application)
@@ -32,80 +21,84 @@ namespace CustomerInfo.Microservice.Test
         [Fact]
         public async Task GivenFunction_AfterBind_SendSingleMessageIsReceived()
         {
-            IWorkContext workContext = WorkContextBuilder.Default;
-            ITestContext testContext = new TestContext();
-            IAssemblyLoader assemblyLoader = new AssemblyLoader();
+            var tokenSource = new CancellationTokenSource();
 
-            string assemblyPathToLoad = @"D:\Sources\Toolbox.Core\Src\Test\Microservice.Core\CustomerInfo.MicroService\bin\Debug\netstandard2.1\CustomerInfo.MicroService.dll";
+            IWorkContext workContext = new WorkContextBuilder()
+                .Set(tokenSource.Token)
+                .Build();
 
-            var diBuilder = new ContainerBuilder();
-            diBuilder.RegisterInstance(testContext).As<ITestContext>();
-            using IContainer container = diBuilder.Build();
-            using ILifetimeScope lifetimeScope = container.BeginLifetimeScope();
+            Task run = RunFunctions(workContext);
 
-            FunctionHost host = new FunctionHostBuilder()
-                .AddFunctionType(assemblyLoader.LoadFromAssemblyPath(assemblyPathToLoad).GetExportedTypes())
-                .UseContainer(new ServiceContainerBuilder().SetLifetimeScope(lifetimeScope).Build())
-                .SetMessageNetConfig(_application.GetMessageNetConfig())
-                .Build(workContext);
-
-            await host.Start(workContext);
-
-            string message = "Hello, my name is HAL";
-            await messageNetClient.SendMessage(Encoding.UTF8.GetBytes(message));
-
-            messageNetClient.Dispose();
-
-            host.Stop(workContext);
-
-            testContext.MessageCount.Should().Be(1);
-            testContext.Messages.Count.Should().Be(1);
-            testContext.Messages.First().Should().Be(message);
         }
 
-        //[Fact]
-        //public async Task GivenFunction_AfterBind_SendMultpleMessageSIsReceived()
-        //{
-        //    ITestContext testContext = new TestContext();
-        //    IAssemblyLoader assemblyLoader = new AssemblyLoader();
+        private async Task RunFunctions(IWorkContext workContext)
+        {
+            IExecutionContext executionContext = new MicroserviceHost.ExecutionContext();
+            IContainer container = new ContainerBuilder().Build();
 
-        //    string assemblyPathToLoad = @"D:\Sources\Toolbox.Core\Src\Test\Microservice.Core\CustomerInfo.MicroService\bin\Debug\netstandard2.1\CustomerInfo.MicroService.dll";
+            var loadAssembly = new LoadAssemblyActivity(_application.Option);
+            await loadAssembly.Load(workContext, executionContext);
 
-        //    Assembly assembly = assemblyLoader.LoadFromAssemblyPath(assemblyPathToLoad!);
+            using ILifetimeScope lifetimeScope = container.BeginLifetimeScope();
+            var buildContainerActivity = new BuildContainerActivity(lifetimeScope);
+            await buildContainerActivity.Build(workContext, executionContext);
 
-        //    IReadOnlyList<FunctionConfiguration> functions = new ExecutionContextBuilder()
-        //        .SetNameServerUri(new Uri("http://localhost"))
-        //        .SetServiceBusConnection("endpoint:fake.connections")
-        //        .SetTypes(assembly.GetExportedTypes())
-        //        .Build(WorkContext.Empty);
+            var runFunctionReceivers = new RunFunctionReceiversActivity(_application.Option);
+            await runFunctionReceivers.Run(workContext, executionContext);
+        }
 
-        //    functions.Count.Should().Be(1);
+        public async Task RunReceiver()
+        {
+            var clientQueueId = new QueueId("default", "test", "clientNode");
+            var identityQueueId = new QueueId("default", "test", "identityNode");
 
-        //    var diBuilder = new ContainerBuilder();
-        //    diBuilder.RegisterInstance(testContext).As<ITestContext>();
+            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig());
+            await messageRepository.Unregister(_workContext, clientQueueId);
+            await messageRepository.Unregister(_workContext, identityQueueId);
 
-        //    functions
-        //        .ForEach(x => diBuilder.RegisterType(x.MethodInfo.DeclaringType!));
+            IMessageNetHost netHost = null!;
 
-        //    using IContainer container = diBuilder.Build();
+            var clientReceiverTask = new TaskCompletionSource<NetMessage>();
 
-        //    IWorkContext workContext = new WorkContextBuilder()
-        //        .Set(new ServiceProviderProxySimple(x => container.Resolve(x)))
-        //        .Build();
+            Func<NetMessage, Task> clientNodeReceiver = x =>
+            {
+                clientReceiverTask.SetResult(x);
+                return Task.CompletedTask;
+            };
 
-        //    var messageNetClient = new MessageNetClientFake();
-        //    FunctionMessageReceiver functionMessageReceiver = new FunctionMessageReceiver(executionContext.FunctionConfigurations[0], messageNetClient);
+            Func<NetMessage, Task> identityNodeReceiver = async x =>
+            {
+                NetMessage netMessage = new NetMessageBuilder(x)
+                    .Add(x.Header.WithReply("get.response"))
+                    .Build();
 
-        //    await functionMessageReceiver.Start(workContext);
+                await netHost.Send(_workContext, netMessage);
+            };
 
-        //    string message = "Hello, my name is HAL";
-        //    await messageNetClient.SendMessage(Encoding.UTF8.GetBytes(message));
+            netHost = new MessageNetHostBuilder()
+                .SetConfig(_application.GetMessageNetConfig())
+                .SetRepository(new MessageRepository(_application.GetMessageNetConfig()))
+                .SetAwaiter(new MessageAwaiterManager())
+                .AddNodeReceiver(new NodeHostReceiver(identityQueueId, identityNodeReceiver))
+                .AddNodeReceiver(new NodeHostReceiver(clientQueueId, clientNodeReceiver))
+                .Build();
 
-        //    messageNetClient.Dispose();
+            await netHost.Start(_workContext);
 
-        //    testContext.MessageCount.Should().Be(1);
-        //    testContext.Messages.Count.Should().Be(1);
-        //    testContext.Messages.First().Should().Be(message);
-        //}
+            var header = new MessageHeader(identityQueueId.ToMessageUri(), clientQueueId.ToMessageUri(), "get");
+
+            var message = new NetMessageBuilder()
+                .Add(header)
+                .Build();
+
+            await netHost.Send(_workContext, message);
+
+            NetMessage receivedMessage = await clientReceiverTask.Task;
+
+            receivedMessage.Headers.Count.Should().Be(2);
+            receivedMessage.Headers.First().ToUri.Should().Be(clientQueueId.ToMessageUri().ToString());
+            receivedMessage.Headers.First().FromUri.Should().Be(identityQueueId.ToMessageUri().ToString());
+            receivedMessage.Headers.Skip(1).First().Should().Be(header);
+        }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MicroserviceHost
 {
-    internal class NamespaceConnection
+    public class NamespaceConnection
     {
         public string Namespace { get; set; } = null!;
 

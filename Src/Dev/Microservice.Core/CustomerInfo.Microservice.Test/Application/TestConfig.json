@@ -1,4 +1,11 @@
 {
-  "NamespaceName": "messagehubtest",
-  "SharedAccessKeyName": "RootManageSharedAccessKey"
+  "Run": true,
+  "AssemblyPath": "D:\\Sources\\Toolbox.Core\\Src\\Test\\Microservice.Core\\CustomerInfo.MicroService\\bin\\Debug\\netstandard2.1\\CustomerInfo.MicroService.dll",
+
+  "NamespaceConnection": [
+    {
+      "Namespace": "default",
+      "ConnectionString": "Endpoint=sb://messagehubtest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={SharedAccessKey};TransportType=Amqp"
+    }
+  ]
 }

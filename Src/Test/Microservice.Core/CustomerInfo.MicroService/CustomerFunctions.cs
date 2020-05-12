@@ -19,7 +19,7 @@ namespace CustomerInfo.MicroService
             _testContext = testContext;
         }
 
-        [MessageFunction("CustomerAddress", "test/Get-CustomerInfo")]
+        [MessageFunction("CustomerAddress", "{namespace}/{network.id}/Get-CustomerInfo")]
         public Task GetCustomerInfo(IWorkContext context, CustomerInfoRequest request)
         {
             context.VerifyNotNull(nameof(context));
@@ -30,7 +30,7 @@ namespace CustomerInfo.MicroService
             return Task.CompletedTask;
         }
 
-        [MessageFunction("CustomerAddress", "test/Post-LogCustomerAddress")]
+        [MessageFunction("CustomerAddress", "{namespace}/{network.id}/Post-LogCustomerAddress")]
         public Task GetCustomerInfo(IWorkContext context, NetMessage request)
         {
             context.VerifyNotNull(nameof(context));

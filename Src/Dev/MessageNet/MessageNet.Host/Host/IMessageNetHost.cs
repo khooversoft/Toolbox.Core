@@ -10,16 +10,12 @@ using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Host
 {
-    public interface IMessageNetHost : IDisposable
+    public interface IMessageNetHost : IMessageNetSend, IDisposable
     {
         Task Start(IWorkContext context);
 
         Task Stop(IWorkContext context);
 
         Task<IMessageClient> GetMessageClient(IWorkContext context, QueueId queueId);
-
-        Task Send(IWorkContext context, NetMessage netMessage);
-
-        Task<NetMessage> Call(IWorkContext context, NetMessage netMessage, TimeSpan? timeout = null);
     }
 }

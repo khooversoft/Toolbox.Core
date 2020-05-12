@@ -29,11 +29,11 @@ namespace MicroserviceHost
 
         [Option("Namespace for nodes")]
         [PropertyResolver]
-        public string? Namespace { get; set; }
+        public string Namespace { get; set; } = "default";
 
         [Option("Network id for nodes")]
         [PropertyResolver("network.id")]
-        public string? NetworkId { get; set; }
+        public string NetworkId { get; set; } = "test";
 
         [Option("Path to assembly to run")]
         [PropertyResolver]

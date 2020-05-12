@@ -90,18 +90,18 @@ namespace Toolbox.Standard.Test.Function
 
             const string msg = "Message 99-";
 
-            var objs = new object[]
+            var filteredTypes = new Type[]
             {
-                msg,
-                WorkContextBuilder.Default,
+                msg.GetType(),
+                WorkContextBuilder.Default.GetType(),
             };
 
-            Type[] missing = host["SendFunction4"].FunctionInfo.MethodInfo.GetMissingParameters(objs);
+            Type[] missing = host["SendFunction4"].FunctionInfo.MethodInfo.GetMissingParameters(filteredTypes);
             missing.Should().NotBeNull();
             missing.Length.Should().Be(1);
             (missing[0] == typeof(SendMsg)).Should().BeTrue();
 
-            objs = new object[]
+            var objs = new object[]
             {
                 new SendMsg("private"),
                 msg,

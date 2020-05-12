@@ -32,6 +32,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3871EC27-6079-41EA-85C9-A42BC761BE8A}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		..\..\Test\MessageNet\ServiceBusSetup\Create-TestServiceBus.ps1 = ..\..\Test\MessageNet\ServiceBusSetup\Create-TestServiceBus.ps1
+		..\..\Test\MessageNet\ServiceBusSetup\Remove-TestServiceBus.ps1 = ..\..\Test\MessageNet\ServiceBusSetup\Remove-TestServiceBus.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageNet.Host", "..\MessageNet\MessageNet.Host\MessageNet.Host.csproj", "{2D3F21F7-9BD9-432F-BE55-892320F997C4}"

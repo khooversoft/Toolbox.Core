@@ -53,14 +53,20 @@ namespace Khooversoft.Toolbox.Standard
                 .ToArray();
         }
 
-        public static Type[] GetMissingParameters(this MethodInfo methodInfo, object[] filterOut)
+        /// <summary>
+        /// Return missing parameter for method base on filtered types
+        /// </summary>
+        /// <param name="methodInfo">methodInfo of the method</param>
+        /// <param name="filterOut">types to filter out</param>
+        /// <returns></returns>
+        public static Type[] GetMissingParameters(this MethodInfo methodInfo, Type[] filterOut)
         {
             methodInfo.VerifyNotNull(nameof(methodInfo));
             filterOut.VerifyNotNull(nameof(filterOut));
 
             return methodInfo
                 .GetParameters()
-                .Where((x, i) => (filterOut.FirstOrDefault(y => x.ParameterType.IsAssignableFrom(y.GetType())) == null && methodInfo.GetParameters()[i].DefaultValue == DBNull.Value))
+                .Where((x, i) => (filterOut.FirstOrDefault(filterType => x.ParameterType.IsAssignableFrom(filterType)) == null && methodInfo.GetParameters()[i].DefaultValue == DBNull.Value))
                 .Select(x => x.ParameterType)
                 .ToArray();
         }

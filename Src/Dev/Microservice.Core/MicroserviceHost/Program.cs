@@ -4,8 +4,11 @@ using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+
+[assembly:InternalsVisibleTo("CustomerInfo.Microservice.Test", AllInternalsVisible = true)]
 
 namespace MicroserviceHost
 {
@@ -38,19 +41,21 @@ namespace MicroserviceHost
 
         private static void DisplayStartDetails(string[] args) => Console.WriteLine($"Arguments: {string.Join(", ", args)}");
 
-        private Task<int> Run(string[] args)
+        private async Task<int> Run(string[] args)
         {
             Console.WriteLine(_programTitle);
             Console.WriteLine();
 
-            IOption option = OptionBuilder.Build(args);
+            IOption option = new OptionBuilder()
+                .SetArgs(args)
+                .Build();
 
             if (option.Help)
             {
                 option.FormatHelp()
                     .ForEach(x => Console.WriteLine(option.SecretManager.Mask(x)));
 
-                return Task.FromResult(_ok);
+                return _ok;
             }
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -73,21 +78,33 @@ namespace MicroserviceHost
                 {
                     e.Cancel = true;
                     cancellationTokenSource.Cancel();
-                    Console.WriteLine("Canceling...");
+                    logger.Info(context, "Canceling...");
                 };
 
-                Console.WriteLine("Hit Ctrl C to quit");
+                Console.WriteLine("Hit Control-C to quit");
                 Console.WriteLine();
 
-                //IExecutionContext executionContext = new ExecutionContext();
+                IExecutionContext executionContext = new ExecutionContext
+                {
+                    KnownInjectMethodTypes = new[]
+                    {
+                        typeof(IWorkContext),
+                        typeof(ITelemetry)
+                    },
+                };
 
-                //await new IAction[]
-                //{
-                //    container.Resolve<LoadAssemblyAction>(),
-                //}
-                //.ForEachAsync(x => x.Run(context, executionContext));
+                var activities = new Func<Task>[]
+                {
+                    () => option.Run ? container.Resolve<LoadAssemblyActivity>().Load(context, executionContext) : Task.CompletedTask,
+                    () => option.Run ? container.Resolve<BuildContainerActivity>().Build(context, executionContext) : Task.CompletedTask,
+                    () => option.Run ? container.Resolve<RunFunctionReceiversActivity>().Run(context, executionContext) : Task.CompletedTask,
+                };
 
-                return Task.FromResult(_ok);
+                await activities
+                    .ForEachAsync(async x => await x());
+
+                logger.Info(context, "Completed");
+                return _ok;
             }
         }
 
@@ -96,7 +113,9 @@ namespace MicroserviceHost
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(option).As<IOption>();
-            builder.RegisterType<LoadAssemblyAction>().InstancePerLifetimeScope();
+            builder.RegisterType<LoadAssemblyActivity>().InstancePerLifetimeScope();
+            builder.RegisterType<BuildContainerActivity>().InstancePerLifetimeScope();
+            builder.RegisterType<RunFunctionReceiversActivity>().InstancePerLifetimeScope();
 
             BuildTelemetry(option, builder);
 

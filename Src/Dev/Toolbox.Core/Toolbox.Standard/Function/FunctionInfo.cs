@@ -15,13 +15,14 @@ namespace Khooversoft.Toolbox.Standard
 
             MethodInfo = method;
             Attribute = attribute;
-        }
 
-        public string Name =>
-            Attribute.GetType().GetProperty(nameof(Name))
+            Name = Attribute.GetType().GetProperty(nameof(Name))
                 ?.GetValue(Attribute)
                 ?.CastAs<string>()
             ?? $"{MethodInfo.DeclaringType.Name}.{MethodInfo.Name}";
+        }
+
+        public string Name { get; }
 
         public MethodInfo MethodInfo { get; }
 

@@ -6,18 +6,46 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace MicroserviceHost
 {
-    internal static class OptionBuilder
+    internal class OptionBuilder
     {
-        public static IOption Build(this string[] args)
+        public string[]? Args { get; set; }
+
+        public Stream? JsonStream { get; set; }
+
+        public string UserSecretsId { get; set; } = nameof(MicroserviceHost);
+
+        public OptionBuilder SetArgs(params string[] args)
         {
+            Args = args;
+            return this;
+        }
+
+        public OptionBuilder SetJsonStream(Stream stream)
+        {
+            JsonStream = stream;
+            return this;
+        }
+
+        public OptionBuilder SetUserSecretId(string userSecretId)
+        {
+            UserSecretsId = userSecretId.VerifyNotEmpty(nameof(userSecretId));
+            return this;
+        }
+
+        public IOption Build()
+        {
+            string[] args = Args ?? Array.Empty<string>();
+
             Option option = new ConfigurationBuilder()
                 .AddIncludeFiles(args, "ConfigFile")
+                .Func(x => JsonStream != null ? x.AddJsonStream(JsonStream) : x)
                 .AddCommandLine(args.ConflateKeyValue<Option>())
-                .AddUserSecrets(nameof(MicroserviceHost))
+                .AddUserSecrets(UserSecretsId.VerifyNotEmpty(nameof(UserSecretsId)))
                 .Build()
                 .BuildOption<Option>();
 

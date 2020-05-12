@@ -1,4 +1,5 @@
-﻿using Khooversoft.Toolbox.Standard;
+﻿using Autofac;
+using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,15 +7,12 @@ using System.Text;
 
 namespace MicroserviceHost
 {
-    public class ExecutionContext : IExecutionContext
+    internal class ExecutionContext : IExecutionContext
     {
-        public ExecutionContext(IEnumerable<FunctionConfiguration> functionConfigurations)
-        {
-            functionConfigurations.VerifyNotNull(nameof(functionConfigurations));
+        public ILifetimeScope? LifetimeScope { get; set; }
 
-            FunctionConfigurations = functionConfigurations.ToList();
-        }
+        public IReadOnlyList<FunctionInfo>? FunctionInfos { get; set; }
 
-        public IReadOnlyList<FunctionConfiguration> FunctionConfigurations { get; }
+        public IReadOnlyList<Type>? KnownInjectMethodTypes { get; set; }
     }
 }

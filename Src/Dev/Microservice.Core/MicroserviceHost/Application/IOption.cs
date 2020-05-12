@@ -1,12 +1,13 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
+using Khooversoft.MessageNet.Host;
 using Khooversoft.Toolbox.Standard;
 using System.Collections.Generic;
 
 namespace MicroserviceHost
 {
-    internal interface IOption
+    public interface IOption
     {
         string AssemblyPath { get; set; }
 
@@ -22,12 +23,14 @@ namespace MicroserviceHost
 
         IList<NamespaceConnection> NamespaceConnections { get; }
 
-        public string? Namespace { get; }
+        public string Namespace { get; }
 
-        public string? NetworkId { get; }
+        public string NetworkId { get; }
 
         IPropertyResolver Properties { get; }
 
         ITelemetrySecretManager SecretManager { get; }
+
+        IMessageNetConfig MessageNetConfig { get; }
     }
 }

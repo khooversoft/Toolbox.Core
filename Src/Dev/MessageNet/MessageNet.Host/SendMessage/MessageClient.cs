@@ -38,6 +38,7 @@ namespace Khooversoft.MessageNet.Host
         public async Task Send(IWorkContext context, NetMessage message)
         {
             if (_messageSender == null || _messageSender?.IsClosedOrClosing == true) return;
+            message.Header.ToUri.ToMessageUri().ToQueueId().GetQueueName().VerifyAssert(x => x == _queueName, $"Message ToUri {message.Header.ToUri} does not match queueName {_queueName}");
 
             // Write the body of the message to the console
             context.Telemetry.Verbose(context, $"Sending message: {message}");
@@ -55,6 +56,7 @@ namespace Khooversoft.MessageNet.Host
         public async Task<NetMessage> Call(IWorkContext context, NetMessage message, TimeSpan? timeout = null)
         {
             if (_messageSender == null || _messageSender?.IsClosedOrClosing == true) throw new InvalidOperationException("Sender has been closed or is closing");
+            message.Header.ToUri.ToMessageUri().ToQueueId().GetQueueName().VerifyAssert(x => x == _queueName, $"Message ToUri {message.Header.ToUri} does not match queueName {_queueName}");
 
             // Write the body of the message to the console
             context.Telemetry.Verbose(context, $"Calling message: {message}");

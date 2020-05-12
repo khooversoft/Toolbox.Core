@@ -1,9 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using Autofac;
+using Khooversoft.Toolbox.Standard;
+using System;
+using System.Collections.Generic;
 
 namespace MicroserviceHost
 {
-    public interface IExecutionContext
+    internal interface IExecutionContext
     {
-        IReadOnlyList<FunctionConfiguration> FunctionConfigurations { get; }
+        ILifetimeScope? LifetimeScope { get; set; }
+
+        IReadOnlyList<FunctionInfo>? FunctionInfos { get; set; }
+
+        IReadOnlyList<Type>? KnownInjectMethodTypes { get; set; }
     }
 }
