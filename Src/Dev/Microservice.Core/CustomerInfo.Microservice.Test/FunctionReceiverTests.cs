@@ -1,7 +1,12 @@
 using Autofac;
 using CustomerInfo.Microservice.Test.Application;
+using FluentAssertions;
+using Khooversoft.MessageNet.Host;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using MicroserviceHost;
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -21,14 +26,18 @@ namespace CustomerInfo.Microservice.Test
         [Fact]
         public async Task GivenFunction_AfterBind_SendSingleMessageIsReceived()
         {
-            var tokenSource = new CancellationTokenSource();
+            var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(1));
 
             IWorkContext workContext = new WorkContextBuilder()
                 .Set(tokenSource.Token)
                 .Build();
 
-            Task run = RunFunctions(workContext);
+            Task runReceiver = RunFunctions(workContext);
+            Task runSender = RunSender(workContext);
 
+            tokenSource.Cancel();
+
+            await Task.WhenAll(runReceiver, runSender);
         }
 
         private async Task RunFunctions(IWorkContext workContext)
@@ -47,14 +56,10 @@ namespace CustomerInfo.Microservice.Test
             await runFunctionReceivers.Run(workContext, executionContext);
         }
 
-        public async Task RunReceiver()
+        public async Task RunSender(IWorkContext workContext)
         {
-            var clientQueueId = new QueueId("default", "test", "clientNode");
-            var identityQueueId = new QueueId("default", "test", "identityNode");
-
-            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig());
-            await messageRepository.Unregister(_workContext, clientQueueId);
-            await messageRepository.Unregister(_workContext, identityQueueId);
+            var clientQueueId = new QueueId("default", "test", "Get-CustomerInfo");
+            var sourceId = new QueueId("default", "test", "asker");
 
             IMessageNetHost netHost = null!;
 
@@ -66,38 +71,30 @@ namespace CustomerInfo.Microservice.Test
                 return Task.CompletedTask;
             };
 
-            Func<NetMessage, Task> identityNodeReceiver = async x =>
-            {
-                NetMessage netMessage = new NetMessageBuilder(x)
-                    .Add(x.Header.WithReply("get.response"))
-                    .Build();
-
-                await netHost.Send(_workContext, netMessage);
-            };
-
             netHost = new MessageNetHostBuilder()
-                .SetConfig(_application.GetMessageNetConfig())
-                .SetRepository(new MessageRepository(_application.GetMessageNetConfig()))
+                .SetConfig(_application.Option.MessageNetConfig)
+                .SetRepository(new MessageRepository(_application.Option.MessageNetConfig))
                 .SetAwaiter(new MessageAwaiterManager())
-                .AddNodeReceiver(new NodeHostReceiver(identityQueueId, identityNodeReceiver))
                 .AddNodeReceiver(new NodeHostReceiver(clientQueueId, clientNodeReceiver))
                 .Build();
 
-            await netHost.Start(_workContext);
+            await netHost.Start(workContext);
 
-            var header = new MessageHeader(identityQueueId.ToMessageUri(), clientQueueId.ToMessageUri(), "get");
+            var header = new MessageHeader(sourceId.ToMessageUri(), clientQueueId.ToMessageUri(), "get");
 
             var message = new NetMessageBuilder()
                 .Add(header)
                 .Build();
 
-            await netHost.Send(_workContext, message);
+            NetMessage response = await netHost.Call(workContext, message);
+
+            workContext.CancellationToken.Register(() => clientReceiverTask.SetException(new OperationCanceledException()));
 
             NetMessage receivedMessage = await clientReceiverTask.Task;
 
             receivedMessage.Headers.Count.Should().Be(2);
             receivedMessage.Headers.First().ToUri.Should().Be(clientQueueId.ToMessageUri().ToString());
-            receivedMessage.Headers.First().FromUri.Should().Be(identityQueueId.ToMessageUri().ToString());
+            receivedMessage.Headers.First().FromUri.Should().Be(sourceId.ToMessageUri().ToString());
             receivedMessage.Headers.Skip(1).First().Should().Be(header);
         }
     }

@@ -54,7 +54,7 @@ namespace MicroserviceHost
                 return;
             }
 
-            await Function.InjectAsync(Context, Telemetry, message);
+            await Function.InjectAsync(Context, Telemetry, netMessage, message);
         }
     }
 }

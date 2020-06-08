@@ -94,7 +94,7 @@ namespace Khooversoft.Toolbox.Standard
         [DebuggerStepThrough]
         public static T VerifyNotNull<T>([NotNull] this T subject, string name)
         {
-            if (EqualityComparer<T>.Default.Equals(subject, default!)) throw new ArgumentNullException(name);
+            if (subject == null || EqualityComparer<T>.Default.Equals(subject, default!)) throw new ArgumentNullException(name);
             return subject;
         }
 

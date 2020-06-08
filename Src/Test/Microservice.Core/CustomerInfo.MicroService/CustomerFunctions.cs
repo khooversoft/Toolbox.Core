@@ -10,35 +10,48 @@ namespace CustomerInfo.MicroService
 {
     public class CustomerFunctions
     {
-        private readonly ITestContext _testContext;
+        private readonly IMessageNetSend _messageNetSend;
 
-        public CustomerFunctions(ITestContext testContext)
+        public CustomerFunctions(IMessageNetSend messageNetSend)
         {
-            testContext.VerifyNotNull(nameof(testContext));
-
-            _testContext = testContext;
+            _messageNetSend = messageNetSend;
         }
 
         [MessageFunction("CustomerAddress", "{namespace}/{network.id}/Get-CustomerInfo")]
-        public Task GetCustomerInfo(IWorkContext context, CustomerInfoRequest request)
+        public async Task GetCustomerInfo(IWorkContext context, NetMessage netMessage, CustomerInfoRequest request)
         {
             context.VerifyNotNull(nameof(context));
             request.VerifyNotNull(nameof(request));
 
-            _testContext.AddMessage(request);
+            var response = new CustomerInfoResponse
+            {
+                CustomerId = request.CustomerId,
+                Addr1 = "Address 1",
+                Addr2 = "Address 2",
+                City = "City",
+                State = "State",
+                Zip = "Zip",
+            };
 
-            return Task.CompletedTask;
+            NetMessage reply = new NetMessageBuilder(netMessage)
+                .Add(netMessage.Header.WithReply("get.response"))
+                .Add(MessageContent.Create(response))
+                .Build();
+
+            await _messageNetSend.Send(context, reply);
         }
 
         [MessageFunction("CustomerAddress", "{namespace}/{network.id}/Post-LogCustomerAddress")]
-        public Task GetCustomerInfo(IWorkContext context, NetMessage request)
+        public async Task GetCustomerInfo(IWorkContext context, NetMessage request)
         {
             context.VerifyNotNull(nameof(context));
             request.VerifyNotNull(nameof(request));
 
-            _testContext.AddMessage(request);
+            NetMessage reply = new NetMessageBuilder(request)
+                .Add(request.Header.WithReply("get.response"))
+                .Build();
 
-            return Task.CompletedTask;
+            await _messageNetSend.Send(context, reply);
         }
     }
 }

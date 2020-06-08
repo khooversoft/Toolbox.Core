@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
@@ -89,7 +90,8 @@ namespace MicroserviceHost
                     KnownInjectMethodTypes = new[]
                     {
                         typeof(IWorkContext),
-                        typeof(ITelemetry)
+                        typeof(ITelemetry),
+                        typeof(NetMessage)
                     },
                 };
 

@@ -19,6 +19,7 @@ namespace CustomerInfo.Microservice.Test.Application
 
             Option = new OptionBuilder()
                 .SetUserSecretId("CustomerInfo.Microservice.Test")
+                .SetJsonStream(configStream)
                 .Build();
         }
 

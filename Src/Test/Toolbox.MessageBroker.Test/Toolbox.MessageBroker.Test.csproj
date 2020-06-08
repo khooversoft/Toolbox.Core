@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Dev\Toolbox.Core\Toolbox.Security\Toolbox.Security.csproj" />
+    <ProjectReference Include="..\..\Dev\Toolbox.Core\Toolbox.MessageBroker\Toolbox.MessageBroker.csproj" />
     <ProjectReference Include="..\..\Dev\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
   </ItemGroup>
 

@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Text;
 
-namespace Microservice.Interface.Test
-{
-    public interface ITestContext
-    {
-        int MessageCount { get; }
+//namespace Microservice.Interface.Test
+//{
+//    public interface ITestContext
+//    {
+//        int MessageCount { get; }
 
-        IReadOnlyList<object> Messages { get; }
+//        IReadOnlyList<object> Messages { get; }
 
-        void IncrementMessageCount();
+//        void IncrementMessageCount();
 
-        void AddMessage(object message);
-    }
-}
+//        void AddMessage(object message);
+//    }
+//}

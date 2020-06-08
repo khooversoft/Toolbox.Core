@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Khooversoft.MessageNet.Host
+namespace Khooversoft.MessageNet.Interface
 {
     public interface IMessageNetSend
     {
