@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Interface for property resolver
+    /// </summary>
     public interface IPropertyResolver
     {
         bool Strict { get; }
@@ -15,7 +18,7 @@ namespace Khooversoft.Toolbox.Standard
 
         IReadOnlyDictionary<string, string> SourceProperties { get; }
 
-        string Resolve(string value);
+        string? Resolve(string value);
 
         IPropertyResolver With(string key, string value, PropertyUpdate propertyUpdate);
 

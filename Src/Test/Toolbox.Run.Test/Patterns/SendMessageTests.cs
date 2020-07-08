@@ -21,24 +21,24 @@ namespace Toolbox.Run.Test.Patterns
         {
             int index = 0;
 
-            var start = new Activity("Start", (c, r) => voidTask(() => index = r.GetMessage<int>()));
-            var plana = new Activity("PlanA", (c, r) => voidTask(() => index += 10));
-            var planb = new Activity("PlanB", (c, r) => voidTask(() => index += 100));
+            var start = new Activity("Start", (r, _) => voidTask(() => index = r.GetMessage<int>()));
+            var plana = new Activity("PlanA", (r, _) => voidTask(() => index += 10));
+            var planb = new Activity("PlanB", (r, _) => voidTask(() => index += 100));
 
             var builder = new RunMapBuilder()
             {
                 new Sequence()
                     + start
-                    + (new ControlFlow((c, r) => Task.FromResult(r.GetMessage<int>() % 2 == 0)) + plana)
-                    + (new ControlFlow((c, r) => Task.FromResult(r.GetMessage<int>() % 3 == 0)) + planb),
+                    + (new ControlFlow((r, _) => Task.FromResult(r.GetMessage<int>() % 2 == 0)) + plana)
+                    + (new ControlFlow((r, _) => Task.FromResult(r.GetMessage<int>() % 3 == 0)) + planb),
             };
 
             RunMap runMap = builder.Build();
 
-            await runMap.Send(WorkContextBuilder.Default, 2);
+            await runMap.Send(2);
             index.Should().Be(12);
 
-            await runMap.Send(WorkContextBuilder.Default, 3);
+            await runMap.Send(3);
             index.Should().Be(103);
         }
     }

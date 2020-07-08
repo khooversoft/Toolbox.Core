@@ -2,6 +2,9 @@
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Provides json services using .net core JSON
+    /// </summary>
     public class Json : IJson
     {
         private static readonly JsonSerializerOptions _options = new JsonSerializerOptions

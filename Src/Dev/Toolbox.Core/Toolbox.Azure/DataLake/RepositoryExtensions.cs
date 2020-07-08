@@ -1,6 +1,9 @@
-﻿using Azure.Storage.Blobs.Models;
+﻿using Azure.Storage;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Files.DataLake;
 using Azure.Storage.Files.DataLake.Models;
 using Khooversoft.Toolbox.Standard;
+using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,12 +40,13 @@ namespace Khooversoft.Toolbox.Azure
             };
         }
 
-        public static void Verify(this StoreOption? storeOption)
+        public static DataLakeServiceClient CreateDataLakeServiceClient(this DatalakeRepositoryOption azureStoreOption)
         {
-            storeOption.VerifyNotNull("StoreOption is required");
-            storeOption.ContainerName.VerifyNotEmpty($"{nameof(storeOption.ContainerName)} is missing");
-            storeOption.AccountName.VerifyNotEmpty($"{nameof(storeOption.AccountName)} is missing");
-            storeOption.AccountKey.VerifyNotEmpty($"{nameof(storeOption.AccountKey)} is missing");
+            // Create DataLakeServiceClient using StorageSharedKeyCredentials
+            var serviceUri = new Uri($"https://{azureStoreOption.AccountName}.blob.core.windows.net");
+
+            StorageSharedKeyCredential sharedKeyCredential = new StorageSharedKeyCredential(azureStoreOption.AccountName, azureStoreOption.AccountKey);
+            return new DataLakeServiceClient(serviceUri, sharedKeyCredential);
         }
     }
 }

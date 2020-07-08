@@ -7,6 +7,8 @@ using Khooversoft.Toolbox.Standard;
 using Khooversoft.Toolbox.Actor;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.Extensions.Logging;
+using Khoover.Toolbox.TestTools;
 
 namespace Toolbox.Actor.Tests
 {
@@ -14,7 +16,7 @@ namespace Toolbox.Actor.Tests
     public class ActorChainCallTests
     {
         private const string sumActorName = "actorSum";
-        private IWorkContext _context = WorkContextBuilder.Default;
+        private ILoggerFactory _loggerFactory = new TestLoggerFactory();
 
         [Fact]
         public async Task ActorSingleChainTest()
@@ -26,9 +28,9 @@ namespace Toolbox.Actor.Tests
 
             IActorManager manager = new ActorConfigurationBuilder()
                 .Build()
-                .ToActorManager()
-                .Register(_ => container.Resolve<IActorNode>())
-                .Register(_ => container.Resolve<IActorSum>());
+                .ToActorManager(_loggerFactory)
+                .Register(() => container.Resolve<IActorNode>())
+                .Register(() => container.Resolve<IActorSum>());
 
             using (container)
             {
@@ -38,7 +40,7 @@ namespace Toolbox.Actor.Tests
                 int sum = 0;
                 for (int i = 0; i < 10; i++)
                 {
-                    await node.Add(_context, i);
+                    await node.Add(i);
                     sum += i;
                 }
 
@@ -51,7 +53,7 @@ namespace Toolbox.Actor.Tests
 
         private interface IActorNode : IActor
         {
-            Task Add(IWorkContext context, int value);
+            Task Add(int value);
         }
 
         private interface IActorSum : IActor
@@ -69,7 +71,7 @@ namespace Toolbox.Actor.Tests
             {
             }
 
-            public async Task Add(IWorkContext context, int value)
+            public async Task Add(int value)
             {
                 _actorSum = _actorSum ?? ActorManager.GetActor<IActorSum>(new ActorKey(sumActorName));
                 await _actorSum.Add(value);

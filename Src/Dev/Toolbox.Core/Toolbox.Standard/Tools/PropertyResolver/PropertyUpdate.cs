@@ -7,10 +7,24 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Property update types
+    /// </summary>
     public enum PropertyUpdate
     {
+        /// <summary>
+        /// Fail when duplicate property is encountered
+        /// </summary>
         FailOnDuplicate,
+
+        /// <summary>
+        /// Ignore duplicate, takes the source
+        /// </summary>
         IgnoreDuplicate,
+
+        /// <summary>
+        /// Overwrite properties from source
+        /// </summary>
         Overwrite,
     }
 }

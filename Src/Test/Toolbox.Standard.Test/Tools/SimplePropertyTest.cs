@@ -40,7 +40,7 @@ namespace Toolbox.Standard.Test.Tools
 
             foreach (var item in tests)
             {
-                string resultValue = resolver.Resolve(item.Source!);
+                string? resultValue = resolver.Resolve(item.Source!);
                 resultValue.Should().Be(item.Resolved);
             }
         }
@@ -65,7 +65,7 @@ namespace Toolbox.Standard.Test.Tools
 
             foreach (var item in tests)
             {
-                string resultValue = resolver.Resolve(item.Source);
+                string? resultValue = resolver.Resolve(item.Source);
                 resultValue.Should().Be(item.Resolved);
             }
         }
@@ -92,7 +92,7 @@ namespace Toolbox.Standard.Test.Tools
 
             foreach (var item in tests)
             {
-                string resultValue = resolver.Resolve(item.Source);
+                string? resultValue = resolver.Resolve(item.Source);
                 resultValue.Should().Be(item.Resolved);
             }
         }

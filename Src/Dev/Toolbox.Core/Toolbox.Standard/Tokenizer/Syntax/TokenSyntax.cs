@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Provides the token syntax definition for a general string token.
+    /// </summary>
     public struct TokenSyntax : ITokenSyntax
     {
         public TokenSyntax(string token, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)

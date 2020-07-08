@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +32,7 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public string? FilePath { get; }
 
-        public ZipContainerWriter OpenFile(IWorkContext context)
+        public ZipContainerWriter OpenFile()
         {
             _zipArchive.VerifyAssert(x => x == null, "Zip archive already opened");
 
@@ -39,13 +40,10 @@ namespace Khooversoft.Toolbox.BlockDocument
 
             if (File.Exists(FilePath))
             {
-                context.Telemetry.Info(context, $"Deleting {FilePath}");
                 File.Delete(FilePath);
             }
 
-            context.Telemetry.Info(context, $"Creating {FilePath}");
             _zipArchive = ZipFile.Open(FilePath, ZipArchiveMode.Create);
-
             return this;
         }
 
@@ -55,17 +53,16 @@ namespace Khooversoft.Toolbox.BlockDocument
             archive?.Dispose();
         }
 
-        public ZipContainerWriter Write(IWorkContext context, string zipPath, string data)
+        public ZipContainerWriter Write(string zipPath, string data)
         {
             data.VerifyNotEmpty(nameof(data));
 
             using var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(data));
-            return Write(context, zipPath, memoryStream);
+            return Write(zipPath, memoryStream);
         }
 
-        public ZipContainerWriter Write(IWorkContext context, string zipPath, Stream sourceStream)
+        public ZipContainerWriter Write(string zipPath, Stream sourceStream)
         {
-            context.VerifyNotNull(nameof(context));
             zipPath.VerifyNotEmpty(nameof(zipPath));
             sourceStream.VerifyNotNull(nameof(sourceStream));
             _zipArchive.VerifyNotNull("Not opened");

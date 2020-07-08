@@ -12,7 +12,7 @@ namespace Khooversoft.Toolbox.Actor
     /// </summary>
     public class ActorTypeRegistration
     {
-        public ActorTypeRegistration(Type interfaceType, Func<IWorkContext, IActor> createImplementation)
+        public ActorTypeRegistration(Type interfaceType, Func<IActor> createImplementation)
         {
             interfaceType.VerifyNotNull(nameof(interfaceType));
             createImplementation.VerifyNotNull(nameof(createImplementation));
@@ -29,6 +29,6 @@ namespace Khooversoft.Toolbox.Actor
         /// <summary>
         /// Create implementation by lambda
         /// </summary>
-        public Func<IWorkContext, IActor> CreateImplementation { get; }
+        public Func<IActor> CreateImplementation { get; }
     }
 }

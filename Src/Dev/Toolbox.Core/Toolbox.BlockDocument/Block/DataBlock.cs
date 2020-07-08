@@ -43,6 +43,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             JwtSignature = jwtSignature;
         }
 
+        // TODO: dateTimeStamp to unix date for this constructor
         public DataBlock(DateTimeOffset dateTimeStamp,
                          string blockType,
                          string blockId,

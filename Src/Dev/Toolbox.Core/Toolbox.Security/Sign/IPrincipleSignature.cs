@@ -14,6 +14,6 @@ namespace Khooversoft.Toolbox.Security
         TimeSpan ValidFor { get; }
 
         string Sign(string payloadDigest);
-        JwtTokenDetails? ValidateSignature(IWorkContext context, string jwt);
+        JwtTokenDetails? ValidateSignature(string jwt);
     }
 }

@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Block token that has been extracted from the data.
+    /// </summary>
     public struct BlockToken : IToken
     {
         public BlockToken(string value)

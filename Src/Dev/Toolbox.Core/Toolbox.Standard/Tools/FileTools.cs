@@ -9,6 +9,14 @@ namespace Khooversoft.Toolbox.Standard
 {
     public static class FileTools
     {
+        /// <summary>
+        /// Write assembly resource to temp file
+        /// </summary>
+        /// <param name="fileName">file name</param>
+        /// <param name="folder">folder name under temp directory</param>
+        /// <param name="type">assembly containing the resource</param>
+        /// <param name="resourceId">resource id</param>
+        /// <returns>output file</returns>
         public static string WriteResourceToTempFile(string fileName, string folder, Type type, string resourceId)
         {
             fileName.VerifyNotEmpty(nameof(fileName));
@@ -23,6 +31,11 @@ namespace Khooversoft.Toolbox.Standard
             return filePath;
         }
 
+        /// <summary>
+        /// Get file's hash (MD5)
+        /// </summary>
+        /// <param name="file">file to hash</param>
+        /// <returns>MD5 hash byte array</returns>
         public static byte[] GetFileHash(string file)
         {
             using Stream read = new FileStream(file, FileMode.Open);
@@ -35,11 +48,20 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="type">type int the assembly that has the resource</param>
         /// <param name="streamId">resource id</param>
         /// <returns>stream</returns>
-        public static Stream GetResourceStream(this Type type, string streamId) =>
-                Assembly.GetAssembly(type.VerifyNotNull(nameof(type)))!
+        public static Stream GetResourceStream(this Type type, string streamId)
+        {
+            type.VerifyNotNull(nameof(type));
+
+            return Assembly.GetAssembly(type)!
                     .GetManifestResourceStream(streamId.VerifyNotEmpty(nameof(streamId)))
                     .VerifyNotNull($"Cannot find {streamId} in assembly's resource");
+        }
 
+        /// <summary>
+        /// Write stream to file
+        /// </summary>
+        /// <param name="stream">stream to write</param>
+        /// <param name="file">full file</param>
         public static void WriteStreamToFile(this Stream stream, string file)
         {
             using Stream writeFile = new FileStream(file, FileMode.Create);

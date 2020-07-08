@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -18,17 +19,20 @@ namespace Khooversoft.Toolbox.Security
     {
         private readonly object _lock = new object();
         private readonly CacheObject<X509Certificate2> _cachedCertificate = new CacheObject<X509Certificate2>(TimeSpan.FromDays(1));
+        private readonly ILogger<LocalCertificate> _logger;
 
-        public LocalCertificate(LocalCertificateKey key)
+        public LocalCertificate(LocalCertificateKey key, ILogger<LocalCertificate> logger)
         {
             key.VerifyNotNull(nameof(key));
 
             LocalCertificateKey = key;
+            _logger = logger;
         }
 
-        public LocalCertificate(StoreLocation storeLocation, StoreName storeName, string thumbprint, bool requirePrivateKey)
+        public LocalCertificate(StoreLocation storeLocation, StoreName storeName, string thumbprint, bool requirePrivateKey, ILogger<LocalCertificate> logger)
         {
             LocalCertificateKey = new LocalCertificateKey(storeLocation, storeName, thumbprint, requirePrivateKey);
+            _logger = logger;
         }
 
         /// <summary>
@@ -47,12 +51,12 @@ namespace Khooversoft.Toolbox.Security
         /// <exception cref="ProgramExitException">Certificate is not found</exception>
         /// <returns>X509 certificate</returns>
         /// <exception cref="CertificateNotFoundException">when certificate valid certificate was not found</exception>
-        public X509Certificate2 GetCertificate(IWorkContext context, bool? throwOnNotFound = null)
+        public X509Certificate2 GetCertificate(bool? throwOnNotFound = null)
         {
             X509Certificate2 certificate;
 
             Exception? saveException = null;
-            throwOnNotFound = throwOnNotFound ?? LocalCertificateKey.RequirePrivateKey;
+            throwOnNotFound ??= LocalCertificateKey.RequirePrivateKey;
 
             lock (_lock)
             {
@@ -63,7 +67,7 @@ namespace Khooversoft.Toolbox.Security
 
                 using (X509Store store = new X509Store(LocalCertificateKey.StoreName, LocalCertificateKey.StoreLocation))
                 {
-                    context.Telemetry.Verbose(context, $"Looking for certificate for {this}");
+                    _logger.LogTrace($"Looking for certificate for {this}");
 
                     try
                     {
@@ -83,13 +87,13 @@ namespace Khooversoft.Toolbox.Security
                     }
                     catch (Exception ex)
                     {
-                        context.Telemetry.Warning(context, $"Exception: {ex}");
+                        _logger.LogError(ex, $"Exception: {ex}");
                         _cachedCertificate.Clear();
                         saveException = ex;
                     }
                 }
 
-                context.Telemetry.Verbose(context, $"{(_cachedCertificate != null ? "Found" : "Not found")} certificate for {this}");
+                _logger.LogTrace($"{(_cachedCertificate != null ? "Found" : "Not found")} certificate for {this}");
 
                 if (!_cachedCertificate!.TryGetValue(out certificate) && throwOnNotFound == true)
                 {

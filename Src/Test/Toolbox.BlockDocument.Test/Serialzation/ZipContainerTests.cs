@@ -15,8 +15,6 @@ namespace Toolbox.BlockDocument.Test
 {
     public class ZipContainerTests
     {
-        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
-
         [Fact]
         public void GivenBlockChain_WhenContainerIsMemory_ShouldRoundTrip()
         {
@@ -38,14 +36,14 @@ namespace Toolbox.BlockDocument.Test
             var buffer = new byte[1000];
             using var memoryBuffer = new MemoryStream(buffer);
             var writer = new ZipContainerWriter(new ZipArchive(memoryBuffer, ZipArchiveMode.Create, leaveOpen: true));
-            writer.Write(_workContext, _zipPath, json);
+            writer.Write(_zipPath, json);
             writer.Close();
 
             memoryBuffer.Length.Should().BeGreaterThan(0);
             memoryBuffer.Seek(0, SeekOrigin.Begin);
 
             var reader = new ZipContainerReader(new ZipArchive(memoryBuffer, ZipArchiveMode.Read, leaveOpen: true));
-            string readJson = reader.Read(_workContext, _zipPath);
+            string readJson = reader.Read(_zipPath);
             reader.Close();
 
             BlockChain result = readJson.ToBlockChain();
@@ -74,14 +72,14 @@ namespace Toolbox.BlockDocument.Test
             string json = blockChain.ToJson();
 
             string tempFile = Path.GetTempFileName();
-            var writer = new ZipContainerWriter(tempFile).OpenFile(_workContext);
-            writer.Write(_workContext, _zipPath, json);
+            var writer = new ZipContainerWriter(tempFile).OpenFile();
+            writer.Write(_zipPath, json);
             writer.Close();
 
-            var reader = new ZipContainerReader(tempFile).OpenFile(_workContext);
-            reader.Exist(_workContext, _zipPath).Should().BeTrue();
+            var reader = new ZipContainerReader(tempFile).OpenFile();
+            reader.Exist(_zipPath).Should().BeTrue();
 
-            string readJson = reader.Read(_workContext, _zipPath);
+            string readJson = reader.Read(_zipPath);
             reader.Close();
             File.Delete(tempFile);
 

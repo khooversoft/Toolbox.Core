@@ -19,7 +19,6 @@ namespace Khooversoft.Toolbox.Actor
         private readonly SemaphoreSlim _lockSemaphore = new SemaphoreSlim(1, 1);
         private IActorBase? _instance;
         private IActorManager? _manager;
-        private IWorkContext? _workContext;
 
         public ActorProxy()
         {
@@ -32,9 +31,8 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="instance">instance of actor class</param>
         /// <param name="manager">actor manager</param>
         /// <returns>proxy</returns>
-        public static T Create(IWorkContext context, IActorBase instance, IActorManager manager)
+        public static T Create(IActorBase instance, IActorManager manager)
         {
-            context.VerifyNotNull(nameof(context));
             instance.VerifyNotNull(nameof(instance));
             manager.VerifyNotNull(nameof(manager));
 
@@ -43,7 +41,6 @@ namespace Khooversoft.Toolbox.Actor
             ActorProxy<T> proxy = (ActorProxy<T>)proxyObject;
             proxy._instance = instance;
             proxy._manager = manager;
-            proxy._workContext = context.WithActivity();
 
             return (T)proxyObject;
         }
@@ -60,11 +57,6 @@ namespace Khooversoft.Toolbox.Actor
             {
                 _lockSemaphore.Wait(_manager!.Configuration.ActorCallTimeout);
                 return targetMethod.Invoke(_instance, args);
-            }
-            catch (Exception ex)
-            {
-                _workContext!.Telemetry.Error(_workContext, ex.Message, ex);
-                throw;
             }
             finally
             {

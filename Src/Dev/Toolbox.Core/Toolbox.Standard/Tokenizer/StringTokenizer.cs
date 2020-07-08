@@ -8,6 +8,9 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// String tokenizer, parses string for values and tokens based on token syntax
+    /// </summary>
     public class StringTokenizer
     {
         private readonly List<ITokenSyntax> _syntaxList = new List<ITokenSyntax>();
@@ -16,42 +19,71 @@ namespace Khooversoft.Toolbox.Standard
         {
         }
 
+        /// <summary>
+        /// Return white space tokens that have been collapsed.
+        /// </summary>
+        /// <returns>this</returns>
         public StringTokenizer UseCollapseWhitespace()
         {
             _syntaxList.Add(new WhiteSpaceSyntax());
             return this;
         }
 
+        /// <summary>
+        /// Return single quoted blocks as a token
+        /// </summary>
+        /// <returns></returns>
         public StringTokenizer UseSingleQuote()
         {
             _syntaxList.Add(new BlockSyntax('\''));
             return this;
         }
 
+        /// <summary>
+        /// Return double quoted blocks as a token
+        /// </summary>
+        /// <returns></returns>
         public StringTokenizer UseDoubleQuote()
         {
             _syntaxList.Add(new BlockSyntax('"'));
             return this;
         }
 
+        /// <summary>
+        /// Add tokens to be used in parsing
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
         public StringTokenizer Add(params string[] tokens)
         {
             _syntaxList.AddRange(tokens.Select(x => (ITokenSyntax)new TokenSyntax(x)));
             return this;
         }
 
+        /// <summary>
+        /// Add token syntax used in parsing
+        /// </summary>
+        /// <param name="tokenSyntaxes"></param>
+        /// <returns></returns>
         public StringTokenizer Add(params ITokenSyntax[] tokenSyntaxes)
         {
             _syntaxList.AddRange(tokenSyntaxes);
             return this;
         }
 
-        public IReadOnlyList<IToken> Parse(params string[] sources)
-        {
-            return Parse(string.Join(string.Empty, sources));
-        }
+        /// <summary>
+        /// Parse strings for tokens
+        /// </summary>
+        /// <param name="sources">n number of strings</param>
+        /// <returns>list of tokens</returns>
+        public IReadOnlyList<IToken> Parse(params string[] sources) => Parse(string.Join(string.Empty, sources));
 
-        public IReadOnlyList<IToken> Parse(string source)
+        /// <summary>
+        /// Parse string for tokens
+        /// </summary>
+        /// <param name="source">source</param>
+        /// <returns>list of tokens</returns>
+        public IReadOnlyList<IToken> Parse(string? source)
         {
             var tokenList = new List<IToken>();
 
@@ -93,7 +125,7 @@ namespace Khooversoft.Toolbox.Standard
 
                 if (matchLength == null)
                 {
-                    dataStart = dataStart ?? index;
+                    dataStart ??= index;
                     continue;
                 }
 

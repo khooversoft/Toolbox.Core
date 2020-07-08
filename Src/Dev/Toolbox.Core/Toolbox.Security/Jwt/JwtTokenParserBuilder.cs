@@ -3,6 +3,7 @@
 
 using Khooversoft.Toolbox;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -55,6 +56,6 @@ namespace Khooversoft.Toolbox.Security
             return this;
         }
 
-        public JwtTokenParser Build() => new JwtTokenParser(Certificates, ValidIssuers, ValidAudiences);
+        public JwtTokenParser Build() => new JwtTokenParser(Certificates, ValidIssuers, ValidAudiences, new NullLogger<JwtTokenParser>());
     }
 }

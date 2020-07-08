@@ -2,8 +2,8 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
-using Khooversoft.Toolbox.Standard;
 
 namespace Khooversoft.Toolbox.Azure
 {
@@ -11,16 +11,11 @@ namespace Khooversoft.Toolbox.Azure
     {
         string ConnectionString { get; }
 
-        Task<QueueDefinition> CreateQueue(IWorkContext context, QueueDefinition queueDefinition);
-
-        Task DeleteQueue(IWorkContext context, string queueName);
-
-        Task<QueueDefinition> GetQueue(IWorkContext context, string queueName);
-
-        Task<bool> QueueExists(IWorkContext context, string queueName);
-
-        Task<IReadOnlyList<QueueDefinition>> Search(IWorkContext context, string search, int maxSize = 100);
-
-        Task<QueueDefinition> UpdateQueue(IWorkContext context, QueueDefinition queueDefinition);
+        Task<QueueDefinition> Create(QueueDefinition queueDefinition, CancellationToken token);
+        Task Delete(string queueName, CancellationToken token);
+        Task<QueueDefinition> GetDefinition(string queueName, CancellationToken token);
+        Task<bool> Exist(string queueName, CancellationToken token);
+        Task<IReadOnlyList<QueueDefinition>> Search(CancellationToken token, string? search = null, int maxSize = 100);
+        Task<QueueDefinition> Update(QueueDefinition queueDefinition, CancellationToken token);
     }
 }

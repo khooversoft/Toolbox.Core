@@ -19,7 +19,6 @@ namespace Khooversoft.Toolbox.Actor
     {
         private int _timerLockValue;
         private Timer? _timer;
-        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private int _running = 0;
 
         /// <summary>
@@ -47,20 +46,15 @@ namespace Khooversoft.Toolbox.Actor
         /// </summary>
         /// <param name="context">context</param>
         /// <returns>task</returns>
-        public async Task Activate(IWorkContext context)
+        public async Task Activate()
         {
-            context.VerifyNotNull(nameof(context));
-            context = context.WithActivity();
-
             int currentValue = Interlocked.CompareExchange(ref _running, 1, 0);
             if (currentValue != 0)
             {
                 return;
             }
 
-            ActorManager.Configuration.ActorActivateEvent(context, ActorKey, this.GetType());
-
-            await OnActivate(context).ConfigureAwait(false);
+            await OnActivate().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -68,20 +62,16 @@ namespace Khooversoft.Toolbox.Actor
         /// </summary>
         /// <param name="context">context</param>
         /// <returns>task</returns>
-        public async Task Deactivate(IWorkContext context)
+        public async Task Deactivate()
         {
-            context.VerifyNotNull(nameof(context));
-            context = context.WithActivity();
-
             int currentValue = Interlocked.CompareExchange(ref _running, 0, 1);
             if (currentValue != 1)
             {
                 return;
             }
 
-            ActorManager.Configuration.ActorDeactivateEvent(context, ActorKey, this.GetType());
             StopTimer();
-            await OnDeactivate(context).ConfigureAwait(false);
+            await OnDeactivate().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -96,20 +86,20 @@ namespace Khooversoft.Toolbox.Actor
         /// </summary>
         /// <param name="context">context</param>
         /// <returns>task</returns>
-        protected virtual Task OnActivate(IWorkContext context) => Task.FromResult(0);
+        protected virtual Task OnActivate() => Task.CompletedTask;
 
         /// <summary>
         /// Event for on deactivate actor
         /// </summary>
         /// <param name="context">context</param>
         /// <returns>task</returns>
-        protected virtual Task OnDeactivate(IWorkContext context) => Task.FromResult(0);
+        protected virtual Task OnDeactivate() => Task.CompletedTask;
 
         /// <summary>
         /// Time event
         /// </summary>
         /// <returns>task</returns>
-        protected virtual Task OnTimer() => Task.FromResult(0);
+        protected virtual Task OnTimer() => Task.CompletedTask;
 
         /// <summary>
         /// Set timer notification of actor
@@ -121,7 +111,6 @@ namespace Khooversoft.Toolbox.Actor
             _timer.VerifyAssert(x => x == null, "Timer already running");
 
             _timer = new Timer(TimerCallback, null, dueTime, period);
-            ActorManager.Configuration.ActorStartTimerEvent(_workContext.WithActivity(), ActorKey);
         }
 
         /// <summary>
@@ -133,7 +122,6 @@ namespace Khooversoft.Toolbox.Actor
             if (t != null)
             {
                 t.Dispose();
-                ActorManager.Configuration.ActorStopTimerEvent(_workContext.WithActivity(), ActorKey);
             }
         }
 
@@ -151,7 +139,6 @@ namespace Khooversoft.Toolbox.Actor
 
             try
             {
-                ActorManager.Configuration.ActorStartTimerEvent(_workContext.WithActivity(), ActorKey);
                 OnTimer().GetAwaiter().GetResult();
             }
             finally

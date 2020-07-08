@@ -10,7 +10,7 @@ using System.Text;
 namespace Khooversoft.Toolbox.Standard
 {
     /// <summary>
-    /// Path builder
+    /// Vector string builder
     /// 
     /// Path is a string composed of part separated by a delimiter
     /// </summary>
@@ -31,8 +31,8 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>value at index</returns>
         public string this[int index]
         {
-            get { return _parts[index]; }
-            set { _parts[index] = value; }
+            get => _parts[index];
+            set => _parts[index] = value;
         }
 
         /// <summary>

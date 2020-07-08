@@ -32,12 +32,11 @@ namespace Khooversoft.Toolbox.BlockDocument
 
         public string? FilePath { get; }
 
-        public ZipContainerReader OpenFile(IWorkContext context)
+        public ZipContainerReader OpenFile()
         {
             _zipArchive.VerifyAssert(x => x == null, "Zip archive already opened");
             File.Exists(FilePath).VerifyAssert(x => x == true, $"{FilePath} does not exist");
 
-            context.Telemetry.Info(context, $"Reading {FilePath}");
             _zipArchive = ZipFile.Open(FilePath, ZipArchiveMode.Read);
 
             return this;
@@ -49,7 +48,7 @@ namespace Khooversoft.Toolbox.BlockDocument
             archive?.Dispose();
         }
 
-        public bool Exist(IWorkContext context, string zipPath)
+        public bool Exist(string zipPath)
         {
             zipPath.VerifyNotEmpty(nameof(zipPath));
 
@@ -59,17 +58,18 @@ namespace Khooversoft.Toolbox.BlockDocument
             return zipArchiveEntry != null;
         }
 
-        public string Read(IWorkContext context, string zipPath)
+        public string Read(string zipPath)
         {
             var memoryStream = new MemoryStream();
-            Read(context, zipPath, memoryStream);
+
+            Read(zipPath, memoryStream);
             memoryStream.Seek(0, SeekOrigin.Begin);
+
             return Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length);
         }
 
-        public ZipContainerReader Read(IWorkContext context, string zipPath, Stream targetStream)
+        public ZipContainerReader Read(string zipPath, Stream targetStream)
         {
-            context.VerifyNotNull(nameof(context));
             zipPath.VerifyNotEmpty(nameof(zipPath));
             targetStream.VerifyNotNull(nameof(targetStream));
             _zipArchive.VerifyNotNull("Not opened");

@@ -1,8 +1,10 @@
 ﻿using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -12,22 +14,22 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace ToolBox.Azure.Test.Queue
 {
     [Collection("QueueTests")]
-    public class QueueSendReceiveTests : IClassFixture<ApplicationFixture>
+    public class QueueSendReceiveTests
     {
-        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
-        private readonly QueueManagement _queueManagement;
+        private readonly ILoggerFactory _loggerFactory = new TestLoggerFactory();
+        private readonly AzureTestOption _testOption;
 
-        public QueueSendReceiveTests(ApplicationFixture application)
+        public QueueSendReceiveTests()
         {
-            _queueManagement = new QueueManagement(application.ConnectionString);
+            _testOption = new TestOptionBuilder().Build();
         }
 
-        [Fact(Skip = "IntegrationTests")]
+        //[Fact(Skip = "IntegrationTests")]
+        [Fact]
         public async Task GivenQueue_WhenMessageSent_ShouldReceive()
         {
             const int max = 10;
@@ -49,10 +51,12 @@ namespace ToolBox.Azure.Test.Queue
             var queueDefinition = new QueueDefinition("QueueSendReceiveTests1");
             await CreateQueue(queueDefinition);
 
-            var sender = new MessageSender(_queueManagement.ConnectionString, queueDefinition.QueueName);
-            var receiver = new QueueReceiver<TestMessage>(_queueManagement.ConnectionString, queueDefinition.QueueName);
+            IQueueManagement queue = _testOption.GetQueueManagement(_loggerFactory);
 
-            await receiver.Start(_workContext, receiverFunc);
+            var sender = new MessageSender(queue.ConnectionString, queueDefinition.QueueName);
+            var receiver = new QueueReceiver<TestMessage>(queue.ConnectionString, queueDefinition.QueueName, _loggerFactory.CreateLogger<QueueReceiver<TestMessage>>());
+
+            await receiver.Start(receiverFunc);
 
             await Enumerable.Range(0, max)
                 .Select(x => new TestMessage(x, $"Value_{x}"))
@@ -75,7 +79,8 @@ namespace ToolBox.Azure.Test.Queue
             await DeleteQueue(queueDefinition);
         }
 
-        [Fact(Skip = "IntegrationTests")]
+        //[Fact(Skip = "IntegrationTests")]
+        [Fact]
         public async Task GivenTwoQueue_MessageRoundTrip_ShouldSuccess()
         {
             const int max = 10;
@@ -103,10 +108,12 @@ namespace ToolBox.Azure.Test.Queue
             var bounceReceiverTask = new TaskCompletionSource<bool>();
             Task bounce = Bounce(queue1Definition, queue2Definition, bounceReceiverTask);
 
-            var sender = new MessageSender(_queueManagement.ConnectionString, queue2Definition.QueueName);
-            var receiver = new QueueReceiver<TestMessage>(_queueManagement.ConnectionString, queue1Definition.QueueName);
+            IQueueManagement queue = _testOption.GetQueueManagement(_loggerFactory);
 
-            await receiver.Start(_workContext, receiverFunc);
+            var sender = new MessageSender(queue.ConnectionString, queue2Definition.QueueName);
+            var receiver = new QueueReceiver<TestMessage>(queue.ConnectionString, queue1Definition.QueueName, _loggerFactory.CreateLogger<QueueReceiver<TestMessage>>());
+
+            await receiver.Start(receiverFunc);
 
             await Enumerable.Range(0, max)
                 .Select(x => new TestMessage(x, $"Value_{x}"))
@@ -133,7 +140,9 @@ namespace ToolBox.Azure.Test.Queue
 
         private async Task Bounce(QueueDefinition sendDefinition, QueueDefinition receiverDefinition, TaskCompletionSource<bool> finish)
         {
-            var sender = new MessageSender(_queueManagement.ConnectionString, sendDefinition.QueueName);
+            IQueueManagement queue = _testOption.GetQueueManagement(_loggerFactory);
+
+            var sender = new MessageSender(queue.ConnectionString, sendDefinition.QueueName);
             int count = 0;
 
             Func<TestMessage, Task> receiverFunc = async x =>
@@ -142,8 +151,8 @@ namespace ToolBox.Azure.Test.Queue
                 await sender.SendAsync(new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(x))));
             };
 
-            var receiver = new QueueReceiver<TestMessage>(_queueManagement.ConnectionString, receiverDefinition.QueueName);
-            await receiver.Start(_workContext, receiverFunc);
+            var receiver = new QueueReceiver<TestMessage>(queue.ConnectionString, receiverDefinition.QueueName, _loggerFactory.CreateLogger<QueueReceiver<TestMessage>>());
+            await receiver.Start(receiverFunc);
 
             await finish.Task;
             await receiver.Stop();
@@ -151,24 +160,21 @@ namespace ToolBox.Azure.Test.Queue
 
         private async Task CreateQueue(QueueDefinition queueDefinition)
         {
-            // Act
-            bool state = await new StateManagerBuilder()
-                .Add(new RemoveQueueState(_queueManagement, queueDefinition.QueueName!))
-                .Add(new CreateQueueState(_queueManagement, queueDefinition))
-                .Build()
-                .Set(_workContext);
+            await DeleteQueue(queueDefinition);
 
-            state.Should().BeTrue();
+            IQueueManagement queue = _testOption.GetQueueManagement(_loggerFactory);
+
+            await queue.Create(queueDefinition, CancellationToken.None);
         }
 
         private async Task DeleteQueue(QueueDefinition queueDefinition)
         {
-            bool state = await new StateManagerBuilder()
-                .Add(new RemoveQueueState(_queueManagement, queueDefinition.QueueName!))
-                .Build()
-                .Set(_workContext);
+            IQueueManagement queue = _testOption.GetQueueManagement(_loggerFactory);
 
-            state.Should().BeTrue();
+            if ((await queue.Exist(queueDefinition.QueueName, CancellationToken.None)))
+            {
+                await queue.Delete(queueDefinition.QueueName, CancellationToken.None);
+            }
         }
 
         private class TestMessage

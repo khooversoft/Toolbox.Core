@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,26 +13,22 @@ namespace Khooversoft.Toolbox.Standard
     public static class StringExtensions
     {
         /// <summary>
-        /// Parse path
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="delimiter"></param>
-        /// <returns></returns>
-        public static StringVector ParsePath(this string value, string delimiter = "/")
-        {
-            return new StringVectorBuilder(delimiter)
-                .Parse(value)
-                .Build();
-        }
-
-        /// <summary>
         /// Is string empty (null or white space)
         /// </summary>
         /// <param name="self">value</param>
         /// <returns>true or false</returns>
-        public static bool IsEmpty(this string? self)
+        public static bool IsEmpty(this string? self) => string.IsNullOrWhiteSpace(self);
+
+        /// <summary>
+        /// Convert string to null if null or whitespace
+        /// </summary>
+        /// <param name="subject">string</param>
+        /// <returns>null or not empty string</returns>
+        public static string? ToNullIfEmpty(this string? subject)
         {
-            return string.IsNullOrWhiteSpace(self);
+            if (subject.IsEmpty()) return null;
+
+            return subject;
         }
 
         /// <summary>

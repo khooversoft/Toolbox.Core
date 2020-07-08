@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    ///  Standard token interface
+    /// </summary>
     public interface IToken
     {
         string Value { get; }

@@ -3,6 +3,7 @@ using Azure.Storage;
 using Azure.Storage.Files.DataLake;
 using Azure.Storage.Files.DataLake.Models;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,24 +17,25 @@ namespace Khooversoft.Toolbox.Azure
     {
         private readonly DataLakeServiceClient _serviceClient;
         private readonly DataLakeFileSystemClient _fileSystem;
+        private readonly ILogger<DatalakeRepository> _logger;
 
-        public DatalakeRepository(StoreOption blobStoreOption)
+        public DatalakeRepository(DatalakeRepositoryOption azureStoreOption, ILogger<DatalakeRepository> logger)
         {
-            blobStoreOption.VerifyNotNull(nameof(blobStoreOption)).Verify();
+            azureStoreOption.VerifyNotNull(nameof(azureStoreOption)).Verify();
+            logger.VerifyNotNull(nameof(logger));
 
-            // Create DataLakeServiceClient using StorageSharedKeyCredentials
-            var serviceUri = new Uri($"https://{blobStoreOption.AccountName}.blob.core.windows.net");
-
-            StorageSharedKeyCredential sharedKeyCredential = new StorageSharedKeyCredential(blobStoreOption.AccountName, blobStoreOption.AccountKey);
-            _serviceClient = new DataLakeServiceClient(serviceUri, sharedKeyCredential);
+            _logger = logger;
+            _serviceClient = azureStoreOption.CreateDataLakeServiceClient();
 
             // Get a reference to a file system (container)
-            _fileSystem = _serviceClient.GetFileSystemClient(blobStoreOption.ContainerName);
+            _fileSystem = _serviceClient.GetFileSystemClient(azureStoreOption.FileSystemName);
         }
 
         public async Task Delete(string path, CancellationToken token)
         {
             path.VerifyNotEmpty(nameof(path));
+
+            _logger.LogTrace($"{nameof(Delete)} deleting {path}");
 
             DataLakeFileClient file = _fileSystem.GetFileClient(path);
             await file.DeleteIfExistsAsync(cancellationToken: token);
@@ -44,6 +46,8 @@ namespace Khooversoft.Toolbox.Azure
             path.VerifyNotEmpty(nameof(path));
             toStream.VerifyNotNull(nameof(toStream));
 
+            _logger.LogTrace($"{nameof(Download)} downloading {path} to stream");
+
             DataLakeFileClient file = _fileSystem.GetFileClient(path);
             await file.ReadToAsync(toStream, cancellationToken: token);
         }
@@ -52,6 +56,8 @@ namespace Khooversoft.Toolbox.Azure
         {
             fromStream.VerifyNotNull(nameof(fromStream));
             toPath.VerifyNotEmpty(nameof(toPath));
+
+            _logger.LogTrace($"{nameof(Upload)} from stream to {toPath}");
 
             DataLakeFileClient file = _fileSystem.GetFileClient(toPath);
             await file.UploadAsync(fromStream, force, token);
@@ -94,6 +100,8 @@ namespace Khooversoft.Toolbox.Azure
             DataLakeFileClient file = _fileSystem.GetFileClient(path);
             Response<FileDownloadInfo> response = await file.ReadAsync(token);
 
+            _logger.LogTrace($"{nameof(Read)} from {path}");
+
             using MemoryStream memory = new MemoryStream();
             await response.Value.Content.CopyToAsync(memory);
 
@@ -107,6 +115,7 @@ namespace Khooversoft.Toolbox.Azure
                 .VerifyNotNull(nameof(data))
                 .VerifyAssert(x => x.Length > 0, $"{nameof(data)} length must be greater then 0");
 
+            _logger.LogTrace($"{nameof(Write)} to {path}");
             using var memoryBuffer = new MemoryStream(data.ToArray());
 
             DataLakeFileClient file = _fileSystem.GetFileClient(path);
@@ -116,6 +125,8 @@ namespace Khooversoft.Toolbox.Azure
         public async Task DeleteDirectory(string path, CancellationToken token)
         {
             path.VerifyNotEmpty(nameof(path));
+
+            _logger.LogTrace($"{nameof(DeleteDirectory)} {path}");
 
             DataLakeDirectoryClient directoryClient = _fileSystem.GetDirectoryClient(path);
             await directoryClient.DeleteAsync(cancellationToken: token);

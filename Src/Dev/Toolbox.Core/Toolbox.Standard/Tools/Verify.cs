@@ -45,6 +45,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="test">test func</param>
         /// <param name="message">message</param>
         /// <returns>subject</returns>
+        [DebuggerStepThrough]
         public static T VerifyAssert<T>(this T subject, Func<T, bool> test, string message)
         {
             if (test(subject)) return subject;
@@ -61,6 +62,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="test">test func</param>
         /// <param name="getMessage">get message</param>
         /// <returns>subject</returns>
+        [DebuggerStepThrough]
         public static T VerifyAssert<T>(this T subject, Func<T, bool> test, Func<T, string> getMessage)
         {
             if (test(subject)) return subject;
@@ -92,6 +94,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="name">name of subject or message</param>
         /// <returns>subject</returns>
         [DebuggerStepThrough]
+        [return: NotNull]
         public static T VerifyNotNull<T>([NotNull] this T subject, string name)
         {
             if (subject == null || EqualityComparer<T>.Default.Equals(subject, default!)) throw new ArgumentNullException(name);
@@ -105,6 +108,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="name">name of subject or message</param>
         /// <returns>subject</returns>
         [DebuggerStepThrough]
+        [return: NotNull]
         public static string VerifyNotEmpty([NotNull] this string? subject, string name)
         {
             if (string.IsNullOrWhiteSpace(subject)) throw new ArgumentNullException(name);

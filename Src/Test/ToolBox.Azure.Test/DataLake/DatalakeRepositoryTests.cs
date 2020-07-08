@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,13 +10,21 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ToolBox.Azure.Test.Application;
 using Xunit;
 
 namespace ToolBox.Azure.Test.DataLake
 {
+    [Collection("DatalakeTests")]
     public class DatalakeRepositoryTests
     {
+        private readonly AzureTestOption _testOption;
+        private readonly ILoggerFactory _loggerFactory = new TestLoggerFactory();
+
+        public DatalakeRepositoryTests()
+        {
+            _testOption = new TestOptionBuilder().Build();
+        }
+
         [Trait("Category", "Unit")]
         [Fact]
         public async Task GivenData_WhenSaved_ShouldWork()
@@ -22,7 +32,11 @@ namespace ToolBox.Azure.Test.DataLake
             const string data = "this is a test";
             const string path = "testString.txt";
 
-            IDatalakeRepository datalakeRepository = TestOption.GetDatalakeRepository();
+            IDatalakeRepository datalakeRepository = _testOption.GetDatalakeRepository(_loggerFactory);
+
+            await _testOption
+                .GetDatalakeManagement(_loggerFactory)
+                .CreateIfNotExist(_testOption.DatalakeOption.FileSystemName, CancellationToken.None);
 
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
             await datalakeRepository.Write(path, dataBytes, true, CancellationToken.None);
@@ -52,9 +66,13 @@ namespace ToolBox.Azure.Test.DataLake
         {
             const string path = "Test.json";
 
-            IDatalakeRepository datalakeRepository = TestOption.GetDatalakeRepository();
+            IDatalakeRepository datalakeRepository = _testOption.GetDatalakeRepository(_loggerFactory);
 
-            string originalFilePath = FileTools.WriteResourceToTempFile(path, nameof(DatalakeRepositoryTests), typeof(DatalakeRepositoryTests), TestOption._resourceId);
+            await _testOption
+                .GetDatalakeManagement(_loggerFactory)
+                .CreateIfNotExist(_testOption.DatalakeOption.FileSystemName, CancellationToken.None);
+
+            string originalFilePath = FileTools.WriteResourceToTempFile(path, nameof(DatalakeRepositoryTests), typeof(TestOptionBuilder), TestOptionBuilder.ResourceId);
             originalFilePath.Should().NotBeNullOrEmpty();
 
             using (Stream readFile = new FileStream(originalFilePath, FileMode.Open))
@@ -91,7 +109,7 @@ namespace ToolBox.Azure.Test.DataLake
         {
             const string path = "Test.json";
 
-            IDatalakeRepository datalakeRepository = TestOption.GetDatalakeRepository();
+            IDatalakeRepository datalakeRepository = _testOption.GetDatalakeRepository(_loggerFactory);
 
             await ClearContainer(datalakeRepository);
 
@@ -99,7 +117,7 @@ namespace ToolBox.Azure.Test.DataLake
             verifyList.Should().NotBeNull();
             verifyList.Count.Should().Be(0);
 
-            string originalFilePath = FileTools.WriteResourceToTempFile(path, nameof(DatalakeRepositoryTests), typeof(DatalakeRepositoryTests), TestOption._resourceId);
+            string originalFilePath = FileTools.WriteResourceToTempFile(path, nameof(DatalakeRepositoryTests), typeof(TestOptionBuilder), TestOptionBuilder.ResourceId);
             originalFilePath.Should().NotBeNullOrEmpty();
 
             string[] fileLists = new[]
@@ -144,6 +162,10 @@ namespace ToolBox.Azure.Test.DataLake
 
         private async Task ClearContainer(IDatalakeRepository datalakeRepository)
         {
+            await _testOption
+                .GetDatalakeManagement(_loggerFactory)
+                .CreateIfNotExist(_testOption.DatalakeOption.FileSystemName, CancellationToken.None);
+
             IReadOnlyList<DatalakePathItem> list = await datalakeRepository.Search(null!, x => true, false, CancellationToken.None);
             list.Should().NotBeNull();
 

@@ -2,8 +2,10 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -15,15 +17,15 @@ namespace Toolbox.Actor.Tests
     [Trait("Category", "Actor")]
     public class ActorProxyTests
     {
-        private IWorkContext _context = WorkContextBuilder.Default;
+        private ILoggerFactory _loggerFactory = new TestLoggerFactory();
 
         [Fact]
         public async Task ActorProxyMultiTaskTest()
         {
             const int taskCount = 10;
 
-            ActorManager manager = new ActorManager();
-            manager.Register<ICache>( _ => new StringCache());
+            ActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache());
 
             var tasks = new List<Task>();
             ActorKey key1 = new ActorKey("Cache/Test1");

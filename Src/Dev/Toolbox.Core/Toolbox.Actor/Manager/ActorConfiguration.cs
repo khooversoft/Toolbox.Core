@@ -13,33 +13,23 @@ namespace Khooversoft.Toolbox.Actor
     {
         public ActorConfiguration(
             int capacity,
-            IActorRepository actorRepository,
             TimeSpan actorCallTimeout,
             TimeSpan actorRetirementPeriod,
-            TimeSpan inactivityScanPeriod,
-            IWorkContext workContext
+            TimeSpan inactivityScanPeriod
             )
         {
-            workContext.VerifyNotNull(nameof(workContext));
-
             Capacity = capacity;
-            ActorRepository = actorRepository;
             ActorCallTimeout = actorCallTimeout;
             ActorRetirementPeriod = actorRetirementPeriod;
             InactivityScanPeriod = inactivityScanPeriod;
-            WorkContext = workContext;
         }
 
         public int Capacity { get; }
-
-        public IActorRepository ActorRepository { get; }
 
         public TimeSpan ActorCallTimeout { get; }
 
         public TimeSpan ActorRetirementPeriod { get; }
 
         public TimeSpan InactivityScanPeriod { get; }
-
-        public IWorkContext WorkContext { get; }
     }
 }

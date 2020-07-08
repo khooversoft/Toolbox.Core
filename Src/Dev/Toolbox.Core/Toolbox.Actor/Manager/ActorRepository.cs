@@ -3,6 +3,7 @@
 
 using Khooversoft.Toolbox;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -18,24 +19,23 @@ namespace Khooversoft.Toolbox.Actor
     /// </summary>
     public class ActorRepository : IActorRepository
     {
-        private readonly IWorkContext _workContext;
-
         private readonly LruCache<RegistrationKey, IActorRegistration> _actorCache;
         private readonly ActionBlock<IActorRegistration> _actorRemove;
         private readonly object _lock = new object();
         private int _timerLockValue;
         private readonly Timer _timer;
         private readonly ActorConfiguration _configuration;
+        private readonly ILogger<ActorRepository> _logger;
 
-        public ActorRepository(ActorConfiguration configuration)
+        public ActorRepository(ActorConfiguration configuration, ILogger<ActorRepository> logger)
         {
             configuration.VerifyNotNull(nameof(configuration));
             configuration.Capacity.VerifyAssert(x => x > 0, $"Capacity {configuration.Capacity} must be greater than 0");
+            logger.VerifyNotNull(nameof(logger));
 
             _actorRemove = new ActionBlock<IActorRegistration>(x => RetireActor(x));
-            _workContext = configuration.WorkContext.WithActivity();
             _configuration = configuration;
-
+            _logger = logger;
             _actorCache = new LruCache<RegistrationKey, IActorRegistration>(_configuration.Capacity, new RegistrationKeyComparer());
             _actorCache.CacheItemRemoved += x => _actorRemove.Post(x.Value);
 
@@ -47,11 +47,9 @@ namespace Khooversoft.Toolbox.Actor
         /// </summary>
         /// <param name="context">context</param>
         /// <returns></returns>
-        public Task Clear(IWorkContext context)
+        public Task Clear()
         {
-            context.VerifyNotNull(nameof(context));
-
-            context.Telemetry.Verbose(context, "Clearing actor container");
+            _logger.LogTrace("Clearing actor container");
             List<IActorRegistration> list;
 
             lock (_lock)
@@ -61,7 +59,7 @@ namespace Khooversoft.Toolbox.Actor
             }
 
             return list
-                .Select(x => x.Instance.Deactivate(context))
+                .Select(x => x.Instance.Deactivate())
                 .WhenAll();
         }
 
@@ -70,11 +68,11 @@ namespace Khooversoft.Toolbox.Actor
         /// </summary>
         /// <param name="registration">actor registration</param>
         /// <returns>task</returns>
-        public void Set(IWorkContext context, IActorRegistration registration)
+        public void Set(IActorRegistration registration)
         {
             registration.VerifyNotNull(nameof(registration));
 
-            context.Telemetry.Verbose(context, $"Setting actor {registration.ActorKey}");
+            _logger.LogTrace($"Setting actor {registration.ActorKey}");
             IActorRegistration? currentActorRegistration = null;
 
             var key = new RegistrationKey(registration.ActorType, registration.ActorKey.Key);
@@ -92,7 +90,7 @@ namespace Khooversoft.Toolbox.Actor
             // Dispose of the old actor
             if (currentActorRegistration != null) _actorRemove.Post(currentActorRegistration);
 
-            registration.Instance!.Activate(context).GetAwaiter().GetResult();
+            registration.Instance!.Activate().GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -122,12 +120,12 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="actorType">actor type</param>
         /// <param name="actorKey">actor key</param>
         /// <returns>actor registration or null if not exist</returns>
-        public async Task<IActorRegistration?> Remove(IWorkContext context, Type actorType, ActorKey actorKey)
+        public async Task<IActorRegistration?> Remove(Type actorType, ActorKey actorKey)
         {
             actorType.VerifyNotNull(nameof(actorType));
             actorKey.VerifyNotNull(nameof(actorKey));
 
-            context.Telemetry.Verbose(context, $"Removing actor {actorKey}");
+            _logger.LogTrace($"Removing actor {actorKey}");
 
             IActorRegistration registration;
 
@@ -139,7 +137,7 @@ namespace Khooversoft.Toolbox.Actor
 
             try
             {
-                await registration.Instance.Deactivate(context);
+                await registration.Instance.Deactivate();
             }
             finally
             {
@@ -158,11 +156,9 @@ namespace Khooversoft.Toolbox.Actor
             int currentValue = Interlocked.CompareExchange(ref _timerLockValue, 1, 0);
             if (currentValue != 0) return;
 
-            IWorkContext context = _workContext.WithActivity();
-
             try
             {
-                _workContext.Telemetry.Verbose(context, "GarbageCollection");
+                _logger.LogTrace("GarbageCollection");
                 DateTimeOffset retireDate = DateTimeOffset.UtcNow.AddSeconds(-_configuration.ActorRetirementPeriod.TotalSeconds);
 
                 foreach (var item in _actorCache)
@@ -189,7 +185,7 @@ namespace Khooversoft.Toolbox.Actor
             var key = new RegistrationKey(actorRegistration.ActorType, actorRegistration.ActorKey.Key);
             _actorCache.Remove(key);
 
-            await Remove(_workContext, actorRegistration.ActorType, actorRegistration.ActorKey);
+            await Remove(actorRegistration.ActorType, actorRegistration.ActorKey);
         }
 
         /// <summary>

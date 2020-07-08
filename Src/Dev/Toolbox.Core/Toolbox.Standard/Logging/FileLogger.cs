@@ -5,6 +5,9 @@ using System.Threading.Tasks.Dataflow;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// File logger, writes logging entry to action block
+    /// </summary>
     public class FileLogger : ILogger
     {
         private readonly ITargetBlock<string> _fileSync;

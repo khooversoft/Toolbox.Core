@@ -44,7 +44,7 @@ namespace Khooversoft.Toolbox.BlockDocument
         {
             get
             {
-                _currentDigest = _currentDigest ?? new CurrentDigest(GetDigest(), _blocks.Count);
+                _currentDigest ??= new CurrentDigest(GetDigest(), _blocks.Count);
 
                 if (((CurrentDigest)_currentDigest).BlockCount != _blocks.Count)
                 {

@@ -7,6 +7,11 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Provides a typed token by associating a token definition with a type of token defined by T.
+    /// Normally a enum is used for T for efficient processing.
+    /// </summary>
+    /// <typeparam name="T">type of token value</typeparam>
     public struct TokenSyntax<T> : ITokenSyntax where T : Enum
     {
         public TokenSyntax(string token, T tokenType, StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)

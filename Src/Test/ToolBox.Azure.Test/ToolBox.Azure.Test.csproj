@@ -2,32 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UserSecretsId>ToolBox.Azure.Test</UserSecretsId>
+    <UserSecretsId>Toolbox.Test</UserSecretsId>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Application\TestConfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Application\TestConfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.4.4" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.2">
+    <PackageReference Include="coverlet.collector" Version="1.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="1.3.0">
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -36,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Dev\Toolbox.Core\Toolbox.Azure\Toolbox.Azure.csproj" />
     <ProjectReference Include="..\..\Dev\Toolbox.Core\Toolbox.Standard\Toolbox.Standard.csproj" />
+    <ProjectReference Include="..\Toolbox.TestTools\Toolbox.TestTools.csproj" />
   </ItemGroup>
 
 </Project>

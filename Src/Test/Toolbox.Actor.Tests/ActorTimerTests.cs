@@ -1,10 +1,10 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
-using Autofac;
 using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.Toolbox.Actor;
-using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +16,13 @@ namespace Toolbox.Actor.Tests
     [Trait("Category", "Actor")]
     public class ActorTimerTests
     {
-        private IWorkContext _context = WorkContextBuilder.Default;
+        private ILoggerFactory _loggerFactory = new TestLoggerFactory();
 
         [Fact]
         public async Task ActorSimpleTimerTest()
         {
-            IActorManager manager = new ActorManager();
-            manager.Register<ITimerActor>(_ => new TimeActor());
+            IActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ITimerActor>(() => new TimeActor());
 
             ActorKey key = new ActorKey("timer/test");
             ITimerActor timerActor = manager.GetActor<ITimerActor>(key);
@@ -45,18 +45,17 @@ namespace Toolbox.Actor.Tests
 
         private class TimeActor : ActorBase, ITimerActor
         {
-            private HashSet<string> _values = new HashSet<string>();
             private int _count = 0;
 
             public TimeActor()
             {
             }
 
-            protected override Task OnActivate(IWorkContext context)
+            protected override Task OnActivate()
             {
                 SetTimer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
 
-                return base.OnActivate(context);
+                return base.OnActivate();
             }
 
             protected override Task OnTimer()
@@ -65,10 +64,7 @@ namespace Toolbox.Actor.Tests
                 return Task.FromResult(0);
             }
 
-            public Task<int> GetCount()
-            {
-                return Task.FromResult(_count);
-            }
+            public Task<int> GetCount() => Task.FromResult(_count);
         }
     }
 }

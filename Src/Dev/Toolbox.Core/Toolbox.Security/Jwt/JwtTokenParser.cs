@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,9 @@ namespace Khooversoft.Toolbox.Security
     /// </summary>
     public class JwtTokenParser
     {
-        public JwtTokenParser(IEnumerable<KeyValuePair<string, X509Certificate2>> certificates, IEnumerable<string> validIssuers, IEnumerable<string> validAudiences)
+        private readonly ILogger _logger = null!;
+
+        public JwtTokenParser(IEnumerable<KeyValuePair<string, X509Certificate2>> certificates, IEnumerable<string> validIssuers, IEnumerable<string> validAudiences, ILogger<JwtTokenParser> logger)
         {
             certificates.VerifyNotNull(nameof(certificates));
             validIssuers.VerifyNotNull(nameof(validIssuers));
@@ -32,9 +35,10 @@ namespace Khooversoft.Toolbox.Security
             Certificates = certificates.ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
             ValidIssuers = new List<string>(validIssuers);
             ValidAudiences = new List<string>(validAudiences);
+            _logger = logger;
         }
 
-        public JwtTokenParser(IEnumerable<RsaPublicPrivateKey> rsaPublicPrivateKeys, IEnumerable<string> validIssuers, IEnumerable<string> validAudiences)
+        public JwtTokenParser(IEnumerable<RsaPublicPrivateKey> rsaPublicPrivateKeys, IEnumerable<string> validIssuers, IEnumerable<string> validAudiences, ILogger<JwtTokenParser> logger)
         {
             validIssuers.VerifyNotNull(nameof(validIssuers));
             validAudiences.VerifyNotNull(nameof(validAudiences));
@@ -42,6 +46,7 @@ namespace Khooversoft.Toolbox.Security
             RsaPublicPrivateKey = rsaPublicPrivateKeys.ToDictionary(x => x.Kid.ToString(), x => x, StringComparer.OrdinalIgnoreCase); ;
             ValidIssuers = new List<string>(validIssuers);
             ValidAudiences = new List<string>(validAudiences);
+            _logger = logger;
         }
 
         /// <summary>
@@ -74,10 +79,9 @@ namespace Khooversoft.Toolbox.Security
         /// <param name="context">context</param>
         /// <param name="token">JWT token</param>
         /// <returns>token details or null</returns>
-        public JwtTokenDetails? Parse(IWorkContext context, string token)
+        public JwtTokenDetails? Parse(string token)
         {
-            context.VerifyNotNull(nameof(context));
-            token.VerifyNotNull(nameof(token));
+            token.VerifyNotEmpty(nameof(token));
 
             try
             {
@@ -118,7 +122,7 @@ namespace Khooversoft.Toolbox.Security
             }
             catch (Exception ex)
             {
-                context.Telemetry.Error(context, "Parse JWT token failure", ex);
+                _logger.LogError(ex, "Parse JWT token failure");
                 return null;
             }
         }

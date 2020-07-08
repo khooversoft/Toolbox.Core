@@ -7,6 +7,10 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Marks property on class to be used as property sources.
+    /// Name will override property name if specified.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     public sealed class PropertyResolverAttribute : Attribute
     {

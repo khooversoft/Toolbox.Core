@@ -3,10 +3,12 @@
 
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus.Management;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Khooversoft.Toolbox.Azure
@@ -14,65 +16,68 @@ namespace Khooversoft.Toolbox.Azure
     public class QueueManagement : IQueueManagement
     {
         private readonly ManagementClient _managementClient;
+        private readonly ILogger<QueueManagement> _logging;
 
-        public QueueManagement(string connectionString)
+        public QueueManagement(QueueManagementOption queueManagementOption, ILogger<QueueManagement> logging)
         {
-            connectionString.VerifyNotEmpty(nameof(connectionString));
+            queueManagementOption.VerifyNotNull(nameof(queueManagementOption));
+            logging.VerifyNotNull(nameof(logging));
 
-            _managementClient = new ManagementClient(connectionString);
-            ConnectionString = connectionString;
+            ConnectionString = queueManagementOption.GetConnectionString();
+            _managementClient = new ManagementClient(ConnectionString);
+            _logging = logging;
         }
 
         public string ConnectionString { get; }
 
-        public Task<bool> QueueExists(IWorkContext context, string queueName)
+        public async Task<bool> Exist(string queueName, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             queueName.VerifyNotEmpty(nameof(queueName));
 
-            return _managementClient.QueueExistsAsync(queueName, context.CancellationToken);
+            bool exist = await _managementClient.QueueExistsAsync(queueName, token);
+            _logging.LogTrace($"{nameof(Exist)}: Queue={queueName}, return={exist}");
+            return exist;
         }
 
-        public async Task<QueueDefinition> UpdateQueue(IWorkContext context, QueueDefinition queueDefinition)
+        public async Task<QueueDefinition> Update(QueueDefinition queueDefinition, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             queueDefinition.VerifyNotNull(nameof(queueDefinition));
 
-            QueueDescription result = await _managementClient.UpdateQueueAsync(queueDefinition.ConvertTo(), context.CancellationToken);
+            QueueDescription result = await _managementClient.UpdateQueueAsync(queueDefinition.ConvertTo(), token);
+            _logging.LogTrace($"{nameof(Update)}: QueueName={queueDefinition.QueueName}");
 
             return result.ConvertTo();
         }
 
-        public async Task<QueueDefinition> CreateQueue(IWorkContext context, QueueDefinition queueDefinition)
+        public async Task<QueueDefinition> Create(QueueDefinition queueDefinition, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             queueDefinition.VerifyNotNull(nameof(queueDefinition));
 
-            QueueDescription createdDescription = await _managementClient.CreateQueueAsync(queueDefinition.ConvertTo(), context.CancellationToken);
+            QueueDescription createdDescription = await _managementClient.CreateQueueAsync(queueDefinition.ConvertTo(), token);
+            _logging.LogTrace($"{nameof(Create)}: QueueName={queueDefinition.QueueName}");
+            
             return createdDescription.ConvertTo();
         }
 
-        public async Task<QueueDefinition> GetQueue(IWorkContext context, string queueName)
+        public async Task<QueueDefinition> GetDefinition(string queueName, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             queueName.VerifyNotEmpty(nameof(queueName));
 
-            QueueDescription queueDescription = await _managementClient.GetQueueAsync(queueName, context.CancellationToken);
+            QueueDescription queueDescription = await _managementClient.GetQueueAsync(queueName, token);
+            _logging.LogTrace($"{nameof(GetDefinition)}: QueueName={queueName}");
             return queueDescription.ConvertTo();
         }
 
-        public Task DeleteQueue(IWorkContext context, string queueName)
+        public async Task Delete(string queueName, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             queueName.VerifyNotEmpty(nameof(queueName));
 
-            return _managementClient.DeleteQueueAsync(queueName, context.CancellationToken);
+            _logging.LogTrace($"{nameof(Delete)}: QueueName={queueName}");
+            await _managementClient.DeleteQueueAsync(queueName, token);
         }
 
-        public async Task<IReadOnlyList<QueueDefinition>> Search(IWorkContext context, string? search = null, int maxSize = 100)
+        public async Task<IReadOnlyList<QueueDefinition>> Search(CancellationToken token, string? search = null, int maxSize = 100)
         {
-            context.VerifyNotNull(nameof(context));
-
             List<QueueDefinition> list = new List<QueueDefinition>();
             int windowSize = 100;
             int index = 0;
@@ -82,7 +87,7 @@ namespace Khooversoft.Toolbox.Azure
 
             while (list.Count < maxSize)
             {
-                IList<QueueDescription> subjects = await _managementClient.GetQueuesAsync(windowSize, index, context.CancellationToken);
+                IList<QueueDescription> subjects = await _managementClient.GetQueuesAsync(windowSize, index, token);
                 if (subjects.Count == 0) break;
 
                 index += subjects.Count;

@@ -31,7 +31,9 @@ namespace Toolbox.Standard.Test.Tools
 
             subject.HasRoot.Should().Be(hasRoot);
 
-            subject = value.ParsePath();
+            subject = new StringVectorBuilder()
+                .Parse(value)
+                .Build();
 
             subject
                 .Zip(expectedParts, (o, i) => (o, i))

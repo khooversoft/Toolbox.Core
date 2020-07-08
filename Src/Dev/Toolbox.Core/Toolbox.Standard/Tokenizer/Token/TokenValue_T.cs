@@ -7,6 +7,10 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Token value with token type
+    /// </summary>
+    /// <typeparam name="T">type of token</typeparam>
     public struct TokenValue<T> : IToken where T : Enum
     {
         public TokenValue(string value, T tokenType)

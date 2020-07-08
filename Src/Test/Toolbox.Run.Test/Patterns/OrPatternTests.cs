@@ -23,21 +23,21 @@ namespace Toolbox.Run.Test.Patterns
         {
             var queue = new ConcurrentQueue<(string node, int threadId)>();
 
-            var start = new Activity("Start", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var plana = new Activity("PlanA", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var planb = new Activity("PlanB", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
+            var start = new Activity("Start", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var plana = new Activity("PlanA", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var planb = new Activity("PlanB", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
 
             var builder = new RunMapBuilder()
             {
                 new Sequence()
                     + start
-                    + (new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Start-PlanA", Thread.CurrentThread.ManagedThreadId)))) + plana)
-                    + (new ControlFlow((c, r) => falseTask(() => queue.Enqueue((r.Activity.Name + "-Start-PlanB", Thread.CurrentThread.ManagedThreadId)))) + planb),
+                    + (new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Start-PlanA", Thread.CurrentThread.ManagedThreadId)))) + plana)
+                    + (new ControlFlow((r, a) => falseTask(() => queue.Enqueue((a.Name + "-Start-PlanB", Thread.CurrentThread.ManagedThreadId)))) + planb),
             };
 
             RunMap runMap = builder.Build();
 
-            await runMap.Run(WorkContextBuilder.Default);
+            await runMap.Run();
 
             var possibleSequence = new[]
 {
@@ -55,21 +55,21 @@ namespace Toolbox.Run.Test.Patterns
         {
             var queue = new ConcurrentQueue<(string node, int threadId)>();
 
-            var start = new Activity("Start", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var plana = new Activity("PlanA", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var planb = new Activity("PlanB", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
+            var start = new Activity("Start", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var plana = new Activity("PlanA", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var planb = new Activity("PlanB", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
 
             var builder = new RunMapBuilder()
             {
                 new Sequence()
                     + start
-                    + (new ControlFlow((c, r) => falseTask(() => queue.Enqueue((r.Activity.Name + "-Start-PlanA", Thread.CurrentThread.ManagedThreadId)))) + plana)
-                    + (new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Start-PlanB", Thread.CurrentThread.ManagedThreadId)))) + planb),
+                    + (new ControlFlow((r, a) => falseTask(() => queue.Enqueue((a.Name + "-Start-PlanA", Thread.CurrentThread.ManagedThreadId)))) + plana)
+                    + (new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Start-PlanB", Thread.CurrentThread.ManagedThreadId)))) + planb),
             };
 
             RunMap runMap = builder.Build();
 
-            await runMap.Run(WorkContextBuilder.Default);
+            await runMap.Run();
 
             var possibleSequence = new[]
 {
@@ -87,30 +87,30 @@ namespace Toolbox.Run.Test.Patterns
         {
             var queue = new ConcurrentQueue<(string node, int threadId)>();
 
-            var start = new Activity("Start", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var plana = new Activity("PlanA", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var planb = new Activity("PlanB", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var planc = new Activity("PlanC", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var error = new Activity("Error", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var restart = new Activity("Restart", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
+            var start = new Activity("Start", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var plana = new Activity("PlanA", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var planb = new Activity("PlanB", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var planc = new Activity("PlanC", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var error = new Activity("Error", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var restart = new Activity("Restart", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
 
             var builder = new RunMapBuilder()
             {
                 new Sequence()
                     + start
-                    + new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Link-PlanA", Thread.CurrentThread.ManagedThreadId))))
-                    + (new ControlFlow((c, r) => falseTask(() => queue.Enqueue((r.Activity.Name + "-Link-Error(1)", Thread.CurrentThread.ManagedThreadId)))) + error)
+                    + new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Link-PlanA", Thread.CurrentThread.ManagedThreadId))))
+                    + (new ControlFlow((r, a) => falseTask(() => queue.Enqueue((a.Name + "-Link-Error(1)", Thread.CurrentThread.ManagedThreadId)))) + error)
                     + plana
-                    + new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Link-PlanB", Thread.CurrentThread.ManagedThreadId))))
-                    + (new ControlFlow((c, r) => falseTask(() => queue.Enqueue((r.Activity.Name + "-Link-Error(2)", Thread.CurrentThread.ManagedThreadId)))) + error)
+                    + new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Link-PlanB", Thread.CurrentThread.ManagedThreadId))))
+                    + (new ControlFlow((r, a) => falseTask(() => queue.Enqueue((a.Name + "-Link-Error(2)", Thread.CurrentThread.ManagedThreadId)))) + error)
                     + planb
-                    + new ControlFlow((c, r) => falseTask(() => queue.Enqueue((r.Activity.Name + "-Link-PlanB", Thread.CurrentThread.ManagedThreadId))))
-                    + (new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Link-Error(3)", Thread.CurrentThread.ManagedThreadId)))) + error)
+                    + new ControlFlow((r, a) => falseTask(() => queue.Enqueue((a.Name + "-Link-PlanB", Thread.CurrentThread.ManagedThreadId))))
+                    + (new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Link-Error(3)", Thread.CurrentThread.ManagedThreadId)))) + error)
                     + planc,
 
                 new Sequence()
                     + error
-                    + new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Link-Restart", Thread.CurrentThread.ManagedThreadId))))
+                    + new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Link-Restart", Thread.CurrentThread.ManagedThreadId))))
                     + restart
             };
 
@@ -147,8 +147,7 @@ namespace Toolbox.Run.Test.Patterns
 
             Enumerable.SequenceEqual(expectedEdges, edges).Should().BeTrue();
 
-
-            await runMap.Run(WorkContextBuilder.Default);
+            await runMap.Run();
 
             var possibleSequence = new[]
 {
@@ -169,40 +168,40 @@ namespace Toolbox.Run.Test.Patterns
         {
             var queue = new ConcurrentQueue<(string node, int threadId)>();
 
-            var start = new Activity("Start", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var plana = new Activity("PlanA", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var planb = new Activity("PlanB", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var planc = new Activity("PlanC", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var error = new Activity("Error", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
-            var restart = new Activity("Restart", (c, r) => voidTask(() => queue.Enqueue((r.Activity.Name, Thread.CurrentThread.ManagedThreadId))));
+            var start = new Activity("Start", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var plana = new Activity("PlanA", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var planb = new Activity("PlanB", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var planc = new Activity("PlanC", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var error = new Activity("Error", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
+            var restart = new Activity("Restart", (r, a) => voidTask(() => queue.Enqueue((a.Name, Thread.CurrentThread.ManagedThreadId))));
 
             var builder = new RunMapBuilder()
             {
                 new Sequence()
                     + start
-                    + new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Link-PlanA", Thread.CurrentThread.ManagedThreadId))))
-                    + (new ControlFlow((c, r) => falseTask(() => queue.Enqueue((r.Activity.Name + "-Link-Error(1)", Thread.CurrentThread.ManagedThreadId)))) + error)
+                    + new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Link-PlanA", Thread.CurrentThread.ManagedThreadId))))
+                    + (new ControlFlow((r, a) => falseTask(() => queue.Enqueue((a.Name + "-Link-Error(1)", Thread.CurrentThread.ManagedThreadId)))) + error)
                     + plana
-                    + new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Link-PlanB", Thread.CurrentThread.ManagedThreadId))))
-                    + (new ControlFlow((c, r) => falseTask(() => queue.Enqueue((r.Activity.Name + "-Link-Error(2)", Thread.CurrentThread.ManagedThreadId)))) + error)
+                    + new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Link-PlanB", Thread.CurrentThread.ManagedThreadId))))
+                    + (new ControlFlow((r, a) => falseTask(() => queue.Enqueue((a.Name + "-Link-Error(2)", Thread.CurrentThread.ManagedThreadId)))) + error)
                     + planb
-                    + new ControlFlow((c, r) => falseTask(() => queue.Enqueue((r.Activity.Name + "-Link-PlanB", Thread.CurrentThread.ManagedThreadId))))
-                    + (new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Link-Error(3)", Thread.CurrentThread.ManagedThreadId)))) + error)
+                    + new ControlFlow((r, a) => falseTask(() => queue.Enqueue((a.Name + "-Link-PlanB", Thread.CurrentThread.ManagedThreadId))))
+                    + (new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Link-Error(3)", Thread.CurrentThread.ManagedThreadId)))) + error)
                     + planc,
 
                 new Sequence()
                     + error
-                    + new ControlFlow(async (c, r) =>
+                    + new ControlFlow(async (r, a) =>
                     {
                         CountContext context = r.Property.Get<CountContext>();
                         if( !context.CanRestart()) return false;
 
-                        queue.Enqueue((r.Activity.Name + "-Link-Restart", Thread.CurrentThread.ManagedThreadId));
+                        queue.Enqueue((a.Name + "-Link-Restart", Thread.CurrentThread.ManagedThreadId));
                         await Task.Delay(TimeSpan.FromMilliseconds(200));
                         return true;
                     })
                     + restart
-                    + new ControlFlow((c, r) => trueTask(() => queue.Enqueue((r.Activity.Name + "-Link-Start", Thread.CurrentThread.ManagedThreadId))))
+                    + new ControlFlow((r, a) => trueTask(() => queue.Enqueue((a.Name + "-Link-Start", Thread.CurrentThread.ManagedThreadId))))
                     + start,
             };
 
@@ -211,7 +210,7 @@ namespace Toolbox.Run.Test.Patterns
             IRunContext runContext = new RunContext();
             runContext.Property.Set(new CountContext());
 
-            await runMap.Run(WorkContextBuilder.Default, runContext, "Start");
+            await runMap.Run(runContext, "Start");
 
             var possibleSequence = new[]
 {

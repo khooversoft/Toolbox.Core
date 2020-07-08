@@ -7,6 +7,11 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Block syntax handles block sub data that is marked by a delimiter such as quote ("), single (').
+    /// The block start and ending signal must be the same.
+    /// Handles escaping characters with "\" (back slash)s
+    /// </summary>
     public struct BlockSyntax : ITokenSyntax
     {
         public BlockSyntax(char blockSignal = '"')

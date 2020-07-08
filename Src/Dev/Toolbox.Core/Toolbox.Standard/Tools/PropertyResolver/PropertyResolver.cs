@@ -58,7 +58,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <summary>
         /// Tokenizer for properties
         /// </summary>
-        internal static readonly StringTokenizer Tokenizer = new StringTokenizer()
+        internal static StringTokenizer Tokenizer { get; } = new StringTokenizer()
             .Add("{", "}", "{{", "}}");
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="value">value</param>
         /// <returns>resolve value</returns>
-        public string Resolve(string value)
+        public string? Resolve(string? value)
         {
             return InternalResolve(value, Properties);
         }
@@ -126,7 +126,7 @@ namespace Khooversoft.Toolbox.Standard
                 return this;
             }
 
-            switch(propertyUpdate)
+            switch (propertyUpdate)
             {
                 case PropertyUpdate.FailOnDuplicate:
                     return new PropertyResolver(SourceProperties.Concat(values), _comparer, Strict);
@@ -159,7 +159,7 @@ namespace Khooversoft.Toolbox.Standard
 
             foreach (var item in SourceProperties)
             {
-                resolved[item.Key] = InternalResolve(item.Value, SourceProperties);
+                resolved[item.Key] = InternalResolve(item.Value, SourceProperties).ToNullIfEmpty() ?? string.Empty;
             }
 
             return resolved;
@@ -170,7 +170,7 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="value"></param>
         /// <returns>string resolved if possible</returns>
-        private string InternalResolve(string value, IReadOnlyDictionary<string, string> properties)
+        private string? InternalResolve(string? value, IReadOnlyDictionary<string, string> properties)
         {
             if (value.IsEmpty())
             {

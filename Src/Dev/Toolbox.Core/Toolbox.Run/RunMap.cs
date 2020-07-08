@@ -30,13 +30,13 @@ namespace Khooversoft.Toolbox.Run
             }
         }
 
-        public Task Send<T>(IWorkContext context, T message, string? name = null, IRunContext? runContext = null)
+        public Task Send<T>(T message, string? name = null, IRunContext? runContext = null)
         {
             message.VerifyNotNull(nameof(message));
-            return Run(context, new RunContext().SetMessage<T>(message), name);
+            return Run(new RunContext().SetMessage<T>(message), name);
         }
 
-        public async Task Run(IWorkContext context, IRunContext? runContext = null, string? name = null)
+        public async Task Run(IRunContext? runContext = null, string? name = null)
         {
             runContext ??= new RunContext();
 
@@ -47,7 +47,7 @@ namespace Khooversoft.Toolbox.Run
             var runningList = new List<TrackActivity>();
 
             var newActivities = startActivities
-                .Select(x => new TrackActivity(Nodes[x], Nodes[x].Run(context, runContext)))
+                .Select(x => new TrackActivity(Nodes[x], Nodes[x].Run(runContext)))
                 .ToList();
 
             runningList.AddRange(newActivities);
@@ -62,11 +62,11 @@ namespace Khooversoft.Toolbox.Run
                 var edges = GetEdgesForNode(finished.Activity);
                 foreach (var edge in edges)
                 {
-                    bool pass = await edge.IsValid(context, runContext.With(finished.Activity));
+                    bool pass = await edge.IsValid(runContext, finished.Activity);
                     if (pass)
                     {
                         IActivity activity = Nodes[edge.ToActivityName];
-                        runningList.Add(new TrackActivity(activity, activity.Run(context, runContext)));
+                        runningList.Add(new TrackActivity(activity, activity.Run(runContext)));
                     }
                 }
             }

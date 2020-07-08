@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,13 +12,6 @@ namespace Khooversoft.Toolbox.Actor
 {
     public static class ActorManagerExtensions
     {
-        public static IActorManager ToActorManager(this ActorConfiguration self)
-        {
-            self.VerifyNotNull(nameof(self));
-
-            return new ActorManager(self);
-        }
-
         /// <summary>
         /// Create proxy to actor, return current instance or create one
         /// </summary>
@@ -39,6 +33,13 @@ namespace Khooversoft.Toolbox.Actor
         public static bool Exist<T>(this IActorManager actorManager, string actorKey) where T : IActor
         {
             return actorManager.Exist<T>(new ActorKey(actorKey));
+        }
+
+        public static IActorManager ToActorManager(this ActorConfiguration self, ILoggerFactory loggerFactory)
+        {
+            self.VerifyNotNull(nameof(self));
+
+            return new ActorManager(self, loggerFactory);
         }
     }
 }

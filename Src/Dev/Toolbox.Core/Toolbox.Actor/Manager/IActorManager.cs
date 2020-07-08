@@ -10,9 +10,7 @@ namespace Khooversoft.Toolbox.Actor
 {
     public interface IActorManager : IDisposable
     {
-        IActorManager Register<T>() where T : IActor;
-
-        IActorManager Register<T>(Func<IWorkContext, T> createImplementation) where T : IActor;
+        IActorManager Register<T>(Func<T> createImplementation) where T : IActor;
 
         bool Exist<T>(ActorKey actorKey) where T : IActor;
 

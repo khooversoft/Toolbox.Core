@@ -19,19 +19,19 @@ namespace Khooversoft.Toolbox.Security
         {
         }
 
-        public void Clear(IWorkContext context)
+        public void Clear()
         {
             _registration.Clear();
         }
 
-        public void Set(IWorkContext context, LocalCertificate certificate)
+        public void Set(LocalCertificate certificate)
         {
             certificate.VerifyNotNull(nameof(certificate));
 
             _registration[certificate.LocalCertificateKey.Thumbprint] = certificate;
         }
 
-        public LocalCertificate? Get(IWorkContext context, string thumbprint)
+        public LocalCertificate? Get(string thumbprint)
         {
             if (!_registration.TryGetValue(thumbprint, out LocalCertificate spec))
             {

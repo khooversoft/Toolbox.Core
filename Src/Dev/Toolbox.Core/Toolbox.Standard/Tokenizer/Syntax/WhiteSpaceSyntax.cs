@@ -7,14 +7,15 @@ using System.Text;
 
 namespace Khooversoft.Toolbox.Standard
 {
+    /// <summary>
+    /// Defines a whit space token.  Whitespace tokens are any character 32 or less
+    /// and are compressed to a space " " token.
+    /// </summary>
     public struct WhiteSpaceSyntax : ITokenSyntax
     {
         public int Priority { get; }
 
-        public IToken CreateToken(ReadOnlySpan<char> span)
-        {
-            return new TokenValue(" ");
-        }
+        public IToken CreateToken(ReadOnlySpan<char> span) => new TokenValue(" ");
 
         public int? Match(ReadOnlySpan<char> span)
         {

@@ -13,12 +13,12 @@ namespace Khooversoft.Toolbox.Actor
 {
     public interface IActorRepository
     {
-        Task Clear(IWorkContext context);
+        Task Clear();
 
-        void Set(IWorkContext context, IActorRegistration registration);
+        void Set(IActorRegistration registration);
 
         IActorRegistration? Lookup(Type actorType, ActorKey actorKey);
 
-        Task<IActorRegistration?> Remove(IWorkContext context, Type actorType, ActorKey actorKey);
+        Task<IActorRegistration?> Remove(Type actorType, ActorKey actorKey);
     }
 }

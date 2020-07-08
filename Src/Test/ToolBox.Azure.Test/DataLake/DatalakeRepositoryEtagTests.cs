@@ -1,16 +1,26 @@
 ﻿using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.Toolbox.Azure;
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ToolBox.Azure.Test.Application;
 using Xunit;
 
 namespace ToolBox.Azure.Test.DataLake
 {
+    [Collection("DatalakeTests")]
     public class DatalakeRepositoryEtagTests
     {
+        private readonly AzureTestOption _testOption;
+        private readonly ILoggerFactory _loggerFactory = new TestLoggerFactory();
+
+        public DatalakeRepositoryEtagTests()
+        {
+            _testOption = new TestOptionBuilder().Build();
+        }
+
         [Trait("Category", "Unit")]
         [Fact]
         public async Task GivenData_WhenSaved_ShouldMatchEtag()
@@ -18,7 +28,11 @@ namespace ToolBox.Azure.Test.DataLake
             const string data = "this is a test";
             const string path = "testStringEtag.txt";
 
-            IDatalakeRepository datalakeRepository = TestOption.GetDatalakeRepository();
+            IDatalakeRepository datalakeRepository = _testOption.GetDatalakeRepository(_loggerFactory);
+
+            await _testOption
+                .GetDatalakeManagement(_loggerFactory)
+                .CreateIfNotExist(_testOption.DatalakeOption.FileSystemName, CancellationToken.None);
 
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
             await datalakeRepository.Write(path, dataBytes, true, CancellationToken.None);
@@ -50,7 +64,11 @@ namespace ToolBox.Azure.Test.DataLake
             const string data = "this is a test";
             const string path = "testStringEtag.txt";
 
-            IDatalakeRepository datalakeRepository = TestOption.GetDatalakeRepository();
+            IDatalakeRepository datalakeRepository = _testOption.GetDatalakeRepository(_loggerFactory);
+
+            await _testOption
+                .GetDatalakeManagement(_loggerFactory)
+                .CreateIfNotExist(_testOption.DatalakeOption.FileSystemName, CancellationToken.None);
 
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
             await datalakeRepository.Write(path, dataBytes, true, CancellationToken.None);
@@ -84,7 +102,11 @@ namespace ToolBox.Azure.Test.DataLake
             const string data2 = "this is a test2";
             const string path = "testStringEtag.txt";
 
-            IDatalakeRepository datalakeRepository = TestOption.GetDatalakeRepository();
+            IDatalakeRepository datalakeRepository = _testOption.GetDatalakeRepository(_loggerFactory);
+
+            await _testOption
+                .GetDatalakeManagement(_loggerFactory)
+                .CreateIfNotExist(_testOption.DatalakeOption.FileSystemName, CancellationToken.None);
 
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
             await datalakeRepository.Write(path, dataBytes, true, CancellationToken.None);

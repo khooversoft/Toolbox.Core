@@ -2,8 +2,10 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +20,7 @@ namespace Toolbox.Actor.Tests
     public class MultipleActorTests
     {
         private readonly ITestOutputHelper _output;
+        private ILoggerFactory _loggerFactory = new TestLoggerFactory();
 
         public MultipleActorTests(ITestOutputHelper output)
         {
@@ -31,9 +34,9 @@ namespace Toolbox.Actor.Tests
             int count2 = 0;
             const int max = 10;
 
-            IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => CountControl(ref count, y)));
-            manager.Register<ICache2>(_ => new StringCache2(y => CountControl(ref count2, y)));
+            IActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache(y => CountControl(ref count, y)));
+            manager.Register<ICache2>(() => new StringCache2(y => CountControl(ref count2, y)));
 
             Enumerable.Range(0, max)
                 .ForEach(x =>
@@ -79,9 +82,9 @@ namespace Toolbox.Actor.Tests
             const int max = 10;
             const int maxLoop = 10;
 
-            IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => CountControl(ref count, y)));
-            manager.Register<ICache2>(_ => new StringCache2(y => CountControl(ref count2, y)));
+            IActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache(y => CountControl(ref count, y)));
+            manager.Register<ICache2>(() => new StringCache2(y => CountControl(ref count2, y)));
 
             for (int loop = 0; loop < maxLoop; loop++)
             {
@@ -135,9 +138,9 @@ namespace Toolbox.Actor.Tests
             const int max = 1000;
             const int maxLoop = 10;
 
-            IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => CountControl(ref count, y)));
-            manager.Register<ICache2>(_ => new StringCache2(y => CountControl(ref count2, y)));
+            IActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache(y => CountControl(ref count, y)));
+            manager.Register<ICache2>(() => new StringCache2(y => CountControl(ref count2, y)));
 
             for (int loop = 0; loop < maxLoop; loop++)
             {
@@ -205,16 +208,16 @@ namespace Toolbox.Actor.Tests
             public ActorKey GetActorKey() => base.ActorKey;
             public IActorManager GetActorManager() => base.ActorManager;
 
-            protected override Task OnActivate(IWorkContext context)
+            protected override Task OnActivate()
             {
                 Increment(1);
-                return base.OnActivate(context);
+                return base.OnActivate();
             }
 
-            protected override Task OnDeactivate(IWorkContext context)
+            protected override Task OnDeactivate()
             {
                 Increment(-1);
-                return base.OnDeactivate(context);
+                return base.OnDeactivate();
             }
 
             public Task<bool> IsCached(string key) => Task.FromResult(_values.Contains(key));
@@ -244,16 +247,16 @@ namespace Toolbox.Actor.Tests
             public ActorKey GetActorKey() => base.ActorKey;
             public IActorManager GetActorManager() => base.ActorManager;
 
-            protected override Task OnActivate(IWorkContext context)
+            protected override Task OnActivate()
             {
                 Increment(1);
-                return base.OnActivate(context);
+                return base.OnActivate();
             }
 
-            protected override Task OnDeactivate(IWorkContext context)
+            protected override Task OnDeactivate()
             {
                 Increment(-1);
-                return base.OnDeactivate(context);
+                return base.OnDeactivate();
             }
 
             public Task<bool> IsCached(string key) => Task.FromResult(_values.Contains(key));

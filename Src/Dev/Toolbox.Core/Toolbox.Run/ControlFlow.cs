@@ -10,21 +10,21 @@ namespace Khooversoft.Toolbox.Run
 {
     public class ControlFlow : IActivityCommon
     {
-        public ControlFlow(Func<IWorkContext, IRunContext, Task<bool>> predicate)
+        public ControlFlow(Func<IRunContext, IActivity, Task<bool>> predicate)
         {
             predicate.VerifyNotNull(nameof(predicate));
 
             PredicateAsync = predicate;
         }
 
-        public ControlFlow(Func<IWorkContext, IRunContext, bool> predicate)
+        public ControlFlow(Func<IRunContext, IActivity, bool> predicate)
         {
             predicate.VerifyNotNull(nameof(predicate));
 
             Predicate = predicate;
         }
 
-        public ControlFlow(Func<IWorkContext, IRunContext, Task<bool>> predicate, IActivity toActivity)
+        public ControlFlow(Func<IRunContext, IActivity, Task<bool>> predicate, IActivity toActivity)
             : this(predicate)
         {
             toActivity.VerifyNotNull(nameof(toActivity));
@@ -32,7 +32,7 @@ namespace Khooversoft.Toolbox.Run
             ToActivity = toActivity;
         }
 
-        public ControlFlow(Func<IWorkContext, IRunContext, bool> predicate, IActivity toActivity)
+        public ControlFlow(Func<IRunContext, IActivity, bool> predicate, IActivity toActivity)
             : this(predicate)
         {
             toActivity.VerifyNotNull(nameof(toActivity));
@@ -42,9 +42,9 @@ namespace Khooversoft.Toolbox.Run
 
         public IActivity? ToActivity { get; private set; }
 
-        public Func<IWorkContext, IRunContext, Task<bool>>? PredicateAsync { get; }
+        public Func<IRunContext, IActivity, Task<bool>>? PredicateAsync { get; }
 
-        public Func<IWorkContext, IRunContext, bool>? Predicate { get; }
+        public Func<IRunContext, IActivity, bool>? Predicate { get; }
 
         public static ControlFlow operator +(ControlFlow subject, IActivity activity)
         {

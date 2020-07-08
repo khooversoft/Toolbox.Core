@@ -8,11 +8,11 @@ namespace Khooversoft.Toolbox.Security
 {
     public interface ICertificateManager
     {
-        void Clear(IWorkContext context);
+        void Clear();
 
-        void Set(IWorkContext context, LocalCertificate certificate);
+        void Set(LocalCertificate certificate);
 
-        LocalCertificate? Get(IWorkContext context, string thumbprint);
+        LocalCertificate? Get(string thumbprint);
 
         IEnumerator<LocalCertificate> LocalCertificateItems();
     }

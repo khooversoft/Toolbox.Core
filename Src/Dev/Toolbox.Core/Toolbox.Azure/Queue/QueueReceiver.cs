@@ -1,6 +1,7 @@
 ﻿using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,28 +13,29 @@ namespace Khooversoft.Toolbox.Azure
 {
     public class QueueReceiver<T> where T : class
     {
-        private Func<T, Task>? _receiver;
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+        private readonly ILogger<QueueReceiver<T>> _logger;
         private MessageReceiver _messageReceiver;
+        private Func<T, Task>? _receiver;
 
-        public QueueReceiver(string connectionString, string queueName)
+        public QueueReceiver(string connectionString, string queueName, ILogger<QueueReceiver<T>> logger)
         {
             connectionString.VerifyNotEmpty(nameof(connectionString));
             queueName.VerifyNotEmpty(nameof(queueName));
 
             _messageReceiver = new MessageReceiver(connectionString, queueName, ReceiveMode.PeekLock);
+            _logger = logger;
         }
 
-        public Task Start(IWorkContext context, Func<T, Task> receiver)
+        public Task Start(Func<T, Task> receiver)
         {
             _messageReceiver.VerifyNotNull("MessageProcessor is not running");
-            context.VerifyNotNull(nameof(context));
             receiver.VerifyNotNull(nameof(receiver));
 
             _receiver = receiver;
 
             // Configure the MessageHandler Options in terms of exception handling, number of concurrent messages to deliver etc.
-            var messageHandlerOptions = new MessageHandlerOptions(x => ExceptionReceivedHandler(context, x))
+            var messageHandlerOptions = new MessageHandlerOptions(x => ExceptionReceivedHandler(x))
             {
                 // Maximum number of Concurrent calls to the callback `ProcessMessagesAsync`, set to 1 for simplicity.
                 // Set it according to how many messages the application wants to process in parallel.
@@ -44,6 +46,7 @@ namespace Khooversoft.Toolbox.Azure
                 AutoComplete = false
             };
 
+            _logger.LogTrace($"{nameof(Start)}: Register message handler");
             _messageReceiver.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
             return Task.CompletedTask;
         }
@@ -61,6 +64,7 @@ namespace Khooversoft.Toolbox.Azure
                 MessageReceiver? messageReceiver = Interlocked.Exchange(ref _messageReceiver, null!);
                 if (messageReceiver != null)
                 {
+                    _logger.LogTrace($"{nameof(Stop)}: Stopping");
                     await messageReceiver.CloseAsync();
                 }
             }
@@ -102,16 +106,16 @@ namespace Khooversoft.Toolbox.Azure
             }
         }
 
-        private Task ExceptionReceivedHandler(IWorkContext context, ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
         {
-            context.Telemetry.Error(context, "Message handler encountered an exception", exceptionReceivedEventArgs.Exception);
+            _logger.LogError(exceptionReceivedEventArgs.Exception, "Message handler encountered an exception");
 
             var receiverContext = exceptionReceivedEventArgs.ExceptionReceivedContext;
 
-            context.Telemetry.Error(context, "Exception context for troubleshooting:");
-            context.Telemetry.Error(context, $"- Endpoint: {receiverContext.Endpoint}");
-            context.Telemetry.Error(context, $"- Entity Path: {receiverContext.EntityPath}");
-            context.Telemetry.Error(context, $"- Executing Action: {receiverContext.Action}");
+            _logger.LogError("Exception context for troubleshooting:");
+            _logger.LogError($"- Endpoint: {receiverContext.Endpoint}");
+            _logger.LogError($"- Entity Path: {receiverContext.EntityPath}");
+            _logger.LogError($"- Executing Action: {receiverContext.Action}");
 
             return Task.CompletedTask;
         }

@@ -68,10 +68,7 @@ namespace Khooversoft.Toolbox.Standard
         /// Has been introduced to allow casting objects without breaking the fluent API.
         /// <typeparam name="TTo"></typeparam>
         /// <param name="subject">subject to cast</param>
-        public static T CastAs<T>(this object subject) where T : class
-        {
-            return (T)subject;
-        }
+        public static T CastAs<T>(this object subject) => (T)subject;
 
         /// <summary>
         /// Try to casts the specified object to the type specified through type.
@@ -80,7 +77,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <typeparam name="TTo"></typeparam>
         /// <param name="subject">subject to cast</param>
         /// <param name="value">output value if same type, or default</param>
-        public static bool TryCastAs<T>(this object subject, out T? value) where T : class
+        public static bool TryCastAs<T>(this object subject, out T value, T defaultValue)
         {
             if(subject is T)
             {
@@ -88,7 +85,7 @@ namespace Khooversoft.Toolbox.Standard
                 return true;
             }
 
-            value = default;
+            value = defaultValue;
             return false;
         }
 
@@ -114,6 +111,39 @@ namespace Khooversoft.Toolbox.Standard
             if (subject == null) return new byte[0];
 
             return Encoding.UTF8.GetBytes(subject);
+        }
+
+        /// <summary>
+        /// Uses function to recursive build configuration settings (.Net Core Configuration) from a class that can have sub-classes
+        /// </summary>
+        /// <typeparam name="T">type of class</typeparam>
+        /// <param name="subject">instance of class</param>
+        /// <returns>list or configuration settings "propertyName=value"</returns>
+        public static IReadOnlyList<string> GetConfigValues<T>(this T subject) where T : class
+        {
+            subject.VerifyNotNull(nameof(subject));
+
+            return getProperties(null, subject)
+                .ToList();
+
+            static string buildName(string? root, string name) => (root.IsEmpty() ? string.Empty : root + ":") + name;
+
+            // Get properties on object
+            static IEnumerable<string> getProperties(string? root, object subject) =>
+                subject.GetType().GetProperties()
+                .SelectMany(x => getProperty(root, x.Name, x.GetValue(subject)));
+
+            // Get property on object
+            static IEnumerable<string> getProperty(string? root, string name, object? subject) => subject switch
+            {
+                object v when v.GetType() == typeof(string) || !v.GetType().IsClass => new[] { $"{buildName(root, name)}={v!}" },
+
+                IEnumerable<object> v => v.SelectMany((x, i) => getProperties(buildName(root, name) + $":{i}", x)),
+
+                object v => getProperties(buildName(root, name), v),
+
+                _ => Enumerable.Empty<string>(),
+            };
         }
     }
 }

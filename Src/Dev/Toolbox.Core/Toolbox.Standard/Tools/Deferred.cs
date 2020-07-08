@@ -13,33 +13,26 @@ namespace Khooversoft.Toolbox.Standard
     /// </summary>
     public class Deferred
     {
-        private Action<IWorkContext> _execute;
+        private Action _execute;
 
         /// <summary>
-        /// Construct with lambda to return value
+        /// Constructor
         /// </summary>
-        /// <param name="getValue"></param>
-        public Deferred(Action<IWorkContext> execute)
+        /// <param name="execute">execute one time</param>
+        public Deferred(Action execute)
         {
             execute.VerifyNotNull(nameof(execute));
 
-            _execute = x => InternalExecute(() => execute(x));
+            _execute = () =>
+            {
+                Interlocked.Exchange(ref _execute, () => { });
+                execute();
+            };
         }
 
         /// <summary>
         /// Return value (lazy)
         /// </summary>
-        public void Execute(IWorkContext context) => _execute(context);
-
-        /// <summary>
-        /// Get value by switching lambda, will only be called once
-        /// </summary>
-        /// <param name="execute">lambda to get value</param>
-        /// <returns>value</returns>
-        private void InternalExecute(Action userAction)
-        {
-            Interlocked.Exchange(ref _execute, x => { });
-            userAction();
-        }
+        public void Execute() => _execute();
     }
 }

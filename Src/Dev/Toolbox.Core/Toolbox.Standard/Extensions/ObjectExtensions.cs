@@ -124,18 +124,6 @@ namespace Khooversoft.Toolbox.Standard
         }
 
         /// <summary>
-        /// Get key value properties for a class and any sub classes based on an attribute
-        /// </summary>
-        /// <typeparam name="T">attribute type</typeparam>
-        /// <param name="classToScan">class to scan</param>
-        /// <returns>list of property path and values</returns>
-        public static IReadOnlyList<PropertyPathValue> ToKeyValuesForAttribute<T>(this object classToScan)
-            where T : Attribute
-        {
-            return classToScan.SerializeToKeyValue(x => x.GetCustomAttributes<T>().Count() > 0);
-        }
-
-        /// <summary>
         /// Convert object to cache object
         /// </summary>
         /// <typeparam name="T">type</typeparam>

@@ -13,7 +13,7 @@ namespace Khooversoft.Toolbox.Run
     [DebuggerDisplay("Name={Name}")]
     public class Activity : IActivity
     {
-        public Activity(string name, Func<IWorkContext, IRunContext, Task> funcAsync)
+        public Activity(string name, Func<IRunContext, IActivity, Task> funcAsync)
         {
             name.VerifyNotEmpty(nameof(name));
             funcAsync.VerifyNotNull(nameof(funcAsync));
@@ -22,7 +22,7 @@ namespace Khooversoft.Toolbox.Run
             FuncAsync = funcAsync;
         }
 
-        public Activity(string name, Action<IWorkContext, IRunContext> func)
+        public Activity(string name, Action<IRunContext, IActivity> func)
         {
             name.VerifyNotEmpty(nameof(name));
             func.VerifyNotNull(nameof(func));
@@ -35,23 +35,23 @@ namespace Khooversoft.Toolbox.Run
 
         public string Name { get; }
 
-        public Func<IWorkContext, IRunContext, Task>? FuncAsync { get; }
+        public Func<IRunContext, IActivity, Task>? FuncAsync { get; }
 
-        public Action<IWorkContext, IRunContext>? Func { get; }
+        public Action<IRunContext, IActivity>? Func { get; }
 
         public IProperty Properties { get; } = new Property();
 
-        public async Task Run(IWorkContext context, IRunContext runContext)
+        public async Task Run(IRunContext runContext)
         {
             try
             {
                 if (FuncAsync != null)
                 {
-                    await FuncAsync(context, new RunContext(runContext, this));
+                    await FuncAsync(runContext, this);
                 }
                 else
                 {
-                    Func!(context, new RunContext(runContext, this));
+                    Func!(runContext, this);
                 }
             }
             catch (Exception ex)

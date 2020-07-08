@@ -25,17 +25,6 @@ namespace Toolbox.Standard.Test.Tools
         }
 
         [Fact]
-        public void GivenDeferred_WhenSetByValue_ShouldPass()
-        {
-            const string testText = "test";
-
-            var subject = new Deferred<string>(testText);
-
-            subject.Value.Should().Be(testText);
-            subject.Value.Should().Be(testText);
-        }
-
-        [Fact]
         public void GivenDeferred_WhenThrow_ShouldThrow()
         {
             var subject = new Deferred<string>(() => throw new ArgumentException());
@@ -48,22 +37,21 @@ namespace Toolbox.Standard.Test.Tools
         {
             int value = 0;
 
-            var subject = new Deferred(x => value++);
+            var subject = new Deferred(() => value++);
 
-            subject.Execute(null!);
+            subject.Execute();
             value.Should().Be(1);
 
-            subject.Execute(null!);
+            subject.Execute();
             value.Should().Be(1);
         }
 
         [Fact]
         public void GivenDeferred_WhenActionThrow_ShouldThrow()
         {
-            var subject = new Deferred(x => throw new ArgumentException());
-            IWorkContext context = WorkContextBuilder.Default;
+            var subject = new Deferred(() => throw new ArgumentException());
 
-            subject.Invoking(x => x.Execute(context)).Should().Throw<ArgumentException>();
+            subject.Invoking(x => x.Execute()).Should().Throw<ArgumentException>();
         }
     }
 }

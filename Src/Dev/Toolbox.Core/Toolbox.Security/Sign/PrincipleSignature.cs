@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -40,10 +41,10 @@ namespace Khooversoft.Toolbox.Security
                 .Build();
         }
 
-        public JwtTokenDetails? ValidateSignature(IWorkContext context, string jwt)
+        public JwtTokenDetails? ValidateSignature(string jwt)
         {
-            return new JwtTokenParser(PublicPrivateKey.ToEnumerable(), Issuer.ToEnumerable(), Audience.ToEnumerable())
-                .Parse(context, jwt);
+            return new JwtTokenParser(PublicPrivateKey.ToEnumerable(), Issuer.ToEnumerable(), Audience.ToEnumerable(), new NullLogger<JwtTokenParser>())
+                .Parse(jwt);
         }
     }
 }

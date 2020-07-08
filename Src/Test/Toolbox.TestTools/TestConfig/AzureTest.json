@@ -1,0 +1,16 @@
+{
+  "BlobOption": {
+    "ContainerName": "model-test",
+    "ConnectionString": "DefaultEndpointsProtocol=https;AccountName=toolboxteststorage;AccountKey={AccountKey};EndpointSuffix=core.windows.net"
+    //"AccountKey": "from secret"
+  },
+  "DatalakeOption": {
+    "AccountName": "toolboxtestadls",
+    "FileSystemName": "test-file-system"
+    //"AccountKey": "from secret"
+  },
+  "QueueOption": {
+    "ConnectionString": "Endpoint=sb://toolbox-messagehubtest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey={SharedAccessKey}"
+    //"AccountKey": "from secret"
+  }
+}

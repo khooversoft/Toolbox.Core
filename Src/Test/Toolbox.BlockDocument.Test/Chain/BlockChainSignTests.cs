@@ -15,8 +15,6 @@ namespace Toolbox.BlockDocument.Test.Blocks
 {
     public class BlockChainSignTests
     {
-        private static readonly IWorkContext _workContext = WorkContextBuilder.Default;
-
         [Fact]
         public void GivenString_WhenHashed_Match()
         {
@@ -50,7 +48,7 @@ namespace Toolbox.BlockDocument.Test.Blocks
             block1.Validate();
             block1Digest.Should().Be(block1.Digest);
 
-            block1.Validate(_workContext, principleSignature);
+            block1.Validate(principleSignature);
 
             blockChain.IsValid().Should().BeTrue();
 
@@ -59,7 +57,7 @@ namespace Toolbox.BlockDocument.Test.Blocks
                 principleSignature,
             };
 
-            blockChain.Validate(_workContext, keyContainer);
+            blockChain.Validate(keyContainer);
         }
 
         [Fact]
@@ -72,12 +70,12 @@ namespace Toolbox.BlockDocument.Test.Blocks
             var block1 = new DataBlock<TextBlock>(now, "blockTypeV1", "blockIdV1", new TextBlock("name", "type", "author", "dataV1"));
             block1 = block1.WithSignature(principleSignature);
             blockChain.Add(block1);
-            block1.Validate(_workContext, principleSignature);
+            block1.Validate(principleSignature);
 
             var block2 = new DataBlock<TextBlock>(now, "blockTypeV2", "blockIdV2", new TextBlock("name", "type", "author", "dataV2"));
             block2 = block2.WithSignature(principleSignature);
             blockChain.Add(block2);
-            block2.Validate(_workContext, principleSignature);
+            block2.Validate(principleSignature);
 
             blockChain.IsValid().Should().BeTrue();
 
@@ -86,7 +84,7 @@ namespace Toolbox.BlockDocument.Test.Blocks
                 principleSignature,
             };
 
-            blockChain.Validate(_workContext, keyContainer);
+            blockChain.Validate(keyContainer);
         }
 
         [Fact]
@@ -110,7 +108,7 @@ namespace Toolbox.BlockDocument.Test.Blocks
                 principleSignature,
             };
 
-            blockChain.Validate(_workContext, keyContainer);
+            blockChain.Validate(keyContainer);
         }
 
         [Fact]
@@ -133,7 +131,7 @@ namespace Toolbox.BlockDocument.Test.Blocks
                 principleSignature,
             };
 
-            blockChain.Validate(_workContext, keyContainer);
+            blockChain.Validate(keyContainer);
 
             blockChain.Blocks
                 .Select((x, i) => (x, i))
@@ -170,7 +168,7 @@ namespace Toolbox.BlockDocument.Test.Blocks
 
             blockChain.Blocks.Count.Should().Be(4);
             blockChain.IsValid().Should().BeTrue();
-            blockChain.Validate(_workContext, keyContainer);
+            blockChain.Validate(keyContainer);
             string blockChainDigest = blockChain.GetDigest();
             blockChainDigest.Should().NotBeNullOrEmpty();
 

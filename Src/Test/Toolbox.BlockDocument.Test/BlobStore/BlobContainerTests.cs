@@ -2,34 +2,33 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.Toolbox.Azure;
 using Khooversoft.Toolbox.BlockDocument;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Toolbox.BlockDocument.Test.BlobStoreTest
 {
-    public class BlobContainerTests : IClassFixture<ApplicationFixture>
+    public class BlobContainerTests
     {
-        private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=toolboxteststorage;AccountKey={blob-storage-test-AccountKey};EndpointSuffix=core.windows.net";
-        private readonly BlobStoreConnection _blobStore;
-        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
-        private readonly ApplicationFixture _application;
+        private ILoggerFactory _loggerFactory = new TestLoggerFactory();
+        private readonly AzureTestOption _testOption;
+        private readonly BlobRepositoryOption _blobOption;
 
-        public BlobContainerTests(ApplicationFixture application)
+        public BlobContainerTests()
         {
-            _application = application;
-
-            string? connectionString = _connectionString.Resolve(_application.PropertyResolver);
-
-            _blobStore = new BlobStoreConnection("block-document-storage-test", connectionString!);
+            _testOption = new TestOptionBuilder().Build();
+            _blobOption = _testOption.BlobOption.WithContainer("block-chain-test");
         }
 
         [Trait("Category", "LocalOnly")]
@@ -39,9 +38,7 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
             const string _zipPath = "$block";
             const string _blobPath = "Test.sa";
 
-            var container = new BlobRepository(_blobStore);
-
-            await container.CreateContainer(_workContext);
+            var container = new BlobRepository(_blobOption, _loggerFactory.CreateLogger<BlobRepository>());
 
             var blockChain = new BlockChain()
             {
@@ -59,21 +56,21 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
             //var buffer = new byte[1000];
             using var writeMemoryBuffer = new MemoryStream();
             var writer = new ZipContainerWriter(new ZipArchive(writeMemoryBuffer, ZipArchiveMode.Create, leaveOpen: true));
-            writer.Write(_workContext, _zipPath, json);
+            writer.Write(_zipPath, json);
             writer.Close();
 
             writeMemoryBuffer.Length.Should().BeGreaterThan(0);
             writeMemoryBuffer.Seek(0, SeekOrigin.Begin);
 
-            await container.Delete(_workContext, _blobPath);
-            await container.Upload(_workContext, _blobPath, writeMemoryBuffer);
+            await container.Delete(_blobPath, CancellationToken.None);
+            await container.Upload(_blobPath, writeMemoryBuffer, CancellationToken.None);
             writeMemoryBuffer.Close();
 
-            IReadOnlyList<byte> readBlob = await container.Download(_workContext, _blobPath);
+            IReadOnlyList<byte> readBlob = await container.Download(_blobPath);
             using var readMemoryBuffer = new MemoryStream(readBlob.ToArray());
 
             var reader = new ZipContainerReader(new ZipArchive(readMemoryBuffer, ZipArchiveMode.Read));
-            string readJson = reader.Read(_workContext, _zipPath);
+            string readJson = reader.Read(_zipPath);
             reader.Close();
 
             BlockChain result = readJson.ToBlockChain();
@@ -82,7 +79,7 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
 
             blockChainHash.Should().Be(resultChainHash);
 
-            await container.Delete(_workContext, _blobPath);
+            await container.Delete(_blobPath, CancellationToken.None);
         }
 
         [Trait("Category", "LocalOnly")]
@@ -91,9 +88,9 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
         {
             const string _blobPath = "Test.sa";
 
-            var container = new BlobRepository(_blobStore);
+            var container = new BlobRepository(_blobOption, _loggerFactory.CreateLogger<BlobRepository>());
 
-            await container.CreateContainer(_workContext);
+            await container.CreateContainer(CancellationToken.None);
 
             var blockChain = new BlockChain()
             {
@@ -105,22 +102,22 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
             blockChain.Blocks.Count.Should().Be(4);
             string blockChainHash = blockChain.ToMerkleTree().BuildTree().ToString();
 
-            using (var zipStream = blockChain.ToZipContainer(_workContext))
+            using (var zipStream = blockChain.ToZipContainer())
             {
-                await container.Delete(_workContext, _blobPath);
-                await container.Upload(_workContext, _blobPath, zipStream);
+                await container.Delete(_blobPath, CancellationToken.None);
+                await container.Upload(_blobPath, zipStream, CancellationToken.None);
             }
 
-            IReadOnlyList<byte> readBlob = await container.Download(_workContext, _blobPath);
+            IReadOnlyList<byte> readBlob = await container.Download(_blobPath);
             using var readMemoryBuffer = new MemoryStream(readBlob.ToArray());
 
-            BlockChain result = readMemoryBuffer.ToBlockChain(_workContext);
+            BlockChain result = readMemoryBuffer.ToBlockChain();
             result.IsValid().Should().BeTrue();
             string resultChainHash = result.ToMerkleTree().BuildTree().ToString();
 
             blockChainHash.Should().Be(resultChainHash);
 
-            await container.Delete(_workContext, _blobPath);
+            await container.Delete(_blobPath, CancellationToken.None);
         }
 
         [Trait("Category", "LocalOnly")]
@@ -129,9 +126,9 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
         {
             const string _blobPath = "Test.sa";
 
-            var container = new BlobRepository(_blobStore);
+            var container = new BlobRepository(_blobOption, _loggerFactory.CreateLogger<BlobRepository>());
 
-            await container.CreateContainer(_workContext);
+            await container.CreateContainer(CancellationToken.None);
 
             var blockChain = new BlockChain()
             {
@@ -144,15 +141,15 @@ namespace Toolbox.BlockDocument.Test.BlobStoreTest
 
             string blockChainHash = blockChain.ToMerkleTree().BuildTree().ToString();
 
-            using var zipStream = blockChain.ToZipContainer(_workContext);
+            using var zipStream = blockChain.ToZipContainer();
 
-            BlockChain result = zipStream.ToBlockChain(_workContext);
+            BlockChain result = zipStream.ToBlockChain();
             result.IsValid().Should().BeTrue();
             string resultChainHash = result.ToMerkleTree().BuildTree().ToString();
 
             blockChainHash.Should().Be(resultChainHash);
 
-            await container.Delete(_workContext, _blobPath);
+            await container.Delete(_blobPath, CancellationToken.None);
         }
     }
 }

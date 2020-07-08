@@ -15,6 +15,6 @@ namespace Khooversoft.Toolbox.Run
 
         IActivity WithName(string name);
 
-        Task Run(IWorkContext context, IRunContext runContext);
+        Task Run(IRunContext runContext);
     }
 }

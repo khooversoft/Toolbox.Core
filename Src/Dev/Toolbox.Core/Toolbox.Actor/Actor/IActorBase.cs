@@ -17,8 +17,8 @@ namespace Khooversoft.Toolbox.Actor
 
         bool Active { get; }
 
-        Task Activate(IWorkContext context);
+        Task Activate();
 
-        Task Deactivate(IWorkContext context);
+        Task Deactivate();
     }
 }

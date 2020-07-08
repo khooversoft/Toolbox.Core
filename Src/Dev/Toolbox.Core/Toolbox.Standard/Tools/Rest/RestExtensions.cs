@@ -1,6 +1,7 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -10,55 +11,45 @@ namespace Khooversoft.Toolbox.Standard
 {
     public static class RestClientExtensions
     {
-        public static async Task<T> GetContentAsync<T>(this Task<HttpResponseMessage> message, IWorkContext context)
+        public static async Task<T> GetContentAsync<T>(this Task<HttpResponseMessage> message)
             where T : class
         {
-            RestResponse<T> response = await message.GetResponseAsync<T>(context);
+            RestResponse<T> response = await message.GetResponseAsync<T>();
             return response.Content;
         }
 
-        public static async Task<T> GetContentAsync<T>(this HttpResponseMessage message, IWorkContext context)
+        public static async Task<T> GetContentAsync<T>(this HttpResponseMessage message)
             where T : class
         {
-            RestResponse<T> response = await message.GetResponseAsync<T>(context);
+            RestResponse<T> response = await message.GetResponseAsync<T>();
             return response.Content;
         }
 
-        public static async Task<RestResponse> GetResponseAsync(this Task<HttpResponseMessage> message, IWorkContext context)
+        public static async Task<RestResponse> GetResponseAsync(this Task<HttpResponseMessage> message)
         {
             HttpResponseMessage restResponse = await message;
             return new RestResponse(restResponse);
         }
 
-        public static async Task<RestResponse<T>> GetResponseAsync<T>(this Task<HttpResponseMessage> message, IWorkContext context)
+        public static async Task<RestResponse<T>> GetResponseAsync<T>(this Task<HttpResponseMessage> message)
             where T : class
         {
             HttpResponseMessage restResponse = await message;
-            return await GetResponseAsync<T>(restResponse, context);
+            return await GetResponseAsync<T>(restResponse);
         }
 
-        public static async Task<RestResponse<T>> GetResponseAsync<T>(this HttpResponseMessage message, IWorkContext context)
+        public static async Task<RestResponse<T>> GetResponseAsync<T>(this HttpResponseMessage message)
             where T : class
         {
-            context.VerifyNotNull(nameof(context));
+            string json = await message.Content.ReadAsStringAsync();
 
-            try
+            if (typeof(T) == typeof(string))
             {
-                string json = await message.Content.ReadAsStringAsync();
-
-                if (typeof(T) == typeof(string))
-                {
-                    return new RestResponse<T>(message, (T)(object)json);
-                }
-
-                T returnType = JsonConvert.DeserializeObject<T>(json);
-                return new RestResponse<T>(message, returnType);
+                return new RestResponse<T>(message, (T)(object)json);
             }
-            catch (Exception ex)
-            {
-                context.Telemetry.Error(context, $"{nameof(GetResponseAsync)} error '{ex.Message}", ex);
-                throw;
-            }
+
+            T returnType = JsonConvert.DeserializeObject<T>(json);
+            return new RestResponse<T>(message, returnType);
         }
     }
 }

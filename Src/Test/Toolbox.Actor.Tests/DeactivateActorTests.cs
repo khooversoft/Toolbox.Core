@@ -2,8 +2,10 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,13 +17,13 @@ namespace Toolbox.Actor.Tests
     [Trait("Category", "Actor")]
     public class DeactivateActorTests
     {
-        private IWorkContext _context = WorkContextBuilder.Default;
+        private ILoggerFactory _loggerFactory = new TestLoggerFactory();
 
         [Fact]
         public async Task GivenActor_WhenDeactivated_ShouldPass()
         {
-            ActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache());
+            ActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache());
 
             ActorKey actorKey = new ActorKey("Cache/Test1");
             ICache cache = manager.GetActor<ICache>(actorKey);
@@ -29,11 +31,11 @@ namespace Toolbox.Actor.Tests
             int count = await cache.GetCount();
             count.Should().Be(1);
 
-            await cache.TestAndDeactivate(_context);
+            await cache.TestAndDeactivate();
             count = await cache.GetCount();
             count.Should().Be(2);
 
-            await cache.TestAndDeactivate(_context);
+            await cache.TestAndDeactivate();
             count = await cache.GetCount();
             count.Should().Be(4);
         }
@@ -42,7 +44,7 @@ namespace Toolbox.Actor.Tests
         {
             Task<int> GetCount();
 
-            Task TestAndDeactivate(IWorkContext context);
+            Task TestAndDeactivate();
         }
 
         private class StringCache : ActorBase, ICache
@@ -53,26 +55,23 @@ namespace Toolbox.Actor.Tests
             {
             }
 
-            protected override Task OnActivate(IWorkContext context)
+            protected override Task OnActivate()
             {
                 _count++;
-                return base.OnActivate(context);
+                return base.OnActivate();
             }
 
-            protected override Task OnDeactivate(IWorkContext context)
+            protected override Task OnDeactivate()
             {
                 _count++;
-                return base.OnDeactivate(context);
+                return base.OnDeactivate();
             }
 
-            public Task<int> GetCount()
-            {
-                return Task.FromResult(_count);
-            }
+            public Task<int> GetCount() => Task.FromResult(_count);
 
-            public Task TestAndDeactivate(IWorkContext context)
+            public Task TestAndDeactivate()
             {
-                if (_count++ >= 2) return Deactivate(context);
+                if (_count++ >= 2) return Deactivate();
 
                 return Task.CompletedTask;
             }

@@ -11,7 +11,7 @@ namespace Khooversoft.Toolbox.Run
     [DebuggerDisplay("FromActivityName={FromActivityName}, ToActivityName={ToActivityName}")]
     public class ActivityControlFlow : GraphEdge<string>, IControlFlow
     {
-        public ActivityControlFlow(string fromActivityName, string toActivityName, Func<IWorkContext, IRunContext, Task<bool>> predicateAsync)
+        public ActivityControlFlow(string fromActivityName, string toActivityName, Func<IRunContext, IActivity, Task<bool>> predicateAsync)
             : base(fromActivityName, toActivityName)
         {
             fromActivityName.VerifyNotEmpty(nameof(fromActivityName));
@@ -21,7 +21,7 @@ namespace Khooversoft.Toolbox.Run
             PredicateAsync = predicateAsync;
         }
         
-        public ActivityControlFlow(string fromActivityName, string toActivityName, Func<IWorkContext, IRunContext, bool> predicate)
+        public ActivityControlFlow(string fromActivityName, string toActivityName, Func<IRunContext, IActivity, bool> predicate)
             : base(fromActivityName, toActivityName)
         {
             fromActivityName.VerifyNotEmpty(nameof(fromActivityName));
@@ -35,13 +35,13 @@ namespace Khooversoft.Toolbox.Run
 
         public string ToActivityName => ToNodeKey;
 
-        public Func<IWorkContext, IRunContext, Task<bool>>? PredicateAsync { get; }
+        public Func<IRunContext, IActivity, Task<bool>>? PredicateAsync { get; }
 
-        public Func<IWorkContext, IRunContext, bool>? Predicate { get; }
+        public Func<IRunContext, IActivity, bool>? Predicate { get; }
 
-        public async Task<bool> IsValid(IWorkContext context, IRunContext runContext) => PredicateAsync != null 
-            ? await PredicateAsync(context, runContext) 
-            : Predicate!(context, runContext);
+        public async Task<bool> IsValid(IRunContext runContext, IActivity activity) => PredicateAsync != null 
+            ? await PredicateAsync(runContext, activity) 
+            : Predicate!(runContext, activity);
 
         public ActivityControlFlow WithName(string fromName, string toName) => PredicateAsync != null
             ? new ActivityControlFlow(fromName, toName, PredicateAsync)

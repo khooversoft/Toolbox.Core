@@ -3,6 +3,7 @@
 
 using Khooversoft.Toolbox;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
@@ -15,51 +16,35 @@ namespace Khooversoft.Toolbox.Actor
     /// </summary>
     public class ActorManager : IActorManager, IDisposable
     {
-        private static readonly IWorkContext _actorManagerWorkContext = new WorkContextBuilder().Build();
         private const string _disposedTestText = "Actor Manager has been disposed";
 
         private readonly IActorRepository _actorRepository;
-        private readonly ActorTypeManager _typeManager = new ActorTypeManager();
+        private readonly ActorTypeManager _typeManager;
         private readonly object _lock = new object();
+        private readonly ILogger<ActorManager> _logger;
         private int _disposed;
 
-        public ActorManager()
-            : this(ActorConfigurationBuilder.Default)
-        {
-        }
-
-        public ActorManager(ActorConfiguration configuration)
+        public ActorManager(ActorConfiguration configuration, ILoggerFactory loggerFactory)
         {
             configuration.VerifyNotNull(nameof(configuration));
+            loggerFactory.VerifyNotNull(nameof(loggerFactory));
 
             Configuration = configuration;
-            _actorRepository = Configuration.ActorRepository ?? new ActorRepository(Configuration);
+            _logger = loggerFactory.CreateLogger<ActorManager>();
+            _actorRepository = new ActorRepository(Configuration, loggerFactory.CreateLogger<ActorRepository>());
+
+            _typeManager = new ActorTypeManager(loggerFactory.CreateLogger<ActorTypeManager>());
         }
 
         /// <summary>
         /// Configuration
         /// </summary>
-        public ActorConfiguration Configuration { get; private set; }
+        public ActorConfiguration Configuration { get; }
 
         /// <summary>
         /// Is actor manager running (not disposed)
         /// </summary>
-        public bool IsRunning { get { return _disposed == 0; } }
-
-        /// <summary>
-        /// Register actor by interface type
-        /// </summary>
-        /// <typeparam name="T">actor interface</typeparam>
-        /// <param name="context">context</param>
-        /// <param name="createImplementation">creator</param>
-        /// <returns>this</returns>
-        public IActorManager Register<T>() where T : IActor
-        {
-            Verify.Assert(IsRunning, _disposedTestText);
-
-            _typeManager.Register(Configuration.WorkContext.WithActivity(), x => x.Container!.Resolve<T>());
-            return this;
-        }
+        public bool IsRunning => _disposed == 0;
 
         /// <summary>
         /// Register actor and lambda creator
@@ -68,12 +53,12 @@ namespace Khooversoft.Toolbox.Actor
         /// <param name="context">context</param>
         /// <param name="createImplementation">creator</param>
         /// <returns>this</returns>
-        public IActorManager Register<T>(Func<IWorkContext, T> createImplementation) where T : IActor
+        public IActorManager Register<T>(Func<T> createImplementation) where T : IActor
         {
             Verify.Assert(IsRunning, _disposedTestText);
             createImplementation.VerifyNotNull(nameof(createImplementation));
 
-            _typeManager.Register(Configuration.WorkContext.WithActivity(), createImplementation);
+            _typeManager.Register(createImplementation);
             return this;
         }
 
@@ -113,21 +98,21 @@ namespace Khooversoft.Toolbox.Actor
                 }
 
                 // Create actor
-                IActor actorObject = _typeManager.Create<T>(Configuration.WorkContext.WithActivity(), actorKey, this);
+                IActor actorObject = _typeManager.Create<T>(actorKey, this);
 
                 IActorBase? actorBase = actorObject as IActorBase;
                 if (actorBase == null)
                 {
                     var ex = new ArgumentException($"Actor {actorObject.GetType().FullName} does not implement IActorBase");
-                    Configuration.WorkContext.Telemetry.Error(Configuration.WorkContext, "Cannot create", ex);
+                    _logger.LogError("Cannot create", ex);
                     throw ex;
                 }
 
                 // Create proxy
-                T actorInterface = ActorProxy<T>.Create(Configuration.WorkContext.WithActivity(), actorBase, this);
+                T actorInterface = ActorProxy<T>.Create(actorBase, this);
                 actorRegistration = new ActorRegistration(typeof(T), actorKey, actorBase, actorInterface);
 
-                _actorRepository.Set(Configuration.WorkContext.WithActivity(), actorRegistration);
+                _actorRepository.Set(actorRegistration);
 
                 // Create proxy for interface
                 return actorRegistration.GetInstance<T>();
@@ -146,7 +131,7 @@ namespace Khooversoft.Toolbox.Actor
             Verify.Assert(IsRunning, _disposedTestText);
             actorKey.VerifyNotNull(nameof(actorKey));
 
-            IActorRegistration? actorRegistration = await _actorRepository.Remove(Configuration.WorkContext.WithActivity(), typeof(T), actorKey).ConfigureAwait(false);
+            IActorRegistration? actorRegistration = await _actorRepository.Remove(typeof(T), actorKey).ConfigureAwait(false);
             if (actorRegistration == null)
             {
                 return false;
@@ -167,7 +152,7 @@ namespace Khooversoft.Toolbox.Actor
             Verify.Assert(IsRunning, _disposedTestText);
             actorType.VerifyNotNull(nameof(actorType));
 
-            IActorRegistration? subject = await _actorRepository.Remove(Configuration.WorkContext.WithActivity(), actorType, actorKey).ConfigureAwait(false);
+            IActorRegistration? subject = await _actorRepository.Remove(actorType, actorKey).ConfigureAwait(false);
             if (subject == null)
             {
                 return false;
@@ -185,7 +170,7 @@ namespace Khooversoft.Toolbox.Actor
         {
             IsRunning.VerifyAssert(x => x == true, _disposedTestText);
 
-            await _actorRepository.Clear(Configuration.WorkContext.WithActivity()).ConfigureAwait(false);
+            await _actorRepository.Clear().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -196,7 +181,7 @@ namespace Khooversoft.Toolbox.Actor
             int testDisposed = Interlocked.CompareExchange(ref _disposed, 1, 0);
             if (testDisposed == 0)
             {
-                Task.Run(() => _actorRepository.Clear(_actorManagerWorkContext))
+                Task.Run(() => _actorRepository.Clear())
                     .GetAwaiter()
                     .GetResult();
             }

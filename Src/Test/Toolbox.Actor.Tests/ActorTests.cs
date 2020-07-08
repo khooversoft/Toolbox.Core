@@ -9,21 +9,23 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using System.Linq;
+using Khoover.Toolbox.TestTools;
+using Microsoft.Extensions.Logging;
 
 namespace Toolbox.Actor.Tests
 {
     [Trait("Category", "Actor")]
     public class ActorTests
     {
-        private IWorkContext _context = WorkContextBuilder.Default;
+        private ILoggerFactory _loggerFactory = new TestLoggerFactory();
 
         [Fact]
         public async Task GivenActor_WhenCreated_KeyAndManagerShouldBeSet()
         {
             int count = 0;
 
-            IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
+            IActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache(y => count += y));
 
             ActorKey key = new ActorKey("cache/test");
             ICache cache = manager.GetActor<ICache>(key);
@@ -43,8 +45,8 @@ namespace Toolbox.Actor.Tests
         {
             int count = 0;
 
-            IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
+            IActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache(y => count += y));
 
             const int max = 10;
             var keyList = new List<ActorKey>();
@@ -89,8 +91,8 @@ namespace Toolbox.Actor.Tests
         {
             int count = 0;
 
-            IActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
+            IActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache(y => count += y));
 
             ActorKey key = new ActorKey("cache/test");
             ICache cache = manager.GetActor<ICache>(key);
@@ -108,8 +110,8 @@ namespace Toolbox.Actor.Tests
         {
             int count = 0;
 
-            var manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
+            var manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache(y => count += y));
 
             ActorKey key = new ActorKey("cache/test");
             ICache cache = manager.GetActor<ICache>(key);
@@ -125,8 +127,8 @@ namespace Toolbox.Actor.Tests
         {
             int count = 0;
 
-            ActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
+            ActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache(y => count += y));
 
             ActorKey key1 = new ActorKey("Cache/Test1");
             ICache cache1 = manager.GetActor<ICache>(key1);
@@ -150,8 +152,8 @@ namespace Toolbox.Actor.Tests
         {
             int count = 0;
 
-            ActorManager manager = new ActorManager();
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
+            ActorManager manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
+            manager.Register<ICache>(() => new StringCache(y => count += y));
 
             ActorKey key1 = new ActorKey("Cache/Test1");
             ICache cache1 = manager.GetActor<ICache>(key1);
@@ -176,9 +178,9 @@ namespace Toolbox.Actor.Tests
         {
             int count = 0;
 
-            var manager = new ActorManager();
+            var manager = new ActorManager(ActorConfigurationBuilder.Default, _loggerFactory);
 
-            manager.Register<ICache>(_ => new StringCache(y => count += y));
+            manager.Register<ICache>(() => new StringCache(y => count += y));
 
             ActorKey key1 = new ActorKey("Cache/Test1");
             ICache cache1 = manager.GetActor<ICache>(key1);
@@ -238,16 +240,16 @@ namespace Toolbox.Actor.Tests
 
             public IActorManager GetActorManager() => base.ActorManager;
 
-            protected override Task OnActivate(IWorkContext context)
+            protected override Task OnActivate()
             {
                 Increment(1);
-                return base.OnActivate(context);
+                return base.OnActivate();
             }
 
-            protected override Task OnDeactivate(IWorkContext context)
+            protected override Task OnDeactivate()
             {
                 Increment(-1);
-                return base.OnDeactivate(context);
+                return base.OnDeactivate();
             }
 
             public Task<bool> IsCached(string key)

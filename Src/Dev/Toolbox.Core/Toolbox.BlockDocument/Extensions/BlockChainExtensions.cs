@@ -2,6 +2,7 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +16,7 @@ namespace Khooversoft.Toolbox.BlockDocument
         private const string _zipPath = "$BlockChain";
         private const string _merkleTreeHash = "$MerkleTreeHash";
 
-        public static Stream ToZipContainer(this BlockChain blockChain, IWorkContext context)
+        public static Stream ToZipContainer(this BlockChain blockChain)
         {
             blockChain.VerifyNotNull(nameof(blockChain));
             blockChain.IsValid().VerifyAssert(x => x == true, "Block chain is not valid");
@@ -26,10 +27,10 @@ namespace Khooversoft.Toolbox.BlockDocument
             try
             {
                 string blockChainHash = blockChain.ToMerkleTree().BuildTree().ToString();
-                writer.Write(context, _merkleTreeHash, blockChainHash);
+                writer.Write(_merkleTreeHash, blockChainHash);
 
                 string json = blockChain.ToJson();
-                writer.Write(context, _zipPath, json);
+                writer.Write(_zipPath, json);
             }
             finally
             {
@@ -42,14 +43,14 @@ namespace Khooversoft.Toolbox.BlockDocument
             return writeMemoryBuffer;
         }
 
-        public static BlockChain ToBlockChain(this Stream readFromStream, IWorkContext context)
+        public static BlockChain ToBlockChain(this Stream readFromStream)
         {
             readFromStream.VerifyNotNull(nameof(readFromStream));
 
             using var reader = new ZipContainerReader(new ZipArchive(readFromStream, ZipArchiveMode.Read));
 
-            string readJson = reader.Read(context, _zipPath);
-            string blockChainHash = reader.Read(context, _merkleTreeHash);
+            string readJson = reader.Read(_zipPath);
+            string blockChainHash = reader.Read(_merkleTreeHash);
 
             BlockChain result = readJson.ToBlockChain();
             result.IsValid().VerifyAssert(x => x == true, "Read block chain is invalid");

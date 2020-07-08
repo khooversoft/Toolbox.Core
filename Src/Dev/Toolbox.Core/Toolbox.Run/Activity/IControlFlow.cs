@@ -11,6 +11,6 @@ namespace Khooversoft.Toolbox.Run
 
         string ToActivityName { get; }
 
-        Task<bool> IsValid(IWorkContext context, IRunContext runContext);
+        Task<bool> IsValid(IRunContext runContext, IActivity activity);
     }
 }

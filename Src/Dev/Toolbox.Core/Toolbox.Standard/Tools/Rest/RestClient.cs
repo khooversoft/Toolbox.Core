@@ -1,13 +1,16 @@
 ﻿// Copyright (c) KhooverSoft. All rights reserved.
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection.Emit;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Khooversoft.Toolbox.Standard
@@ -21,16 +24,21 @@ namespace Khooversoft.Toolbox.Standard
     public class RestClient
     {
         private readonly HttpClient _client;
+        private readonly IJson _json;
+        private readonly ILogger<RestClient> _logger;
 
         /// <summary>
         /// Create REST client and use provided HttpClient
         /// </summary>
         /// <param name="client"></param>
-        public RestClient(HttpClient client)
+        public RestClient(HttpClient client, ILogger<RestClient> logger, IJson? json = null)
         {
             client.VerifyNotNull(nameof(client));
+            logger.VerifyNotNull(nameof(logger));
 
             _client = client;
+            _logger = logger;
+            _json = json ?? new Json();
         }
 
         /// <summary>
@@ -83,18 +91,12 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>this</returns>
         public RestClient SetBaseAddress(Uri? baseAddress)
         {
-            if (baseAddress == null)
+            BaseAddress = baseAddress switch
             {
-                BaseAddress = null;
-                return this;
-            }
-
-            var build = new UriBuilder(baseAddress)
-            {
-                Query = null
+                Uri uri => new UriBuilder(uri) { Query = null }.Uri,
+                _ => null,
             };
 
-            BaseAddress = build.Uri;
             return this;
         }
 
@@ -105,10 +107,7 @@ namespace Khooversoft.Toolbox.Standard
         /// <returns>this</returns>
         public RestClient AddPath(params string[] values)
         {
-            values.VerifyNotNull(nameof(values));
-
             PathItems = PathItems.With(values);
-
             return this;
         }
 
@@ -150,8 +149,7 @@ namespace Khooversoft.Toolbox.Standard
         {
             value.VerifyAssert(x => !required || x != null, "Value is required but null");
 
-            //string jsonString = JsonSerializer.Serialize(value);
-            string jsonString = JsonConvert.SerializeObject(value);
+            string jsonString = _json.Serialize(value);
             Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
             return this;
         }
@@ -185,40 +183,28 @@ namespace Khooversoft.Toolbox.Standard
         /// </summary>
         /// <param name="context">work context</param>
         /// <returns>this</returns>
-        public Task<HttpResponseMessage> GetAsync(IWorkContext context)
-        {
-            return SendAsync(context, BuildRequestMessage(HttpMethod.Get));
-        }
+        public Task<HttpResponseMessage> GetAsync(CancellationToken token) => SendAsync(BuildRequestMessage(HttpMethod.Get), token);
 
         /// <summary>
         /// Issue Delete
         /// </summary>
         /// <param name="context">work context</param>
         /// <returns>this</returns>
-        public Task<HttpResponseMessage> DeleteAsync(IWorkContext context)
-        {
-            return SendAsync(context, BuildRequestMessage(HttpMethod.Delete));
-        }
+        public Task<HttpResponseMessage> DeleteAsync(CancellationToken token) => SendAsync(BuildRequestMessage(HttpMethod.Delete), token);
 
         /// <summary>
         /// Issue Post
         /// </summary>
         /// <param name="context">work context</param>
         /// <returns>this</returns>
-        public Task<HttpResponseMessage> PostAsync(IWorkContext context)
-        {
-            return SendAsync(context, BuildRequestMessage(HttpMethod.Post));
-        }
+        public Task<HttpResponseMessage> PostAsync(CancellationToken token) => SendAsync(BuildRequestMessage(HttpMethod.Post), token);
 
         /// <summary>
         /// Issue Put
         /// </summary>
         /// <param name="context">work context</param>
         /// <returns>this</returns>
-        public Task<HttpResponseMessage> PutAsync(IWorkContext context)
-        {
-            return SendAsync(context, BuildRequestMessage(HttpMethod.Put));
-        }
+        public Task<HttpResponseMessage> PutAsync(CancellationToken token) => SendAsync(BuildRequestMessage(HttpMethod.Put), token);
 
         /// <summary>
         /// Send request
@@ -226,15 +212,15 @@ namespace Khooversoft.Toolbox.Standard
         /// <param name="context">work context</param>
         /// <param name="requestMessage">request message</param>
         /// <returns>state of HTTP response</returns>
-        private async Task<HttpResponseMessage> SendAsync(IWorkContext context, HttpRequestMessage requestMessage)
+        private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             requestMessage.VerifyNotNull(nameof(requestMessage));
 
             try
             {
-                using var scope = new TelemetryActivityScope(context, requestMessage.RequestUri.ToString());
-                HttpResponseMessage message = await _client.SendAsync(requestMessage, context.CancellationToken);
+                await requestMessage.LogTrace(_logger);
+                HttpResponseMessage message = await _client.SendAsync(requestMessage, token);
+                await message.LogTrace(_logger);
 
                 if (!ValidHttpStatusCodes.Any(x => message.StatusCode == x))
                 {
@@ -245,7 +231,7 @@ namespace Khooversoft.Toolbox.Standard
             }
             catch (Exception ex)
             {
-                context.Telemetry.Error(context, $"{nameof(SendAsync)} error '{ex.Message}", ex);
+                _logger.LogError(ex, $"{nameof(SendAsync)} error '{ex.Message}", ex);
                 throw;
             }
         }

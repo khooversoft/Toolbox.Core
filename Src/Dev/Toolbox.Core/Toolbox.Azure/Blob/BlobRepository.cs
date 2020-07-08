@@ -2,37 +2,42 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Azure;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Khooversoft.Toolbox.Azure
 {
     public class BlobRepository : IBlobRepository
     {
-        private readonly BlobStoreConnection _blobStoreConnection;
+        private readonly BlobRepositoryOption _option;
         private readonly BlobContainerClient _containerClient;
+        private readonly ILogger<BlobRepository> _logger;
 
-        public BlobRepository(BlobStoreConnection blobStoreConnection)
+        public BlobRepository(BlobRepositoryOption blobOption, ILogger<BlobRepository> logger)
         {
-            blobStoreConnection.VerifyNotNull(nameof(blobStoreConnection));
+            blobOption.VerifyNotNull(nameof(blobOption)).Verify();
+            logger.VerifyNotNull(nameof(logger));
 
-            _blobStoreConnection = blobStoreConnection;
-            var client = new BlobServiceClient(_blobStoreConnection.ConnectionString);
-            _containerClient = client.GetBlobContainerClient(_blobStoreConnection.ContainerName);
+            _option = blobOption;
+            _logger = logger;
+
+            var client = new BlobServiceClient(blobOption.GetResolvedConnectionString());
+            _containerClient = client.GetBlobContainerClient(blobOption.ContainerName);
         }
 
-        public async Task CreateContainer(IWorkContext context)
+        public async Task CreateContainer(CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
-
             int count = 0;
             const int max = 10;
             RequestFailedException? save = null;
@@ -41,7 +46,8 @@ namespace Khooversoft.Toolbox.Azure
             {
                 try
                 {
-                    await _containerClient.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: context.CancellationToken);
+                    _logger.LogTrace($"Create container {_option.ContainerName}");
+                    await _containerClient.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: token);
                     return;
                 }
                 catch (RequestFailedException ex)
@@ -54,42 +60,36 @@ namespace Khooversoft.Toolbox.Azure
             throw save!;
         }
 
-        public Task DeleteContainer(IWorkContext context)
+        public async Task DeleteContainer(CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
-
-            return _containerClient.DeleteIfExistsAsync(cancellationToken: context.CancellationToken);
+            _logger.LogTrace($"Delete container {_option.ContainerName}");
+            await _containerClient.DeleteIfExistsAsync(cancellationToken: token);
         }
 
-        public async Task<bool> Exists(IWorkContext context)
-        {
-            context.VerifyNotNull(nameof(context));
+        public async Task<bool> Exists(CancellationToken token) => (await _containerClient.ExistsAsync(token)).Value;
 
-            return (await _containerClient.ExistsAsync(context.CancellationToken)).Value;
-        }
-
-        public async Task Set(IWorkContext context, string path, string data)
+        public async Task Set(string path, string data, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             path.VerifyNotEmpty(nameof(path));
             data.VerifyNotEmpty(nameof(data));
 
+            _logger.LogTrace($"{nameof(Set)} - uploading blob to {path}");
             using Stream content = new MemoryStream(Encoding.UTF8.GetBytes(data));
-            await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
+            await _containerClient.UploadBlobAsync(path, content, token);
         }
 
-        public Task Set<T>(IWorkContext context, string path, T data) where T : class
+        public Task Set<T>(string path, T data, CancellationToken token) where T : class
         {
             path.VerifyNotEmpty(nameof(path));
             data.VerifyNotNull(nameof(data));
 
+            _logger.LogTrace($"{nameof(Set)}:{typeof(T).Name} - uploading blob to {path}");
             string subject = JsonConvert.SerializeObject(data);
-            return Set(context, path, subject);
+            return Set(path, subject, token);
         }
 
-        public async Task<string> Get(IWorkContext context, string path)
+        public async Task<string> Get(string path)
         {
-            context.VerifyNotNull(nameof(context));
             path.VerifyNotEmpty(nameof(path));
 
             BlobClient blobClient = _containerClient.GetBlobClient(path);
@@ -107,21 +107,21 @@ namespace Khooversoft.Toolbox.Azure
             }
         }
 
-        public async Task<T> Get<T>(IWorkContext context, string path) where T : class
+        public async Task<T> Get<T>(string path) where T : class
         {
-            string data = await Get(context, path);
+            string data = await Get(path);
             return JsonConvert.DeserializeObject<T>(data);
         }
 
-        public Task Delete(IWorkContext context, string path)
+        public Task Delete(string path, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             path.VerifyNotEmpty(nameof(path));
 
-            return _containerClient.DeleteBlobIfExistsAsync(path, cancellationToken: context.CancellationToken);
+            _logger.LogTrace($"Deleting {path}");
+            return _containerClient.DeleteBlobIfExistsAsync(path, cancellationToken: token);
         }
 
-        public async Task<IReadOnlyList<string>> List(IWorkContext context, string search)
+        public async Task<IReadOnlyList<string>> List(string search)
         {
             var list = new List<string>();
 
@@ -133,32 +133,34 @@ namespace Khooversoft.Toolbox.Azure
             return list;
         }
 
-        public async Task Upload(IWorkContext context, string path, IEnumerable<byte> content)
+        public async Task Upload(string path, IEnumerable<byte> content, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             path.VerifyNotEmpty(nameof(path));
             content.VerifyNotNull(nameof(content));
+
+            _logger.LogTrace($"{nameof(Upload)}:Array - uploading blob to {path}");
 
             using var memoryBuffer = new MemoryStream(content.ToArray());
-            await _containerClient.UploadBlobAsync(path, memoryBuffer, context.CancellationToken);
+            await _containerClient.UploadBlobAsync(path, memoryBuffer, token);
         }
 
-        public async Task Upload(IWorkContext context, string path, Stream content)
+        public async Task Upload(string path, Stream content, CancellationToken token)
         {
-            context.VerifyNotNull(nameof(context));
             path.VerifyNotEmpty(nameof(path));
             content.VerifyNotNull(nameof(content));
 
-            await _containerClient.UploadBlobAsync(path, content, context.CancellationToken);
+            _logger.LogTrace($"{nameof(Upload)}:Stream - uploading blob to {path}");
+            await _containerClient.UploadBlobAsync(path, content, token);
         }
 
-        public async Task<IReadOnlyList<byte>> Download(IWorkContext context, string path)
+        public async Task<IReadOnlyList<byte>> Download(string path)
         {
-            context.VerifyNotNull(nameof(context));
             path.VerifyNotEmpty(nameof(path));
 
             BlobClient blobClient = _containerClient.GetBlobClient(path);
             BlobDownloadInfo download = await blobClient.DownloadAsync();
+
+            _logger.LogTrace($"{nameof(Download)}:Array - downloading blob to {path}");
 
             using MemoryStream memory = new MemoryStream();
             using var writer = new StreamWriter(memory);
@@ -170,13 +172,15 @@ namespace Khooversoft.Toolbox.Azure
             return memory.ToArray();
         }
 
-        public async Task ClearAll(IWorkContext context)
+        public async Task ClearAll(CancellationToken token)
         {
-            var list = await List(context, "*");
+            var list = await List("*");
+
+            _logger.LogTrace($"{nameof(ClearAll)} - removing all blobs");
 
             foreach (var item in list)
             {
-                await Delete(context, item);
+                await Delete(item, token);
             }
         }
 
