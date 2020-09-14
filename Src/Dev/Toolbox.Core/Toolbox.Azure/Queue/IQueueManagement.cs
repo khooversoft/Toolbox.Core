@@ -17,5 +17,7 @@ namespace Khooversoft.Toolbox.Azure
         Task<bool> Exist(string queueName, CancellationToken token);
         Task<IReadOnlyList<QueueDefinition>> Search(CancellationToken token, string? search = null, int maxSize = 100);
         Task<QueueDefinition> Update(QueueDefinition queueDefinition, CancellationToken token);
+        Task<QueueDefinition> CreateIfNotExist(QueueDefinition queueDefinition, CancellationToken token);
+        Task DeleteIfExist(string queueName, CancellationToken token);
     }
 }

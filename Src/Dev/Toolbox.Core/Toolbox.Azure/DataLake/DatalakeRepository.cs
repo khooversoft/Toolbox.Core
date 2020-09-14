@@ -122,6 +122,32 @@ namespace Khooversoft.Toolbox.Azure
             await file.UploadAsync(memoryBuffer, force, token);
         }
 
+        public async Task Append(string path, byte[] data, CancellationToken token)
+        {
+            path.VerifyNotEmpty(nameof(path));
+            data
+                .VerifyNotNull(nameof(data))
+                .VerifyAssert(x => x.Length > 0, $"{nameof(data)} length must be greater then 0");
+
+            _logger.LogTrace($"{nameof(Write)} to {path}");
+            using var memoryBuffer = new MemoryStream(data.ToArray());
+
+            try
+            {
+                DatalakePathProperties properties = await GetPathProperties(path, token);
+
+                DataLakeFileClient file = _fileSystem.GetFileClient(path);
+
+                await file.AppendAsync(memoryBuffer, properties.ContentLength, cancellationToken: token);
+                await file.FlushAsync(properties.ContentLength + data.Length);
+            }
+            catch (RequestFailedException ex) when (ex.ErrorCode == "PathNotFound" || ex.ErrorCode == "BlobNotFound")
+            {
+                await Write(path, data, true, token);
+            }
+            catch (TaskCanceledException) { }
+        }
+
         public async Task DeleteDirectory(string path, CancellationToken token)
         {
             path.VerifyNotEmpty(nameof(path));

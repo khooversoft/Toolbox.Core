@@ -62,9 +62,11 @@ namespace ToolBox.Azure.Test.DataLake
 
         [Trait("Category", "Unit")]
         [Fact]
-        public async Task GivenFile_WhenSaved_ShouldWork()
+        public async Task GivenNewFile_WhenAppended_ShouldWork()
         {
-            const string path = "Test.json";
+            const string data1 = "this is a test - first line(n)";
+            const string data2 = "*** second line ****";
+            const string path = "testStringAppend1.txt";
 
             IDatalakeRepository datalakeRepository = _testOption.GetDatalakeRepository(_loggerFactory);
 
@@ -72,7 +74,61 @@ namespace ToolBox.Azure.Test.DataLake
                 .GetDatalakeManagement(_loggerFactory)
                 .CreateIfNotExist(_testOption.DatalakeOption.FileSystemName, CancellationToken.None);
 
-            string originalFilePath = FileTools.WriteResourceToTempFile(path, nameof(DatalakeRepositoryTests), typeof(TestOptionBuilder), TestOptionBuilder.ResourceId);
+            byte[] dataBytes = Encoding.UTF8.GetBytes(data1);
+            await datalakeRepository.Write(path, dataBytes, true, CancellationToken.None);
+
+            byte[] appendDataBytes = Encoding.UTF8.GetBytes(data2);
+            await datalakeRepository.Append(path, appendDataBytes, CancellationToken.None);
+
+            byte[] receive = await datalakeRepository.Read(path, CancellationToken.None);
+            receive.Should().NotBeNull();
+
+            Enumerable.SequenceEqual(dataBytes.Concat(appendDataBytes), receive).Should().BeTrue();
+
+            await datalakeRepository.Delete(path, CancellationToken.None);
+        }
+
+        [Trait("Category", "Unit")]
+        [Fact]
+        public async Task GivenExistingFile_WhenAppended_ShouldWork()
+        {
+            string data1 = "this is a test number 2 - first line(n)" + Environment.NewLine;
+            const string data2 = "*** second line of number 2 ****";
+            const string path = "testStringAppend2.txt";
+
+            IDatalakeRepository datalakeRepository = _testOption.GetDatalakeRepository(_loggerFactory);
+
+            await _testOption
+                .GetDatalakeManagement(_loggerFactory)
+                .CreateIfNotExist(_testOption.DatalakeOption.FileSystemName, CancellationToken.None);
+
+            byte[] dataBytes = Encoding.UTF8.GetBytes(data1);
+            await datalakeRepository.Append(path, dataBytes, CancellationToken.None);
+
+            byte[] appendDataBytes = Encoding.UTF8.GetBytes(data2);
+            await datalakeRepository.Append(path, appendDataBytes, CancellationToken.None);
+
+            byte[] receive = await datalakeRepository.Read(path, CancellationToken.None);
+            receive.Should().NotBeNull();
+
+            Enumerable.SequenceEqual(dataBytes.Concat(appendDataBytes), receive).Should().BeTrue();
+
+            await datalakeRepository.Delete(path, CancellationToken.None);
+        }
+
+        [Trait("Category", "Unit")]
+        [Fact]
+        public async Task GivenFile_WhenSaved_ShouldWork()
+        {
+            const string path = "base/folder/Test.json";
+
+            IDatalakeRepository datalakeRepository = _testOption.GetDatalakeRepository(_loggerFactory);
+
+            await _testOption
+                .GetDatalakeManagement(_loggerFactory)
+                .CreateIfNotExist(_testOption.DatalakeOption.FileSystemName, CancellationToken.None);
+
+            string originalFilePath = FileTools.WriteResourceToTempFile(Path.GetFileName(path), nameof(DatalakeRepositoryTests), typeof(TestOptionBuilder), TestOptionBuilder.ResourceId);
             originalFilePath.Should().NotBeNullOrEmpty();
 
             using (Stream readFile = new FileStream(originalFilePath, FileMode.Open))

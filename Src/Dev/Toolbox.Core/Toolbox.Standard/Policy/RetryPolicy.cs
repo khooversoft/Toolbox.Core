@@ -7,35 +7,29 @@ namespace Khooversoft.Toolbox.Standard
 {
     public class RetryPolicy
     {
-        private readonly RetryPolicyConfig _monitorRetryPolicyConfig;
         private object _lock = new object();
 
-        private int _retryCount;
+        private readonly TimeSpan _maxTime;
         private DateTime? _lastRetryDate;
 
-        public RetryPolicy(RetryPolicyConfig monitorRetryPolicyConfig)
+        public RetryPolicy(TimeSpan maxTime) => _maxTime = maxTime;
+
+        public void Reset()
         {
-            monitorRetryPolicyConfig.VerifyNotNull(nameof(monitorRetryPolicyConfig));
-
-            _monitorRetryPolicyConfig = monitorRetryPolicyConfig;
+            lock (_lock)
+            {
+                _lastRetryDate = null;
+            }
         }
-
-        public int RetryCount => _retryCount;
 
         public bool CanRetry()
         {
             lock (_lock)
             {
-                if (_lastRetryDate != null && _monitorRetryPolicyConfig.WithIn != null)
-                {
-                    if (DateTime.Now - _lastRetryDate > (TimeSpan)_monitorRetryPolicyConfig.WithIn) _retryCount = 0;
-                }
+                _lastRetryDate ??= DateTime.Now;
             }
 
-            int retryCount = Interlocked.Increment(ref _retryCount);
-            _lastRetryDate = DateTime.Now;
-
-            return retryCount < _monitorRetryPolicyConfig.MaxRetry;
+            return DateTime.Now - _lastRetryDate <= _maxTime;
         }
     }
 }

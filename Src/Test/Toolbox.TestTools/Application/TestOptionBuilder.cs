@@ -9,13 +9,14 @@ namespace Khoover.Toolbox.TestTools
     {
         public TestOptionBuilder() { }
 
-        public AzureTestOption Build()
+        public AzureTestOption Build(params string[] args)
         {
             using Stream configStream = FileTools.GetResourceStream(typeof(TestOptionBuilder), ResourceId);
 
             IConfiguration configuration = new ConfigurationBuilder()
                 .AddJsonStream(configStream)
                 .AddUserSecrets("Toolbox.Test")
+                .AddCommandLine(args)
                 .Build();
 
             var option = new AzureTestOption();

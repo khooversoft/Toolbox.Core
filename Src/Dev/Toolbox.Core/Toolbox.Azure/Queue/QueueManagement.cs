@@ -18,12 +18,12 @@ namespace Khooversoft.Toolbox.Azure
         private readonly ManagementClient _managementClient;
         private readonly ILogger<QueueManagement> _logging;
 
-        public QueueManagement(QueueManagementOption queueManagementOption, ILogger<QueueManagement> logging)
+        public QueueManagement(string connectionString, ILogger<QueueManagement> logging)
         {
-            queueManagementOption.VerifyNotNull(nameof(queueManagementOption));
+            connectionString.VerifyNotEmpty(nameof(connectionString));
             logging.VerifyNotNull(nameof(logging));
 
-            ConnectionString = queueManagementOption.GetConnectionString();
+            ConnectionString = connectionString;
             _managementClient = new ManagementClient(ConnectionString);
             _logging = logging;
         }
@@ -55,7 +55,7 @@ namespace Khooversoft.Toolbox.Azure
 
             QueueDescription createdDescription = await _managementClient.CreateQueueAsync(queueDefinition.ConvertTo(), token);
             _logging.LogTrace($"{nameof(Create)}: QueueName={queueDefinition.QueueName}");
-            
+
             return createdDescription.ConvertTo();
         }
 
@@ -95,6 +95,22 @@ namespace Khooversoft.Toolbox.Azure
             }
 
             return list;
+        }
+
+        public async Task<QueueDefinition> CreateIfNotExist(QueueDefinition queueDefinition, CancellationToken token)
+        {
+            if ((await Exist(queueDefinition.QueueName, token))) return queueDefinition;
+
+            return await Create(queueDefinition, token);
+        }
+
+        public async Task DeleteIfExist(string queueName, CancellationToken token)
+        {
+            queueName.VerifyNotEmpty(nameof(queueName));
+
+            if ((await Exist(queueName, token))) return;
+
+            await Delete(queueName, token);
         }
     }
 }

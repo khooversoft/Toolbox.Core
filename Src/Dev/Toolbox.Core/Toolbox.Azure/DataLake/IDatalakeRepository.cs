@@ -24,6 +24,8 @@ namespace Khooversoft.Toolbox.Azure
 
         Task Write(string path, byte[] data, bool force, CancellationToken token);
 
+        Task Append(string path, byte[] data, CancellationToken token);
+
         Task DeleteDirectory(string path, CancellationToken token);
     }
 }

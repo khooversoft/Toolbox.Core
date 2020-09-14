@@ -9,8 +9,8 @@ namespace Khooversoft.MessageNet.Interface
 {
     public interface IMessageNetSend
     {
-        Task Send(IWorkContext context, NetMessage netMessage);
+        Task Send(NetMessage netMessage);
 
-        Task<NetMessage> Call(IWorkContext context, NetMessage netMessage, TimeSpan? timeout = null);
+        Task<NetMessage> Call(NetMessage netMessage, TimeSpan? timeout = null);
     }
 }

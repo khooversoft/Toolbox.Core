@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace Khooversoft.Toolbox.Standard
 {
@@ -12,6 +13,8 @@ namespace Khooversoft.Toolbox.Standard
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
+
+        public static IJson Default { get; } = new Json();
 
         public string Serialize<T>(T subject) => JsonSerializer.Serialize(subject, _options);
 

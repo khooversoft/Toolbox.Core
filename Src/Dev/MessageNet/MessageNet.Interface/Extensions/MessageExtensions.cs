@@ -15,14 +15,12 @@ namespace Khooversoft.MessageNet.Interface
         {
             subject.VerifyNotNull(nameof(subject));
 
-            switch (subject.ContentType)
+            return subject.ContentType switch
             {
-                case string stringType when stringType == typeof(string).Name && typeof(T) == typeof(string):
-                    return subject.Content.CastAs<T>();
+                string stringType when stringType == typeof(string).Name && typeof(T) == typeof(string) => subject.Content.CastAs<T>(),
 
-                default:
-                    return JsonConvert.DeserializeObject<T>(subject.Content);
-            }
+                _ => JsonConvert.DeserializeObject<T>(subject.Content),
+            };
         }
     }
 }

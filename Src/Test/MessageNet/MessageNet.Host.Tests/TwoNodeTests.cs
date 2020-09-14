@@ -1,11 +1,14 @@
 ﻿using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.MessageNet.Host;
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using MessageNet.Host.Tests.Application;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -20,8 +23,8 @@ namespace MessageNet.Host.Tests
     [Collection("QueueTests")]
     public class TwoNodeTests : IClassFixture<ApplicationFixture>
     {
-        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly ApplicationFixture _application;
+        private readonly ILoggerFactory _loggerFactory = new TestLoggerFactory();
 
         public TwoNodeTests(ApplicationFixture application)
         {
@@ -34,9 +37,9 @@ namespace MessageNet.Host.Tests
             var clientQueueId = new QueueId("default", "test", "clientNode");
             var identityQueueId = new QueueId("default", "test", "identityNode");
 
-            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig());
-            await messageRepository.Unregister(_workContext, clientQueueId);
-            await messageRepository.Unregister(_workContext, identityQueueId);
+            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory);
+            await messageRepository.Unregister(clientQueueId, CancellationToken.None);
+            await messageRepository.Unregister(identityQueueId, CancellationToken.None);
 
             IMessageNetHost netHost = null!;
 
@@ -54,18 +57,18 @@ namespace MessageNet.Host.Tests
                     .Add(x.Header.WithReply("get.response"))
                     .Build();
 
-                await netHost.Send(_workContext, netMessage);
+                await netHost.Send(netMessage);
             };
 
             netHost = new MessageNetHostBuilder()
                 .SetConfig(_application.GetMessageNetConfig())
-                .SetRepository(new MessageRepository(_application.GetMessageNetConfig()))
+                .SetRepository(new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory))
                 .SetAwaiter(new MessageAwaiterManager())
                 .AddNodeReceiver(new NodeHostReceiver(identityQueueId, identityNodeReceiver))
                 .AddNodeReceiver(new NodeHostReceiver(clientQueueId, clientNodeReceiver))
-                .Build();
+                .Build(_loggerFactory);
 
-            await netHost.Start(_workContext);
+            await netHost.Start(CancellationToken.None);
 
             var header = new MessageHeader(identityQueueId.ToMessageUri(), clientQueueId.ToMessageUri(), "get");
 
@@ -73,7 +76,7 @@ namespace MessageNet.Host.Tests
                 .Add(header)
                 .Build();
 
-            await netHost.Send(_workContext, message);
+            await netHost.Send(message);
 
             NetMessage receivedMessage = await clientReceiverTask.Task;
 
@@ -91,9 +94,9 @@ namespace MessageNet.Host.Tests
             var clientQueueId = new QueueId("default", "test", "clientNode");
             var identityQueueId = new QueueId("default", "test", "identityNode");
 
-            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig());
-            await messageRepository.Unregister(_workContext, clientQueueId);
-            await messageRepository.Unregister(_workContext, identityQueueId);
+            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory);
+            await messageRepository.Unregister(clientQueueId, CancellationToken.None);
+            await messageRepository.Unregister(identityQueueId, CancellationToken.None);
 
             IMessageNetHost netHost = null!;
 
@@ -109,18 +112,18 @@ namespace MessageNet.Host.Tests
                     .Add(x.Header.WithReply("get.response"))
                     .Build();
 
-                await netHost.Send(_workContext, netMessage);
+                await netHost.Send(netMessage);
             };
 
             netHost = new MessageNetHostBuilder()
                 .SetConfig(_application.GetMessageNetConfig())
-                .SetRepository(new MessageRepository(_application.GetMessageNetConfig()))
+                .SetRepository(new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory))
                 .SetAwaiter(new MessageAwaiterManager())
                 .AddNodeReceiver(new NodeHostReceiver(identityQueueId, identityNodeReceiver))
                 .AddNodeReceiver(new NodeHostReceiver(clientQueueId, clientNodeReceiver))
-                .Build();
+                .Build(_loggerFactory);
 
-            await netHost.Start(_workContext);
+            await netHost.Start(CancellationToken.None);
 
             var header = new MessageHeader(identityQueueId.ToMessageUri(), clientQueueId.ToMessageUri(), "get");
 
@@ -128,9 +131,9 @@ namespace MessageNet.Host.Tests
                 .Add(header)
                 .Build();
 
-            NetMessage receivedMessage = await netHost.Call(_workContext, message);
+            NetMessage receivedMessage = await netHost.Call(message);
 
-            await netHost.Stop(_workContext);
+            await netHost.Stop();
 
             receivedMessage.Headers.Count.Should().Be(2);
             receivedMessage.Headers.First().ToUri.Should().Be(clientQueueId.ToMessageUri().ToString());
@@ -150,9 +153,9 @@ namespace MessageNet.Host.Tests
             var clientQueueId = new QueueId("default", "test", "clientNode");
             var identityQueueId = new QueueId("default", "test", "identityNode");
 
-            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig());
-            await messageRepository.Unregister(_workContext, clientQueueId);
-            await messageRepository.Unregister(_workContext, identityQueueId);
+            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory);
+            await messageRepository.Unregister(clientQueueId, CancellationToken.None);
+            await messageRepository.Unregister(identityQueueId, CancellationToken.None);
 
             IMessageNetHost netHost = null!;
 
@@ -168,18 +171,18 @@ namespace MessageNet.Host.Tests
                     .Add(x.Header.WithReply("get.response"))
                     .Build();
 
-                await netHost.Send(_workContext, netMessage);
+                await netHost.Send(netMessage);
             };
 
             netHost = new MessageNetHostBuilder()
                 .SetConfig(_application.GetMessageNetConfig())
-                .SetRepository(new MessageRepository(_application.GetMessageNetConfig()))
+                .SetRepository(new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory))
                 .SetAwaiter(new MessageAwaiterManager())
                 .AddNodeReceiver(new NodeHostReceiver(identityQueueId, identityNodeReceiver))
                 .AddNodeReceiver(new NodeHostReceiver(clientQueueId, clientNodeReceiver))
-                .Build();
+                .Build(_loggerFactory);
 
-            await netHost.Start(_workContext);
+            await netHost.Start(CancellationToken.None);
 
             for (int index = 0; index < max; index++)
             {
@@ -189,11 +192,11 @@ namespace MessageNet.Host.Tests
                     .Add(header)
                     .Build();
 
-                NetMessage receivedMessage = await netHost.Call(_workContext, message);
+                NetMessage receivedMessage = await netHost.Call(message);
                 messageReceivedQueue.Enqueue(receivedMessage);
             }
 
-            await netHost.Stop(_workContext);
+            await netHost.Stop();
 
             for (int index = 0; index < max; index++)
             {

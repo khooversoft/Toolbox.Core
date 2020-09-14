@@ -10,11 +10,9 @@ namespace Khooversoft.MessageNet.Host
     {
         public MessageNetConfig(params NamespaceRegistration[] namespaceRegistrations)
         {
-            namespaceRegistrations
-                .VerifyNotNull(nameof(namespaceRegistrations))
-                .VerifyAssert(x => x.Count() > 0, "Must have at least one registration");
-
-            Registrations = namespaceRegistrations.ToDictionary(x => x.Namespace, x => x, StringComparer.OrdinalIgnoreCase);
+            Registrations = namespaceRegistrations
+                .VerifyAssert(x => x.Count() > 0, "Must have at least one registration")
+                .ToDictionary(x => x.Namespace, x => x, StringComparer.OrdinalIgnoreCase);
         }
 
         public IReadOnlyDictionary<string, NamespaceRegistration> Registrations { get; }

@@ -60,26 +60,19 @@ namespace Khooversoft.MessageNet.Interface
 
         public override bool Equals(object obj)
         {
-            if (obj is MessageHeader header)
-            {
-                return MessageId == header.MessageId &&
-                    ToUri == header.ToUri &&
-                    FromUri == header.FromUri &&
-                    Method == header.Method &&
-                    Claims.Count == header.Claims.Count &&
+            return obj is MessageHeader header &&
+                MessageId == header.MessageId &&
+                ToUri == header.ToUri &&
+                FromUri == header.FromUri &&
+                Method == header.Method &&
+                Claims.Count == header.Claims.Count &&
 
-                    Claims.OrderBy(x => x.Role, StringComparer.OrdinalIgnoreCase)
-                        .Zip(header.Claims.OrderBy(x => x.Role, StringComparer.OrdinalIgnoreCase), (o, i) => (o, i))
-                        .All(x => x.o == x.i);
-            }
-
-            return false;
+                Claims.OrderBy(x => x.Role, StringComparer.OrdinalIgnoreCase)
+                    .Zip(header.Claims.OrderBy(x => x.Role, StringComparer.OrdinalIgnoreCase), (o, i) => (o, i))
+                    .All(x => x.o == x.i);
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(MessageId, ToUri, FromUri, Method);
-        }
+        public override int GetHashCode() => HashCode.Combine(MessageId, ToUri, FromUri, Method);
 
         public static bool operator ==(MessageHeader v1, MessageHeader v2) => v1?.Equals(v2) == true;
 

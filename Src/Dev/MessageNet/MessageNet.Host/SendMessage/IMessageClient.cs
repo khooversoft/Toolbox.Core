@@ -16,8 +16,8 @@ namespace Khooversoft.MessageNet.Host
 
         void Dispose();
 
-        Task Send(IWorkContext context, NetMessage message);
+        Task Send(NetMessage message);
 
-        Task<NetMessage> Call(IWorkContext context, NetMessage message, TimeSpan? timeout = null);
+        Task<NetMessage> Call(NetMessage message, TimeSpan? timeout = null);
     }
 }

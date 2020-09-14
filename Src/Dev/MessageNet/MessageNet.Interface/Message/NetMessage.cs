@@ -95,14 +95,10 @@ namespace Khooversoft.MessageNet.Interface
 
         public override bool Equals(object? obj)
         {
-            if (obj is NetMessage header)
-            {
-                return MessageItems
+            return obj is NetMessage header &&
+                MessageItems
                     .Zip(header.MessageItems, (v1, v2) => (v1, v2))
                     .All(x => x.v1.Equals(x.v2));
-            }
-
-            return false;
         }
 
         public override int GetHashCode()

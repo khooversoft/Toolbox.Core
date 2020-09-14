@@ -1,4 +1,5 @@
 ﻿using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +53,6 @@ namespace Khooversoft.MessageNet.Host
             return this;
         }
 
-        public IMessageNetHost Build() => new MessageNetHost(MessageNetConfig!, MessageRepository!, MessageAwaiterManager!, NodeReceivers);
+        public IMessageNetHost Build(ILoggerFactory loggerFactory) => new MessageNetHost(MessageNetConfig!, MessageRepository!, MessageAwaiterManager!, NodeReceivers, loggerFactory);
     }
 }

@@ -42,6 +42,6 @@ namespace Khoover.Toolbox.TestTools
             ??= new BlobRepository(BlobOption.VerifyNotNull(nameof(BlobOption)), loggerFactory.CreateLogger<BlobRepository>());
 
         public IQueueManagement GetQueueManagement(ILoggerFactory loggerFactory) => _queueManagement
-            ??= new QueueManagement(QueueOption.VerifyNotNull(nameof(QueueOption)), loggerFactory.CreateLogger<QueueManagement>());
+            ??= new QueueManagement(QueueOption.VerifyNotNull(nameof(QueueOption)).GetConnectionString(), loggerFactory.CreateLogger<QueueManagement>());
     }
 }

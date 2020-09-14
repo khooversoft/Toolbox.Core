@@ -3,16 +3,16 @@
 #
 
 param (
-    [string] $Subscription = "Default Subscription / Directory",
-
-    [string] $ResourceGroupName = "toolboxtesting-rg",
-
-    [string] $NamespaceName = "messagehubtest",
-
-    [string] $Location = "westus2"
+    [string] $Folder
 )
 
 $ErrorActionPreference = "Stop";
+
+if( !(Test-Path -Path $Folder -PathType Container ) )
+{
+    Write-Error "$Folder does not exist";
+    Exit(1);
+}
 
 $currentSubscriptionName = (Get-AzContext).Subscription.Name;
 if( $currentSubscriptionName -ne $Subscription )

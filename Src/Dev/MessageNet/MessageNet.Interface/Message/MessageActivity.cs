@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Khooversoft.MessageNet.Interface
@@ -21,19 +22,16 @@ namespace Khooversoft.MessageNet.Interface
 
         public override bool Equals(object obj)
         {
-            if (obj is MessageActivity header)
+            return obj switch
             {
-                return ActivityId == header.ActivityId &&
-                    ParentActivityId == header.ParentActivityId;
-            }
+                MessageActivity header => ActivityId == header.ActivityId &&
+                    ParentActivityId == header.ParentActivityId,
 
-            return false;
+                _ => false,
+            };
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(ActivityId, ParentActivityId);
-        }
+        public override int GetHashCode() => HashCode.Combine(ActivityId, ParentActivityId);
 
         public static bool operator ==(MessageActivity v1, MessageActivity v2) => v1?.Equals(v2) ?? false;
 

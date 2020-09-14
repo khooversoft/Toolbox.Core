@@ -2,7 +2,6 @@
 // Licensed under the MIT License, Version 2.0. See License.txt in the project root for license information.
 
 using Autofac;
-using Khooversoft.Toolbox.Autofac;
 using Khooversoft.Toolbox.Configuration;
 using Khooversoft.Toolbox.Standard;
 using System;
@@ -62,14 +61,6 @@ namespace EventHubPerformanceTest
 
             using (ILifetimeScope container = CreateContainer(option).BeginLifetimeScope(_lifetimeScopeTag))
             {
-                ITelemetry logger = container.Resolve<ITelemetry>();
-
-                IWorkContext context = new WorkContextBuilder()
-                    .Set(cancellationTokenSource.Token)
-                    .Set(logger)
-                    .Set(new ServiceContainerBuilder().SetLifetimeScope(container).Build())
-                    .Build();
-
                 option
                     .FormatSettings()
                     .ForEach(x => context.Telemetry.Info(context, x));
@@ -111,28 +102,28 @@ namespace EventHubPerformanceTest
             builder.RegisterType<EventSendClient>().As<ISendEvent>();
             builder.RegisterType<EventReceiverHost>().As<IEventReceiverHost>();
 
-            BuildTelemetry(option, builder);
+            //BuildTelemetry(option, builder);
 
-            builder.Register(x => x.Resolve<ITelemetryService>().CreateLogger("Main")).As<ITelemetry>().InstancePerLifetimeScope();
+            //builder.Register(x => x.Resolve<ITelemetryService>().CreateLogger("Main")).As<ITelemetry>().InstancePerLifetimeScope();
 
             return builder.Build();
         }
 
-        private void BuildTelemetry(IOption option, ContainerBuilder builder)
-        {
-            builder.Register(x => new ConsoleEventLogger()).As<ConsoleEventLogger>().InstancePerLifetimeScope();
+        //private void BuildTelemetry(IOption option, ContainerBuilder builder)
+        //{
+        //    builder.Register(x => new ConsoleEventLogger()).As<ConsoleEventLogger>().InstancePerLifetimeScope();
 
-            string logType = option.Send ? "Send" : (option.Receive ? "Receive" : "SendReceive");
-            builder.Register(x => new FileEventLogger(option.LoggingFolder, logType)).As<FileEventLogger>().InstancePerLifetimeScope();
+        //    string logType = option.Send ? "Send" : (option.Receive ? "Receive" : "SendReceive");
+        //    builder.Register(x => new FileEventLogger(option.LoggingFolder, logType)).As<FileEventLogger>().InstancePerLifetimeScope();
 
-            Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryServiceBuilder()
-                    .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
-                    .AddFileLogger(x.Resolve<FileEventLogger>())
-                    .Build();
+        //    Func<IComponentContext, ITelemetryService> telemetryService = x => new TelemetryServiceBuilder()
+        //            .AddConsoleLogger(option.ConsoleLevel, x.Resolve<ConsoleEventLogger>())
+        //            .AddFileLogger(x.Resolve<FileEventLogger>())
+        //            .Build();
 
-            builder.Register(x => telemetryService(x)).As<ITelemetryService>().InstancePerLifetimeScope();
+        //    builder.Register(x => telemetryService(x)).As<ITelemetryService>().InstancePerLifetimeScope();
 
 
-        }
+        //}
     }
 }

@@ -16,10 +16,7 @@ namespace Khooversoft.MessageNet.Interface
             return new MessageHeader(netMessage.FromUri, netMessage.ToUri, method, claims);
         }
 
-        public static NetMessageBuilder ToBuilder(this NetMessage subject)
-        {
-            return new NetMessageBuilder(subject);
-        }
+        public static NetMessageBuilder ToBuilder(this NetMessage subject) => new NetMessageBuilder(subject);
 
         public static bool HasClaim(this NetMessage netMessage, MessageClaim messageClaim)
         {

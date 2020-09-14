@@ -40,16 +40,6 @@ namespace Khooversoft.MessageNet.Interface
             return new QueueId(parts[0], parts[1], parts[2]);
         }
 
-        public static bool IsValid(string? nameSpace, string? networkId, string? nodeId)
-        {
-            return !networkId.IsEmpty() &&
-                !nameSpace.IsEmpty() &&
-                !nodeId.IsEmpty() &&
-                _idVerify.IsMatch(nameSpace) &&
-                _idVerify.IsMatch(networkId) &&
-                _nodeIdVerify.IsMatch(nodeId);
-        }
-
         public static bool IsValid(string? networkId, string? nodeId)
         {
             return !networkId.IsEmpty() &&

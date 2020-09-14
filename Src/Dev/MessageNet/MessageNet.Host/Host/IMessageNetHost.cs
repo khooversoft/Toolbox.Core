@@ -6,16 +6,17 @@ using Khooversoft.Toolbox.Standard;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Khooversoft.MessageNet.Host
 {
     public interface IMessageNetHost : IMessageNetSend, IDisposable
     {
-        Task Start(IWorkContext context);
+        Task Start(CancellationToken token);
 
-        Task Stop(IWorkContext context);
+        Task Stop();
 
-        Task<IMessageClient> GetMessageClient(IWorkContext context, QueueId queueId);
+        Task<IMessageClient> GetMessageClient(QueueId queueId);
     }
 }

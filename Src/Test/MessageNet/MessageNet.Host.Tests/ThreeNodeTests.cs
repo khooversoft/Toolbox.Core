@@ -1,13 +1,14 @@
 ﻿using FluentAssertions;
+using Khoover.Toolbox.TestTools;
 using Khooversoft.MessageNet.Host;
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using MessageNet.Host.Tests.Application;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -20,13 +21,13 @@ namespace MessageNet.Host.Tests
         private readonly ITestOutputHelper _output;
         private const string _securityIdToken = "{securityJwtToken}";
         private const string _securityAuthToken = "{securityJwtAuthToken}";
-        private readonly IWorkContext _workContext = WorkContextBuilder.Default;
         private readonly ApplicationFixture _application;
         private readonly MessageUri _clientUri = new QueueId("default", "test", "clientNode").ToMessageUri();
         private readonly MessageUri _identityUri = new QueueId("default", "test", "identityNode").ToMessageUri();
         private readonly MessageUri _authUri = new QueueId("default", "test", "authNode").ToMessageUri();
         private readonly MessageUri _tbankUri = new QueueId("default", "test", "tbankNode").ToMessageUri();
         private readonly ConcurrentQueue<NetMessage> _clientQueue = new ConcurrentQueue<NetMessage>();
+        private readonly ILoggerFactory _loggerFactory = new TestLoggerFactory();
 
         public ThreeNodeTests(ApplicationFixture application, ITestOutputHelper output)
         {
@@ -52,7 +53,7 @@ namespace MessageNet.Host.Tests
                 .Add(MessageContent.Create(new IdentityTokenRequest { UserId = "user1@domain.com", SecurityToken = _securityIdToken }))
                 .Build();
 
-            await client.Send(_workContext, netMessage);
+            await client.Send(netMessage);
 
             tcs.Task.Wait(TimeSpan.FromSeconds(20));
         }
@@ -65,12 +66,12 @@ namespace MessageNet.Host.Tests
 
             netHost = new MessageNetHostBuilder()
                 .SetConfig(_application.GetMessageNetConfig())
-                .SetRepository(new MessageRepository(_application.GetMessageNetConfig()))
+                .SetRepository(new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory))
                 .SetAwaiter(new MessageAwaiterManager())
                 .AddNodeReceiver(new NodeHostReceiver(_clientUri.ToQueueId(), receiver))
-                .Build();
+                .Build(_loggerFactory);
 
-            await netHost.Start(_workContext);
+            await netHost.Start(CancellationToken.None);
             return netHost;
         }
 
@@ -82,12 +83,12 @@ namespace MessageNet.Host.Tests
 
             netHost = new MessageNetHostBuilder()
                 .SetConfig(_application.GetMessageNetConfig())
-                .SetRepository(new MessageRepository(_application.GetMessageNetConfig()))
+                .SetRepository(new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory))
                 .SetAwaiter(new MessageAwaiterManager())
                 .AddNodeReceiver(new NodeHostReceiver(_identityUri.ToQueueId(), receiver))
-                .Build();
+                .Build(_loggerFactory);
 
-            await netHost.Start(_workContext);
+            await netHost.Start(CancellationToken.None);
             return netHost;
         }
 
@@ -99,12 +100,12 @@ namespace MessageNet.Host.Tests
 
             netHost = new MessageNetHostBuilder()
                 .SetConfig(_application.GetMessageNetConfig())
-                .SetRepository(new MessageRepository(_application.GetMessageNetConfig()))
+                .SetRepository(new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory))
                 .SetAwaiter(new MessageAwaiterManager())
                 .AddNodeReceiver(new NodeHostReceiver(_authUri.ToQueueId(), receiver))
-                .Build();
+                .Build(_loggerFactory);
 
-            await netHost.Start(_workContext);
+            await netHost.Start(CancellationToken.None);
             return netHost;
         }
 
@@ -116,12 +117,12 @@ namespace MessageNet.Host.Tests
 
             netHost = new MessageNetHostBuilder()
                 .SetConfig(_application.GetMessageNetConfig())
-                .SetRepository(new MessageRepository(_application.GetMessageNetConfig()))
+                .SetRepository(new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory))
                 .SetAwaiter(new MessageAwaiterManager())
                 .AddNodeReceiver(new NodeHostReceiver(_tbankUri.ToQueueId(), receiver))
-                .Build();
+                .Build(_loggerFactory);
 
-            await netHost.Start(_workContext);
+            await netHost.Start(CancellationToken.None);
             return netHost;
         }
 
@@ -129,11 +130,11 @@ namespace MessageNet.Host.Tests
         {
             _output.WriteLine("Deleting all queues");
 
-            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig());
-            await messageRepository.Unregister(_workContext, _clientUri.ToQueueId());
-            await messageRepository.Unregister(_workContext, _identityUri.ToQueueId());
-            await messageRepository.Unregister(_workContext, _authUri.ToQueueId());
-            await messageRepository.Unregister(_workContext, _tbankUri.ToQueueId());
+            IMessageRepository messageRepository = new MessageRepository(_application.GetMessageNetConfig(), _loggerFactory);
+            await messageRepository.Unregister(_clientUri.ToQueueId(), CancellationToken.None);
+            await messageRepository.Unregister(_identityUri.ToQueueId(), CancellationToken.None);
+            await messageRepository.Unregister(_authUri.ToQueueId(), CancellationToken.None);
+            await messageRepository.Unregister(_tbankUri.ToQueueId(), CancellationToken.None);
         }
 
         private Task ProcessNetMessageReceived(NetMessage netMessage, string toUri, IMessageNetHost netHost, TaskCompletionSource<bool> tcs)
@@ -157,7 +158,7 @@ namespace MessageNet.Host.Tests
                             .Add(MessageContent.Create(new IdentityToken { JwtId = _securityIdToken }))
                             .Build();
 
-                        return netHost.Send(_workContext, response);
+                        return netHost.Send(response);
                     }
 
                 // identity -> client
@@ -171,7 +172,7 @@ namespace MessageNet.Host.Tests
                             .Add(MessageContent.Create(new ResourceAuthorizationRequest { JwtId = _securityIdToken, Resource = "get.balance" }))
                             .Build();
 
-                        return netHost.Send(_workContext, message);
+                        return netHost.Send(message);
                     }
 
                 // client -> auth
@@ -187,7 +188,7 @@ namespace MessageNet.Host.Tests
                             .Add(MessageContent.Create(new ResourceAuthorization { JwtId = _securityIdToken, JwtAuth = _securityAuthToken }))
                             .Build();
 
-                        return netHost.Send(_workContext, response);
+                        return netHost.Send(response);
                     }
 
                 // client -> tbank
@@ -201,7 +202,7 @@ namespace MessageNet.Host.Tests
                             .Add(new MessageHeader(_tbankUri, _clientUri, "get.balance", new MessageClaim("accountId", "1234"), new MessageClaim("bearer", response.JwtAuth!)))
                             .Build();
 
-                        return netHost.Send(_workContext, message);
+                        return netHost.Send(message);
                     }
 
                 // tbank => client
@@ -222,7 +223,7 @@ namespace MessageNet.Host.Tests
                             .Add(MessageContent.Create(bankBalanceDetails))
                             .Build();
 
-                        return netHost.Send(_workContext, message);
+                        return netHost.Send(message);
                     }
 
                 // client (last response)

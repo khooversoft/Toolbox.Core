@@ -154,9 +154,6 @@ namespace Khooversoft.MessageNet.Interface
         /// Build message URI
         /// </summary>
         /// <returns>message URI</returns>
-        public MessageUri Build()
-        {
-            return new MessageUri(Protocol, Namespace, NetworkId!, NodeId!, Route?.Build()?.ToString());
-        }
+        public MessageUri Build() => new MessageUri(Protocol, Namespace, NetworkId!, NodeId!, Route?.Build()?.ToString());
     }
 }

@@ -85,7 +85,7 @@ namespace Khooversoft.MessageNet.Interface
                 new KeyValuePair<string, string>("nodeId", NodeId),
             };
 
-            return new PropertyResolver(properties).Resolve(format);
+            return new PropertyResolver(properties).Resolve(format)!;
         }
     }
 }

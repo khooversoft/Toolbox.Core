@@ -4,6 +4,7 @@
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Standard;
 using Microsoft.Azure.ServiceBus.Core;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,8 +17,9 @@ namespace Khooversoft.MessageNet.Host
         private readonly string _connectionString;
         private readonly string _queueName;
         private readonly IMessageAwaiterManager _awaiterManager;
+        private readonly ILogger<MessageClient> _logger;
 
-        public MessageClient(string connectionString, string queueName, IMessageAwaiterManager awaiterManager)
+        public MessageClient(string connectionString, string queueName, IMessageAwaiterManager awaiterManager, ILogger<MessageClient> logger)
         {
             connectionString.VerifyNotEmpty(nameof(connectionString));
             queueName.VerifyNotEmpty(nameof(queueName));
@@ -26,6 +28,7 @@ namespace Khooversoft.MessageNet.Host
             _connectionString = connectionString;
             _queueName = queueName;
             _awaiterManager = awaiterManager;
+            _logger = logger;
             _messageSender = new MessageSender(_connectionString, _queueName);
         }
 
@@ -35,13 +38,13 @@ namespace Khooversoft.MessageNet.Host
         /// <param name="context">context</param>
         /// <param name="message">message</param>
         /// <returns>task</returns>
-        public async Task Send(IWorkContext context, NetMessage message)
+        public async Task Send(NetMessage message)
         {
             if (_messageSender == null || _messageSender?.IsClosedOrClosing == true) return;
             message.Header.ToUri.ToMessageUri().ToQueueId().GetQueueName().VerifyAssert(x => x == _queueName, $"Message ToUri {message.Header.ToUri} does not match queueName {_queueName}");
 
             // Write the body of the message to the console
-            context.Telemetry.Verbose(context, $"Sending message: {message}");
+            _logger.LogTrace($"Sending message: {message}");
 
             // Send the message to the queue
             await _messageSender!.SendAsync(message.ToMessage());
@@ -53,13 +56,13 @@ namespace Khooversoft.MessageNet.Host
         /// <param name="context">context</param>
         /// <param name="message">message</param>
         /// <returns>task</returns>
-        public async Task<NetMessage> Call(IWorkContext context, NetMessage message, TimeSpan? timeout = null)
+        public async Task<NetMessage> Call(NetMessage message, TimeSpan? timeout = null)
         {
             if (_messageSender == null || _messageSender?.IsClosedOrClosing == true) throw new InvalidOperationException("Sender has been closed or is closing");
             message.Header.ToUri.ToMessageUri().ToQueueId().GetQueueName().VerifyAssert(x => x == _queueName, $"Message ToUri {message.Header.ToUri} does not match queueName {_queueName}");
 
             // Write the body of the message to the console
-            context.Telemetry.Verbose(context, $"Calling message: {message}");
+            _logger.LogTrace($"Calling message: {message}");
 
             // Send the message to the queue
             await _messageSender!.SendAsync(message.ToMessage());

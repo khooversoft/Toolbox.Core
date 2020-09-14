@@ -4,6 +4,7 @@
 using Khooversoft.MessageNet.Interface;
 using Khooversoft.Toolbox.Actor;
 using Khooversoft.Toolbox.Standard;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,12 +25,19 @@ namespace Khooversoft.MessageNet.Host
     {
         private readonly IMessageNetConfig _messageNetConfig;
         private readonly IMessageAwaiterManager _awaiterManager;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<MessageNetHost> _logger;
         private readonly IMessageRepository _routeRepository;
         private readonly ConcurrentDictionary<string, MessageClient> _messageClients = new ConcurrentDictionary<string, MessageClient>(StringComparer.OrdinalIgnoreCase);
         private List<NodeHost>? _receivers;
         private readonly IReadOnlyList<INodeHostReceiver>? _nodeRegistrations;
 
-        public MessageNetHost(IMessageNetConfig messageNetConfig, IMessageRepository messageRepository, IMessageAwaiterManager messageAwaiterManager, IEnumerable<INodeHostReceiver> nodeReceivers)
+        public MessageNetHost(
+            IMessageNetConfig messageNetConfig,
+            IMessageRepository messageRepository,
+            IMessageAwaiterManager messageAwaiterManager,
+            IEnumerable<INodeHostReceiver> nodeReceivers,
+            ILoggerFactory loggerFactory)
         {
             messageNetConfig.VerifyNotNull(nameof(messageNetConfig));
             messageRepository.VerifyNotNull(nameof(messageRepository));
@@ -39,6 +47,8 @@ namespace Khooversoft.MessageNet.Host
             _messageNetConfig = messageNetConfig;
             _routeRepository = messageRepository;
             _awaiterManager = messageAwaiterManager;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<MessageNetHost>();
 
             _nodeRegistrations = nodeReceivers
                 .Select(x => new NodeHostReceiver(x.QueueId, y =>
@@ -54,32 +64,32 @@ namespace Khooversoft.MessageNet.Host
                 .VerifyAssert(x => x.Count() == 0, x => $"Duplicate routes have been detected: {string.Join(", ", x)}");
         }
 
-        public async Task Start(IWorkContext context)
+        public async Task Start(CancellationToken token)
         {
             _receivers.VerifyAssert(x => x == null, "Host is already running");
-            context.Telemetry.Info(context, "Starting message net host");
+            _logger.LogInformation("Starting message net host");
 
             _receivers = _nodeRegistrations
-                .Select(x => new NodeHost(x, _routeRepository))
+                .Select(x => new NodeHost(x, _routeRepository, _loggerFactory.CreateLogger<NodeHost>()))
                 .ToList();
 
             await _receivers
-                .ForEachAsync(x => x.Start(context));
+                .ForEachAsync(x => x.Start(token));
         }
 
-        public async Task Stop(IWorkContext context)
+        public async Task Stop()
         {
             List<NodeHost>? receivers = Interlocked.Exchange(ref _receivers, null!);
             if (receivers != null)
             {
-                context.Telemetry.Info(context, "Starting message net host");
+                _logger.LogInformation("Starting message net host");
 
                 await receivers
-                    .ForEachAsync(async x => await x.Stop(context));
+                    .ForEachAsync(async x => await x.Stop());
             }
         }
 
-        public Task<IMessageClient> GetMessageClient(IWorkContext context, QueueId queueId)
+        public Task<IMessageClient> GetMessageClient(QueueId queueId)
         {
             queueId.VerifyNotNull(nameof(queueId));
 
@@ -90,22 +100,25 @@ namespace Khooversoft.MessageNet.Host
                 throw new ArgumentException($"Cannot locate namespace {queueId.Namespace} in namespace registrations");
             }
 
-            IMessageClient messageClient = _messageClients.GetOrAdd(queueName, x => new MessageClient(namespaceRegistration!.ConnectionString, queueName, _awaiterManager));
+            IMessageClient messageClient = _messageClients.GetOrAdd(
+                queueName,
+                x => new MessageClient(namespaceRegistration!.ConnectionString, queueName, _awaiterManager, _loggerFactory.CreateLogger<MessageClient>()));
+
             return Task.FromResult(messageClient);
         }
 
-        public async Task Send(IWorkContext context, NetMessage netMessage)
+        public async Task Send(NetMessage netMessage)
         {
             MessageUri messageUri = netMessage.Header.ToUri.ToMessageUri();
-            IMessageClient messageClient = await GetMessageClient(context, messageUri.ToQueueId());
-            await messageClient.Send(context, netMessage);
+            IMessageClient messageClient = await GetMessageClient(messageUri.ToQueueId());
+            await messageClient.Send(netMessage);
         }
 
-        public async Task<NetMessage> Call(IWorkContext context, NetMessage netMessage, TimeSpan? timeout = null)
+        public async Task<NetMessage> Call(NetMessage netMessage, TimeSpan? timeout = null)
         {
             MessageUri messageUri = netMessage.Header.ToUri.ToMessageUri();
-            IMessageClient messageClient = await GetMessageClient(context, messageUri.ToQueueId());
-            return await messageClient.Call(context, netMessage, timeout);
+            IMessageClient messageClient = await GetMessageClient(messageUri.ToQueueId());
+            return await messageClient.Call(netMessage, timeout);
         }
 
         public void Dispose()
